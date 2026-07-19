@@ -10,18 +10,28 @@
 
 ## 1. Executive Summary
 
+### Final Summary
+
 | Metric | Value |
 |---|---|
-| Test cases planned | 47 (across 8 suites) |
-| Automated test methods implemented | 49 (one case, TC-CHECKOUT-EDGE-004, is parameterized into 3 boundary-value runs) |
-| Total automated test executions | 51 |
-| Passed | **51** |
+| Application | SauceDemo Checkout |
+| Total Test Cases Designed | 51 |
+| Browsers Tested | Chromium, Firefox, WebKit |
+| Total Test Executions | 153 (51 × 3) |
+| Passed | 153 |
 | Failed | 0 |
+| Skipped | 0 |
+| Overall Success Rate | 100% |
+
+*Note on the "51" figure: the test plan defines 47 distinct test cases; one of them (TC-CHECKOUT-EDGE-004) is parameterized across 3 boundary values, yielding 49 automated test methods and 51 total execution instances per browser. Across all 3 browsers that is 153 executions, all passing.*
+
+| Metric | Value |
+|---|---|
+| Healing actions required | 0 (suite was stable on first run, all browsers) |
 | Blocked | 0 |
-| Healing actions required | 0 (suite was stable on first run) |
 | Overall status | **PASS** |
 
-All acceptance criteria (AC1–AC5) and all five business rules from the user story are covered by automated Playwright tests, all currently passing against the live application. No defects block sign-off; several **application behavior gaps** were identified against the business rules and are logged in Section 4 for product-owner review — they are not automation failures, since the suite's job here was to characterize and lock in actual behavior.
+All acceptance criteria (AC1–AC5) and all five business rules from the user story are covered by automated Playwright tests, all currently passing against the live application on all 3 required browsers. No defects block sign-off; several **application behavior gaps** were identified against the business rules and are logged in Section 4 for product-owner review — they are not automation failures, since the suite's job here was to characterize and lock in actual behavior.
 
 ---
 
@@ -141,4 +151,4 @@ No Critical or High severity defects were found; core happy-path and validation-
 1. ~~Add `firefox` and `webkit` (Safari) projects~~ — done; 153/153 passing cross-browser (Section 3.2a).
 2. Decide on BUG-001 through BUG-004 with the product owner; if accepted as-is, convert their test cases from "negative case" framing to explicit "documented behavior" framing (already partially done, e.g. TC-ACCESS-002's title says "is currently allowed").
 3. Consider a lightweight mobile-viewport pass if mobile responsiveness is a hard release gate.
-4. Wire this suite into CI (a GitHub Actions workflow directory already exists at `.github/workflows/` in this repo) so regressions on saucedemo-side behavior are caught automatically going forward, if this suite is intended to run on a recurring basis rather than as a one-off exercise. Note CI would need `npx playwright install --with-deps` for firefox/webkit binaries.
+4. ~~Wire this suite into CI~~ — done; see `.github/workflows/saucedemo-checkout.yml`. Runs on push/PR (path-filtered to SauceDemo-related files), on a daily schedule (to catch regressions on the application side, since we don't control SauceDemo's own repo), and on manual `workflow_dispatch`. Installs Chromium/Firefox/WebKit via `npx playwright install --with-deps` and runs all 3 browser projects, uploading the HTML report as a build artifact.
