@@ -1,0 +1,92 @@
+{
+  "credentials": {
+    "standardUser": {
+      "username": "standard_user",
+      "password": "secret_sauce"
+    }
+  },
+  "products": {
+    "backpack": {
+      "name": "Sauce Labs Backpack",
+      "slug": "sauce-labs-backpack",
+      "price": "$29.99",
+      "description": "carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection."
+    },
+    "bikeLight": {
+      "name": "Sauce Labs Bike Light",
+      "slug": "sauce-labs-bike-light",
+      "price": "$9.99",
+      "description": "A red light isn't the desired state in testing but it sure helps when riding your bike at night. Water-resistant with 3 lighting modes, 1 AAA battery included."
+    },
+    "boltTShirt": {
+      "name": "Sauce Labs Bolt T-Shirt",
+      "slug": "sauce-labs-bolt-t-shirt",
+      "price": "$15.99",
+      "description": "Get your testing superhero on with the Sauce Labs bolt T-shirt. From American Apparel, 100% ringspun combed cotton, heather gray with red bolt."
+    },
+    "fleeceJacket": {
+      "name": "Sauce Labs Fleece Jacket",
+      "slug": "sauce-labs-fleece-jacket",
+      "price": "$49.99",
+      "description": "It's not every day that you come across a midweight quarter-zip fleece jacket capable of handling everything from a relaxing day outdoors to a busy day at the office."
+    },
+    "onesie": {
+      "name": "Sauce Labs Onesie",
+      "slug": "sauce-labs-onesie",
+      "price": "$7.99",
+      "description": "Rib snap infant onesie for the junior automation engineer in development. Reinforced 3-snap bottom closure, two-needle hemmed sleeved and bottom won't unravel."
+    },
+    "redTShirt": {
+      "name": "Test.allTheThings() T-Shirt (Red)",
+      "slug": "test.allthethings()-t-shirt-(red)",
+      "price": "$15.99",
+      "description": "This classic Sauce Labs t-shirt is perfect to wear when cozying up to your keyboard to automate a few tests. Super-soft and comfy ringspun combed cotton."
+    }
+  },
+  "validCheckoutInfo": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "zip": "12345"
+  },
+  "messages": {
+    "firstNameRequired": "Error: First Name is required",
+    "lastNameRequired": "Error: Last Name is required",
+    "postalCodeRequired": "Error: Postal Code is required",
+    "loginRequired": {
+      "cart": "Epic sadface: You can only access '/cart.html' when you are logged in.",
+      "checkoutStepOne": "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in.",
+      "checkoutStepTwo": "Epic sadface: You can only access '/checkout-step-two.html' when you are logged in.",
+      "checkoutComplete": "Epic sadface: You can only access '/checkout-complete.html' when you are logged in."
+    },
+    "paymentInfo": "SauceCard #31337",
+    "shippingInfo": "Free Pony Express Delivery!",
+    "completeHeader": "Thank you for your order!",
+    "completeText": "Your order has been dispatched, and will arrive just as fast as the pony can get there!"
+  },
+  "totals": {
+    "singleBackpack": { "itemTotal": "Item total: $29.99", "tax": "Tax: $2.40", "total": "Total: $32.39" },
+    "twoItems": { "itemTotal": "Item total: $39.98", "tax": "Tax: $3.20", "total": "Total: $43.18" },
+    "allSixItems": { "itemTotal": "Item total: $129.94", "tax": "Tax: $10.40", "total": "Total: $140.34" },
+    "threeItemsE2E": { "itemTotal": "Item total: $55.97", "tax": "Tax: $4.48", "total": "Total: $60.45" },
+    "empty": { "itemTotal": "Item total: $0", "tax": "Tax: $0.00", "total": "Total: $0.00" }
+  },
+  "edgeCaseInputs": {
+    "specialCharsFirstName": "!@#$%^&*()_+{}:\"<>?",
+    "specialCharsLastName": "O'Brien-Doe123",
+    "nonNumericZip": "abc!@#",
+    "longFirstNameLength": 500,
+    "zipBoundaryValues": ["1", "00000", "123456789012"],
+    "paddedFirstName": "  John  ",
+    "whitespaceOnlyFirstName": "   "
+  },
+  "e2eCheckoutInfo": {
+    "singleItem": { "firstName": "John", "lastName": "Doe", "zip": "12345" },
+    "multiItem": { "firstName": "Max", "lastName": "Items", "zip": "11111" }
+  },
+  "accessControlCheckoutInfo": {
+    "emptyCart": { "firstName": "Jane", "lastName": "Smith", "zip": "54321" }
+  },
+  "navigationCheckoutInfo": {
+    "backNavCheck": { "firstName": "Alex", "lastName": "Turner", "zip": "99999" }
+  }
+}

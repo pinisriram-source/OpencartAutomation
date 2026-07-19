@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authentication — Test Coverage Report</title>
+<style>
+  :root {
+    --bg: #edf1ef;
+    --surface: #ffffff;
+    --surface-2: #f4f7f6;
+    --ink: #10201d;
+    --muted: #4c5d59;
+    --border: #d7ded9;
+    --accent: #0f6e67;
+    --accent-strong: #0b4f4a;
+    --accent-tint: #e2f0ee;
+    --pass: #2e7d46;
+    --pass-tint: #e5f2e8;
+    --warn: #9a6414;
+    --warn-tint: #faf0dc;
+    --fail: #a5342f;
+    --fail-tint: #f8e6e4;
+    --info: #4c5f6c;
+    --info-tint: #eaeef0;
+    --shadow: 0 1px 2px rgba(16, 32, 29, 0.06), 0 1px 1px rgba(16, 32, 29, 0.04);
+    --radius: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1413;
+      --surface: #101c1a;
+      --surface-2: #14201e;
+      --ink: #e7ede9;
+      --muted: #9db0aa;
+      --border: #223330;
+      --accent: #4fcfc2;
+      --accent-strong: #8fe1d6;
+      --accent-tint: #12302c;
+      --pass: #6bc686;
+      --pass-tint: #12291a;
+      --warn: #e3b34d;
+      --warn-tint: #2e2510;
+      --fail: #e2827d;
+      --fail-tint: #331715;
+      --info: #9fb0bc;
+      --info-tint: #16232a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1413;
+    --surface: #101c1a;
+    --surface-2: #14201e;
+    --ink: #e7ede9;
+    --muted: #9db0aa;
+    --border: #223330;
+    --accent: #4fcfc2;
+    --accent-strong: #8fe1d6;
+    --accent-tint: #12302c;
+    --pass: #6bc686;
+    --pass-tint: #12291a;
+    --warn: #e3b34d;
+    --warn-tint: #2e2510;
+    --fail: #e2827d;
+    --fail-tint: #331715;
+    --info: #9fb0bc;
+    --info-tint: #16232a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+  :root[data-theme="light"] {
+    --bg: #edf1ef;
+    --surface: #ffffff;
+    --surface-2: #f4f7f6;
+    --ink: #10201d;
+    --muted: #4c5d59;
+    --border: #d7ded9;
+    --accent: #0f6e67;
+    --accent-strong: #0b4f4a;
+    --accent-tint: #e2f0ee;
+    --pass: #2e7d46;
+    --pass-tint: #e5f2e8;
+    --warn: #9a6414;
+    --warn-tint: #faf0dc;
+    --fail: #a5342f;
+    --fail-tint: #f8e6e4;
+    --info: #4c5f6c;
+    --info-tint: #eaeef0;
+    --shadow: 0 1px 2px rgba(16, 32, 29, 0.06), 0 1px 1px rgba(16, 32, 29, 0.04);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 0 1.25rem 4rem;
+  }
+  a { color: var(--accent-strong); }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, "Roboto Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page { max-width: 78rem; margin: 0 auto; }
+
+  /* ---------- Header / letterhead ---------- */
+  header.report {
+    padding: 2.75rem 0 1.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+  }
+  .report-eyebrow {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0 0 0.6rem;
+  }
+  h1 {
+    font-size: clamp(1.7rem, 3vw, 2.35rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.5rem;
+    text-wrap: balance;
+  }
+  .report-scope {
+    color: var(--muted);
+    font-size: 0.98rem;
+    max-width: 46rem;
+  }
+  .report-meta {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.7;
+  }
+  .report-meta a { color: var(--muted); text-decoration-color: var(--border); }
+
+  section { margin-top: 2.75rem; }
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.25rem;
+  }
+  .section-note {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0 0 1.1rem;
+    max-width: 60ch;
+  }
+
+  /* ---------- Stat tiles ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1.25rem 1.35rem;
+  }
+  .stat-value {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .stat-value small { font-size: 1.05rem; color: var(--muted); font-weight: 500; }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* ---------- Category coverage ---------- */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+    gap: 0.7rem;
+  }
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1rem;
+    box-shadow: var(--shadow);
+  }
+  .cat-top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  .cat-name { font-weight: 700; font-size: 0.92rem; }
+  .cat-frac { font-family: ui-monospace, monospace; font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cat-bar {
+    margin-top: 0.55rem;
+    height: 6px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .cat-bar > span { display: block; height: 100%; border-radius: 4px; }
+  .cat-desc { margin-top: 0.5rem; font-size: 0.8rem; color: var(--muted); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .chip.pass { background: var(--pass-tint); color: var(--pass); }
+  .chip.warn { background: var(--warn-tint); color: var(--warn); }
+  .chip.fail { background: var(--fail-tint); color: var(--fail); }
+  .chip.info { background: var(--info-tint); color: var(--info); }
+
+  /* ---------- Tables ---------- */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 40rem; font-size: 0.88rem; }
+  th, td { text-align: left; padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    background: var(--surface-2);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.id, td.loc { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 0.8rem; white-space: nowrap; }
+  td.loc { color: var(--muted); }
+  td.title { max-width: 26rem; }
+  td.center { text-align: center; }
+
+  tr.group-row td {
+    background: var(--accent-tint);
+    color: var(--accent-strong);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0.45rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+  }
+  td.rule { color: var(--muted); max-width: 28rem; }
+  td.evidence { max-width: 20rem; }
+  .no-tc { color: var(--muted); font-style: italic; }
+
+  /* ---------- Gaps list ---------- */
+  .gaps { display: flex; flex-direction: column; gap: 0.65rem; }
+  .gap-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--fail);
+    border-radius: var(--radius);
+    padding: 0.85rem 1.1rem;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 0.9rem;
+    align-items: start;
+  }
+  .gap-row.medium { border-left-color: var(--warn); }
+  .gap-row.info { border-left-color: var(--info); }
+  .gap-row .chip { margin-top: 0.15rem; }
+  .gap-title { font-weight: 700; font-size: 0.93rem; grid-column: 2; }
+  .gap-row .chip { grid-column: 1; grid-row: 1 / span 2; align-self: start; }
+  .gap-body { grid-column: 2; color: var(--muted); font-size: 0.87rem; }
+
+  /* ---------- Footer ---------- */
+  footer.report {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer.report h3 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+  }
+  .adjacent { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin-top: 0.75rem; }
+  .adjacent div { padding-right: 1rem; }
+  .adjacent strong { color: var(--ink); display: block; margin-bottom: 0.2rem; font-size: 0.85rem; }
+
+  @media (max-width: 760px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    header.report { flex-direction: column; align-items: flex-start; }
+    .report-meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="report">
+    <div>
+      <p class="report-eyebrow">QA Automation · Coverage Report</p>
+      <h1>Authentication — Test Coverage Report</h1>
+      <p class="report-scope">
+        Storefront customer authentication: Login, Logout, and Forgotten Password
+        (<span class="mono">route=account/login</span>,
+        <span class="mono">account/logout</span>,
+        <span class="mono">account/forgotten</span>). Registration and Admin Login
+        are separate modules — see “Adjacent coverage” below.
+      </p>
+    </div>
+    <div class="report-meta">
+      Target: tutorialsninja.com/demo<br>
+      Generated: 2026-07-18<br>
+      Spec: tests/storefront/authentication.spec.ts<br>
+      Docs: docs/test-cases/storefront/TC-ACCOUNT.md
+    </div>
+  </header>
+
+  <section aria-labelledby="summary-h">
+    <h2 id="summary-h">Summary</h2>
+    <p class="section-note">Every automated case was run against the live application, not just asserted in code.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Test cases defined</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">7<small>&nbsp;/ 8</small></div>
+        <div class="stat-label">Automated (88%)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:var(--pass)">7<small>&nbsp;/ 7</small></div>
+        <div class="stat-label">Passing on last run</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:var(--fail)">6</div>
+        <div class="stat-label">Coverage gaps identified</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="uc-h">
+    <h2 id="uc-h">Business use case verification matrix</h2>
+    <p class="section-note">
+      Every individual business path in Login, Logout, and Forgotten Password — not just the 8
+      authored test cases above — checked against what the automation actually asserts. This is a
+      finer grain than “Summary”: one authored test case can close several rows here, and several
+      rows below have no covering test case at all yet.
+    </p>
+    <div class="stats" style="grid-template-columns:repeat(4,1fr); margin-bottom:1.1rem;">
+      <div class="stat">
+        <div class="stat-value">24</div>
+        <div class="stat-label">Business paths identified</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:var(--pass)">9<small>&nbsp;/ 24</small></div>
+        <div class="stat-label">Verified by automation (37%)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:var(--fail)">13</div>
+        <div class="stat-label">No covering test case</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:var(--info)">2</div>
+        <div class="stat-label">Implicit / cannot automate</div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:2.5rem">#</th>
+              <th>Business use case</th>
+              <th>Expected behavior</th>
+              <th>Covering TC</th>
+              <th class="center">Status</th>
+              <th>Evidence</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr class="group-row"><td colspan="6">Login</td></tr>
+            <tr>
+              <td class="id">1</td>
+              <td>Valid credentials authenticate the customer</td>
+              <td class="rule">Correct email + password logs in and lands on My Account.</td>
+              <td class="id">TC-LOGIN-005</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:5</td>
+            </tr>
+            <tr>
+              <td class="id">2</td>
+              <td>Wrong password on a real account is rejected</td>
+              <td class="rule">Registered email + incorrect password → exact "No match" warning, stays logged out.</td>
+              <td class="id">TC-LOGIN-006</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:25</td>
+            </tr>
+            <tr>
+              <td class="id">3</td>
+              <td>Email with no matching account is rejected</td>
+              <td class="rule">Wholly unknown email (any password) → same "No match" warning.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Only the wrong-password path is tested at Login; an unknown email is tested at Forgotten Password, not here.</td>
+            </tr>
+            <tr>
+              <td class="id">4</td>
+              <td>Both fields empty is rejected</td>
+              <td class="rule">No client-side "required" validation exists — request reaches the server and gets the same "No match" warning.</td>
+              <td class="id">TC-LOGIN-014</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:45</td>
+            </tr>
+            <tr>
+              <td class="id">5</td>
+              <td>Only email left blank</td>
+              <td class="rule">Password filled, email blank → rejected the same way.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Partial-empty combination untested.</td>
+            </tr>
+            <tr>
+              <td class="id">6</td>
+              <td>Only password left blank</td>
+              <td class="rule">Email filled, password blank → rejected the same way.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Partial-empty combination untested.</td>
+            </tr>
+            <tr>
+              <td class="id">7</td>
+              <td>Email match is case-insensitive</td>
+              <td class="rule">Logging in with a different letter-case of the registered email should still succeed.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Unverified either way.</td>
+            </tr>
+            <tr>
+              <td class="id">8</td>
+              <td>Post-login redirect returns to the originally-requested page</td>
+              <td class="rule">Guest bounced to Login from a protected page (e.g. Wishlist) lands back there after login, not always on My Account.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Behaved inconsistently during manual exploration — needs a pinned-down test.</td>
+            </tr>
+            <tr>
+              <td class="id">9</td>
+              <td>Script/SQL payloads in Login fields are inert</td>
+              <td class="rule">Injection strings render as literal text / are rejected as an ordinary bad credential, never executed or reflected.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">CLAUDE.md requires this cross-cutting check; Search and Registration have it, Login doesn't.</td>
+            </tr>
+            <tr>
+              <td class="id">10</td>
+              <td>"Forgotten Password" link navigates correctly</td>
+              <td class="rule">Clicking the link from the Login form reaches account/forgotten.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">ForgottenPasswordPage.open() navigates by URL directly, bypassing the link itself.</td>
+            </tr>
+            <tr>
+              <td class="id">11</td>
+              <td>Login page redirects away if already authenticated</td>
+              <td class="rule">Symmetry with Forgotten Password (#19): a logged-in customer visiting account/login shouldn't see the form.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Not checked.</td>
+            </tr>
+            <tr>
+              <td class="id">12</td>
+              <td>Guest cart carries over after login</td>
+              <td class="rule">Items added before login remain in the cart once authenticated.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Primarily Cart module's responsibility; listed here because Login is the trigger and CLAUDE.md names it explicitly.</td>
+            </tr>
+
+            <tr class="group-row"><td colspan="6">Logout</td></tr>
+            <tr>
+              <td class="id">13</td>
+              <td>Logout ends the session</td>
+              <td class="rule">Immediately after logout, a protected page (account/account) redirects to Login instead of loading.</td>
+              <td class="id">TC-LOGIN-015</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:56</td>
+            </tr>
+            <tr>
+              <td class="id">14</td>
+              <td>Logout confirmation is shown</td>
+              <td class="rule">"Account Logout" heading and confirmation copy render.</td>
+              <td class="id">TC-LOGIN-015</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:56</td>
+            </tr>
+            <tr>
+              <td class="id">15</td>
+              <td>Cart contents after logout match the app's promise</td>
+              <td class="rule">The Logout page's own copy claims cart items are "saved" and restored on next login.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">CLAUDE.md lists "session/cart behavior after logout" explicitly; only the session half is checked.</td>
+            </tr>
+
+            <tr class="group-row"><td colspan="6">Forgotten password</td></tr>
+            <tr>
+              <td class="id">16</td>
+              <td>Registered email receives a reset confirmation</td>
+              <td class="rule">Valid, known email → success message, redirected to Login.</td>
+              <td class="id">TC-FORGOT-016</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:70</td>
+            </tr>
+            <tr>
+              <td class="id">17</td>
+              <td>Unregistered email is rejected</td>
+              <td class="rule">Unknown email → "not found in our records" warning, stays on the form.</td>
+              <td class="id">TC-FORGOT-017</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:92</td>
+            </tr>
+            <tr>
+              <td class="id">18</td>
+              <td>Blank email submission is handled</td>
+              <td class="rule">Empty field → same "not found" warning (no separate "required" message).</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Confirmed manually during exploration; not asserted by an automated test.</td>
+            </tr>
+            <tr>
+              <td class="id">19</td>
+              <td>Form is inaccessible while authenticated</td>
+              <td class="rule">Logged-in customer visiting account/forgotten is redirected to My Account.</td>
+              <td class="id">TC-FORGOT-018</td>
+              <td class="center"><span class="chip pass">Verified</span></td>
+              <td class="evidence loc">authentication.spec.ts:105</td>
+            </tr>
+            <tr>
+              <td class="id">20</td>
+              <td>"Back" link returns to Login</td>
+              <td class="rule">Clicking Back from the Forgotten Password form reaches account/login.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Not checked.</td>
+            </tr>
+
+            <tr class="group-row"><td colspan="6">Cross-cutting / access control</td></tr>
+            <tr>
+              <td class="id">21</td>
+              <td>Guest is redirected to Login from any protected account page</td>
+              <td class="rule">Wishlist, Order History, Address Book, Downloads, Rewards, Returns, Transactions, Newsletter, Edit Account, Change Password — 10 protected routes.</td>
+              <td class="id">TC-ACCOUNT-013</td>
+              <td class="center"><span class="chip fail">Gap</span></td>
+              <td class="evidence">Documented for Wishlist only, and not automated even there — 1 of 10 routes named, 0 automated.</td>
+            </tr>
+            <tr>
+              <td class="id">22</td>
+              <td>Registration auto-authenticates the new customer</td>
+              <td class="rule">No separate login step is needed immediately after registering.</td>
+              <td class="no-tc">none direct</td>
+              <td class="center"><span class="chip warn">Implicit</span></td>
+              <td class="evidence">Relied on as a precondition by every downstream test (e.g. account-maintenance.spec.ts) but never itself asserted.</td>
+            </tr>
+            <tr>
+              <td class="id">23</td>
+              <td>Session persists across ordinary navigation</td>
+              <td class="rule">An authenticated session survives multiple page-to-page navigations, not just the instant after login.</td>
+              <td class="no-tc">indirect</td>
+              <td class="center"><span class="chip pass">Verified elsewhere</span></td>
+              <td class="evidence">account-maintenance.spec.ts navigates Edit Account → Address Book → Newsletter → Password while logged in.</td>
+            </tr>
+            <tr>
+              <td class="id">24</td>
+              <td>Completing a reset via the emailed link</td>
+              <td class="rule">Following the link and setting a new password end-to-end.</td>
+              <td class="no-tc">none</td>
+              <td class="center"><span class="chip info">Cannot automate</span></td>
+              <td class="evidence">Requires inbox access this suite doesn't have — manual-test note, not a closable gap.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="cat-h">
+    <h2 id="cat-h">Coverage by scenario category</h2>
+    <p class="section-note">
+      Categories are the ones CLAUDE.md requires per module. A category is “Partial” when
+      some but not all of its expected business paths are exercised.
+    </p>
+    <div class="cat-grid">
+      <div class="cat-card">
+        <div class="cat-top"><span class="cat-name">Functional</span><span class="cat-frac">2 / 2</span></div>
+        <div class="cat-bar"><span style="width:100%;background:var(--pass)"></span></div>
+        <div class="cat-desc">Valid login, valid forgotten-password request.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-top"><span class="cat-name">Negative</span><span class="cat-frac">3 / 3</span></div>
+        <div class="cat-bar"><span style="width:100%;background:var(--pass)"></span></div>
+        <div class="cat-desc">Wrong password, empty credentials, unregistered email.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-top"><span class="cat-name">Boundary</span><span class="cat-frac">1 / 1</span></div>
+        <div class="cat-bar"><span style="width:100%;background:var(--pass)"></span></div>
+        <div class="cat-desc">Forgotten-password form is inaccessible while authenticated.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-top"><span class="cat-name">Session / business rule</span><span class="cat-frac">1 / 2</span></div>
+        <div class="cat-bar"><span style="width:50%;background:var(--warn)"></span></div>
+        <div class="cat-desc">Logout ends the session ✓. Cart contents after logout: unverified.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-top"><span class="cat-name">Access-gating</span><span class="cat-frac">0 / 1 auto.</span></div>
+        <div class="cat-bar"><span style="width:12%;background:var(--fail)"></span></div>
+        <div class="cat-desc">Guest→Login redirect is documented (TC-ACCOUNT-013) but not automated.</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-top"><span class="cat-name">Security</span><span class="cat-frac">0 / 1</span></div>
+        <div class="cat-bar"><span style="width:0%;background:var(--fail)"></span></div>
+        <div class="cat-desc">Injection/XSS payloads in login fields: not tested for this module.</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="wf-h">
+    <h2 id="wf-h">Business workflow traceability</h2>
+    <p class="section-note">Key Business Workflows (CLAUDE.md) that pass through Authentication.</p>
+    <div class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Workflow</th>
+              <th>Path</th>
+              <th>Auth touchpoint</th>
+              <th>Related cases</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="id">#2</td>
+              <td class="title">Registration → Login → Checkout as registered customer → Order History</td>
+              <td>Login leg</td>
+              <td class="id">TC-LOGIN-005</td>
+              <td><span class="chip pass">Covered</span></td>
+            </tr>
+            <tr>
+              <td class="id">#8</td>
+              <td class="title">Wishlist / Compare → move to cart → checkout</td>
+              <td>Wishlist requires login (guest redirected)</td>
+              <td class="id">TC-ACCOUNT-013</td>
+              <td><span class="chip warn">Documented only</span></td>
+            </tr>
+            <tr>
+              <td class="id">#9</td>
+              <td class="title">Account maintenance — edit profile, address book, password, newsletter</td>
+              <td>Logout / re-login to confirm password change took effect</td>
+              <td class="id">indirect</td>
+              <td><span class="chip pass">Covered (indirectly)</span></td>
+            </tr>
+            <tr>
+              <td class="id">cross-cutting</td>
+              <td class="title">“Session/cart behavior after logout”</td>
+              <td>Logout</td>
+              <td class="id">TC-LOGIN-015</td>
+              <td><span class="chip warn">Partial — session end only</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="matrix-h">
+    <h2 id="matrix-h">Automated test case matrix</h2>
+    <p class="section-note">The 8 authored test cases themselves (each closes one or more rows in the use-case matrix above).</p>
+    <div class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Priority</th>
+              <th class="center">Automated</th>
+              <th class="center">Last run</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="id">TC-LOGIN-005</td>
+              <td class="title">Registered customer logs in with valid credentials</td>
+              <td>Smoke</td>
+              <td>Critical</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:5</td>
+            </tr>
+            <tr>
+              <td class="id">TC-LOGIN-006</td>
+              <td class="title">Login rejects an incorrect password</td>
+              <td>Negative</td>
+              <td>High</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:25</td>
+            </tr>
+            <tr>
+              <td class="id">TC-LOGIN-014</td>
+              <td class="title">Login submitted with both fields empty is rejected</td>
+              <td>Negative</td>
+              <td>Medium</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:45</td>
+            </tr>
+            <tr>
+              <td class="id">TC-LOGIN-015</td>
+              <td class="title">Logout ends the customer session</td>
+              <td>Functional</td>
+              <td>High</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:56</td>
+            </tr>
+            <tr>
+              <td class="id">TC-FORGOT-016</td>
+              <td class="title">Forgotten password accepts a registered email</td>
+              <td>Functional</td>
+              <td>High</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:70</td>
+            </tr>
+            <tr>
+              <td class="id">TC-FORGOT-017</td>
+              <td class="title">Forgotten password rejects an email with no matching account</td>
+              <td>Negative</td>
+              <td>Medium</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:92</td>
+            </tr>
+            <tr>
+              <td class="id">TC-FORGOT-018</td>
+              <td class="title">Forgotten password page is inaccessible while logged in</td>
+              <td>Boundary</td>
+              <td>Low</td>
+              <td class="center">✓</td>
+              <td class="center"><span class="chip pass">Pass</span></td>
+              <td class="loc">authentication.spec.ts:105</td>
+            </tr>
+            <tr>
+              <td class="id">TC-ACCOUNT-013</td>
+              <td class="title">Wishlist requires authentication for a guest</td>
+              <td>Negative</td>
+              <td>Medium</td>
+              <td class="center">—</td>
+              <td class="center"><span class="chip fail">Not automated</span></td>
+              <td class="loc">TC-ACCOUNT.md only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="gaps-h">
+    <h2 id="gaps-h">Gaps &amp; recommendations</h2>
+    <p class="section-note">Business paths not yet closed, ordered by how much regression risk they carry.</p>
+    <div class="gaps">
+      <div class="gap-row">
+        <span class="chip fail">High</span>
+        <div class="gap-title">Injection / XSS payloads in the Login form aren't tested</div>
+        <div class="gap-body">
+          CLAUDE.md's cross-cutting scenarios require that script/SQL payloads in form fields render
+          as literal text. Search and Registration already cover this; Login's e-mail/password fields
+          don't. Add a case submitting a payload like <span class="mono">'&nbsp;OR&nbsp;1=1--</span> /
+          <span class="mono">&lt;script&gt;</span> and assert it's rejected as an ordinary
+          no-match credential, not reflected unescaped.
+        </div>
+      </div>
+      <div class="gap-row">
+        <span class="chip warn">Medium</span>
+        <div class="gap-title">Post-login redirect back to the originally-requested page is unverified</div>
+        <div class="gap-body">
+          When a guest is bounced to Login from a protected page (Wishlist, Checkout), it's untested
+          whether a successful login returns them to that page or always lands on My Account. During
+          exploration this behaved inconsistently depending on prior navigation — worth pinning down
+          with an explicit test rather than leaving it assumed.
+        </div>
+      </div>
+      <div class="gap-row medium">
+        <span class="chip warn">Medium</span>
+        <div class="gap-title">TC-ACCOUNT-013 (guest wishlist → login redirect) has no automated test</div>
+        <div class="gap-body">
+          Documented in TC-ACCOUNT.md and referenced by Workflow 8, but no spec exercises it. Natural
+          to pair with the redirect-back gap above in one test.
+        </div>
+      </div>
+      <div class="gap-row medium">
+        <span class="chip warn">Medium</span>
+        <div class="gap-title">Cart contents after logout are not asserted</div>
+        <div class="gap-body">
+          CLAUDE.md explicitly lists “session/cart behavior after logout” as a scenario. TC-LOGIN-015
+          confirms the session ends, but doesn't check whether cart line items survive the logout
+          (the Logout page's own copy claims they're saved and restored on next login).
+        </div>
+      </div>
+      <div class="gap-row info">
+        <span class="chip info">Low</span>
+        <div class="gap-title">Login email is not tested for case-insensitivity</div>
+        <div class="gap-body">
+          Logging in with the registered email in a different letter case (e.g. Name@Example.com vs.
+          name@example.com) is a common real-world path and is currently unverified either way.
+        </div>
+      </div>
+      <div class="gap-row info">
+        <span class="chip info">Out of scope</span>
+        <div class="gap-title">Completing a password reset via the emailed link isn't automated</div>
+        <div class="gap-body">
+          TC-FORGOT-016 verifies the request is accepted and the confirmation message shown; actually
+          following the reset link and setting a new password requires inbox access this suite doesn't
+          have. Flagging as a manual-test note rather than a closable gap.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="report">
+    <h3>Adjacent module coverage (context only — not scored above)</h3>
+    <div class="adjacent">
+      <div>
+        <strong>Registration</strong>
+        Well covered separately — 12 cases in tests/registration.spec.ts (valid, duplicate email,
+        password mismatch, agreement required, first-name/telephone/password boundaries).
+      </div>
+      <div>
+        <strong>Admin Login</strong>
+        AdminLoginPage is exercised implicitly by every admin test via the shared
+        <span class="mono">adminToken</span> fixture, but there's no dedicated test asserting an
+        invalid admin login is rejected with the correct message — a sibling gap to the Login-security
+        item above, in the Admin Access Control module rather than this one.
+      </div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

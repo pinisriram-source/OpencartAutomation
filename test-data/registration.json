@@ -1,0 +1,35 @@
+{
+  "validCustomer": {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "telephone": "9876543210",
+    "password": "SecurePass123"
+  },
+  "boundary": {
+    "firstNameMinLength": 1,
+    "firstNameMaxLength": 32,
+    "firstNameOverMax": 33,
+    "telephoneBelowMin": 2,
+    "telephoneMinLength": 3,
+    "telephoneMaxLength": 32,
+    "passwordBelowMin": 3,
+    "passwordMinLength": 4,
+    "passwordMaxLength": 20
+  },
+  "invalidEmailSamples": [
+    "a@b",
+    "user@localhost"
+  ],
+  "messages": {
+    "agreeRequired": "Warning: You must agree to the Privacy Policy!",
+    "firstNameLength": "First Name must be between 1 and 32 characters!",
+    "lastNameLength": "Last Name must be between 1 and 32 characters!",
+    "emailInvalid": "E-Mail Address does not appear to be valid!",
+    "telephoneLength": "Telephone must be between 3 and 32 characters!",
+    "passwordLength": "Password must be between 4 and 20 characters!",
+    "passwordMismatch": "Password confirmation does not match password!",
+    "emailDuplicate": "Warning: E-Mail Address is already registered!",
+    "successHeading": "Your Account Has Been Created!",
+    "successMessage": "Congratulations! Your new account has been successfully created!"
+  }
+}
