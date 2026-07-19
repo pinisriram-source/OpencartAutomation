@@ -56,6 +56,23 @@ Run command: `npx playwright test tests/saucedemo-checkout --reporter=list`
 Environment: Chromium (Desktop Chrome), 1 worker, `retries=0` (local, non-CI).
 Total duration: 15.0 minutes.
 
+### 3.2a Cross-Browser Results (Chromium / Firefox / WebKit)
+
+`playwright.config.ts` was updated to add `firefox` and `webkit` projects scoped to `tests/saucedemo-checkout` (the existing OpenCart suites continue to run on `chromium` only, so their runtime is unaffected).
+
+Run command: `npx playwright test tests/saucedemo-checkout --project=chromium --project=firefox --project=webkit --reporter=list`
+
+| Browser | Executions | Passed | Failed |
+|---|---|---|---|
+| Chromium (Desktop Chrome) | 51 | 51 | 0 |
+| Firefox (Desktop Firefox) | 51 | 51 | 0 |
+| WebKit (Desktop Safari) | 51 | 51 | 0 |
+| **Total** | **153** | **153** | **0** |
+
+Total duration: 23.9 minutes. No browser-specific selector, timing, or assertion failures — the story's Technical Notes requirement to "Test across Chrome, Firefox, and Safari browsers" is now satisfied and automated.
+
+**Incidental fix:** during this run, `playwright.config.ts` was found to have no explicit `outputDir`, so Playwright's default (`test-results/`) collided with this hand-authored report living in the same folder — a full suite run wiped the report file. Fixed by setting `outputDir: './playwright-results'` and updating `.gitignore` accordingly, so Playwright's own run artifacts no longer share a directory with authored reports.
+
 ### 3.2 Initial Automation Results
 
 The suite passed in full on its first execution — all 51 test executions green, zero failures. No selector, timing, or assertion issues were encountered.
@@ -101,11 +118,11 @@ No Critical or High severity defects were found; core happy-path and validation-
 | Business Rule 4 (order clears cart) | TC-CHECKOUT-COMPLETE-002, TC-ACCESS-003 | — | ✅ |
 | Business Rule 5 (cancel at any step) | TC-CHECKOUT-INFO-007, TC-CHECKOUT-OVERVIEW-008, TC-NAV-002 | — | ✅ |
 | Navigation / browser back | `navigation-flow.spec.ts` (TC-NAV-001…005) | — | ✅ |
-| Cross-browser (Chrome/Firefox/Safari) | — | — | ❌ Gap — see below |
+| Cross-browser (Chrome/Firefox/Safari) | `firefox`/`webkit` projects in `playwright.config.ts` | — | ✅ (153/153 passing, see 3.2a) |
 | Mobile responsiveness | — | — | ❌ Gap — see below |
 
 **Coverage gaps / recommendations:**
-1. **Cross-browser execution** — the user story's Technical Notes call for Chrome, Firefox, and Safari coverage. `playwright.config.ts` currently defines only a `chromium` project. Recommend adding `firefox` and `webkit` projects and re-running the suite before considering this requirement fully closed.
+1. ~~Cross-browser execution~~ — **closed.** `firefox` and `webkit` projects were added to `playwright.config.ts`, scoped to `tests/saucedemo-checkout`; all 51 test cases pass on all 3 browsers (153/153, see Section 3.2a).
 2. **Mobile responsiveness** — not covered by the current suite (no mobile viewport/device project configured). Recommend a follow-up pass with a mobile emulation project if this is a hard requirement rather than a nice-to-have.
 3. **Alternate user personas** (`locked_out_user`, `problem_user`, `performance_glitch_user`, `error_user`, `visual_user`) were explicitly scoped out of this pass per the test plan; consider a follow-up suite if these are in-scope for the broader story.
 4. Business-rule gaps (BUG-001, BUG-003, BUG-004) should go back to the product owner to confirm whether they are accepted SauceDemo demo-app behavior (likely, since SauceDemo is a fixed public demo target) or represent real validation to add.
@@ -121,7 +138,7 @@ No Critical or High severity defects were found; core happy-path and validation-
 - Lack of format validation (BUG-003, BUG-004) is consistent with SauceDemo being a fixed public demo app with intentionally shallow validation; unlikely to change, but worth confirming expectations aren't drifting for a real target.
 
 **Next steps:**
-1. Add `firefox` and `webkit` (Safari) projects to `playwright.config.ts` and confirm the suite passes cross-browser, per the story's Technical Notes.
+1. ~~Add `firefox` and `webkit` (Safari) projects~~ — done; 153/153 passing cross-browser (Section 3.2a).
 2. Decide on BUG-001 through BUG-004 with the product owner; if accepted as-is, convert their test cases from "negative case" framing to explicit "documented behavior" framing (already partially done, e.g. TC-ACCESS-002's title says "is currently allowed").
 3. Consider a lightweight mobile-viewport pass if mobile responsiveness is a hard release gate.
-4. Wire this suite into CI (a GitHub Actions workflow directory already exists at `.github/workflows/` in this repo) so regressions on saucedemo-side behavior are caught automatically going forward, if this suite is intended to run on a recurring basis rather than as a one-off exercise.
+4. Wire this suite into CI (a GitHub Actions workflow directory already exists at `.github/workflows/` in this repo) so regressions on saucedemo-side behavior are caught automatically going forward, if this suite is intended to run on a recurring basis rather than as a one-off exercise. Note CI would need `npx playwright install --with-deps` for firefox/webkit binaries.

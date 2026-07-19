@@ -5,6 +5,7 @@ dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
+  outputDir: './playwright-results',
   timeout: 45_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,
@@ -22,6 +23,16 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      testDir: './tests/saucedemo-checkout',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      testDir: './tests/saucedemo-checkout',
+      use: { ...devices['Desktop Safari'] },
     },
   ],
 });

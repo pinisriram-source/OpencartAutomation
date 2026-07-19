@@ -317,7 +317,7 @@ the GitHub MCP agent.
 
 Git Repository URL:
 
-https://github.com/ravikaanth/AgentE2EQAWorkflow-Playwright.git
+https://github.com/pinisriram-source/OpencartAutomation.git
 
 Please perform the following Git operations:
 
