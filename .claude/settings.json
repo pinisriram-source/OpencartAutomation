@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__playwright-test__generator_write_test",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \".claude/hooks/guard-generator-write-test.js\"",
+            "statusMessage": "Checking generator_write_test target path is inside tests/"
+          }
+        ]
+      }
+    ]
+  }
+}
