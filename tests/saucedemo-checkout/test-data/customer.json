@@ -1,0 +1,21 @@
+{
+  "valid": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "postalCode": "12345"
+  },
+  "specialCharacters": {
+    "firstName": "<script>alert(1)</script>@@##$$%%",
+    "lastName": "O'Brien-Smith Jr. 123",
+    "postalCode": "!!!###"
+  },
+  "numericFirstName": {
+    "firstName": "12345",
+    "lastName": "67890",
+    "postalCode": "ABCDE"
+  },
+  "boundary": {
+    "longNameLength": 250,
+    "longPostalCodeLength": 100
+  }
+}

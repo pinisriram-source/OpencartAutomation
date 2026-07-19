@@ -1,0 +1,10 @@
+{
+  "firstNameRequired": "Error: First Name is required",
+  "lastNameRequired": "Error: Last Name is required",
+  "postalCodeRequired": "Error: Postal Code is required",
+  "notLoggedInCheckoutStepOne": "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in.",
+  "paymentInfo": "SauceCard #31337",
+  "shippingInfo": "Free Pony Express Delivery!",
+  "thankYou": "Thank you for your order!",
+  "completeText": "Your order has been dispatched, and will arrive just as fast as the pony can get there!"
+}

@@ -1,11 +1,11 @@
 import { test as base, expect } from '@playwright/test';
-import { LoginPage, BASE_URL } from '../pages/login.page';
-import { InventoryPage } from '../pages/inventory.page';
-import { CartPage } from '../pages/cart.page';
-import { CheckoutStepOnePage } from '../pages/checkout-step-one.page';
-import { CheckoutStepTwoPage } from '../pages/checkout-step-two.page';
-import { CheckoutCompletePage } from '../pages/checkout-complete.page';
-import testData from '../test-data/saucedemo-checkout.json';
+import { LoginPage } from '../pages/LoginPage';
+import { InventoryPage } from '../pages/InventoryPage';
+import { CartPage } from '../pages/CartPage';
+import { CheckoutStepOnePage } from '../pages/CheckoutStepOnePage';
+import { CheckoutStepTwoPage } from '../pages/CheckoutStepTwoPage';
+import { CheckoutCompletePage } from '../pages/CheckoutCompletePage';
+import users from '../test-data/users.json';
 
 type SauceDemoFixtures = {
   loginPage: LoginPage;
@@ -14,40 +14,39 @@ type SauceDemoFixtures = {
   checkoutStepOnePage: CheckoutStepOnePage;
   checkoutStepTwoPage: CheckoutStepTwoPage;
   checkoutCompletePage: CheckoutCompletePage;
-  /** Logs in as standard_user via the login page (the only persona in scope per the test plan). */
-  loginAsStandardUser: () => Promise<void>;
+  /** Logs in as the standard user (fresh, cart-less session) and lands on the Products page. */
+  loggedInPage: InventoryPage;
 };
 
 export const test = base.extend<SauceDemoFixtures>({
-  loginPage: async ({ page }, use) => {
-    await use(new LoginPage(page));
-  },
-  inventoryPage: async ({ page }, use) => {
-    await use(new InventoryPage(page));
-  },
-  cartPage: async ({ page }, use) => {
-    await use(new CartPage(page));
-  },
-  checkoutStepOnePage: async ({ page }, use) => {
-    await use(new CheckoutStepOnePage(page));
-  },
-  checkoutStepTwoPage: async ({ page }, use) => {
-    await use(new CheckoutStepTwoPage(page));
-  },
-  checkoutCompletePage: async ({ page }, use) => {
-    await use(new CheckoutCompletePage(page));
-  },
-  loginAsStandardUser: async ({ loginPage }, use) => {
-    await use(async () => {
-      await loginPage.open();
-      await loginPage.login(testData.credentials.standardUser.username, testData.credentials.standardUser.password);
-    });
+  loginPage: async ({ page }, use) => use(new LoginPage(page)),
+  inventoryPage: async ({ page }, use) => use(new InventoryPage(page)),
+  cartPage: async ({ page }, use) => use(new CartPage(page)),
+  checkoutStepOnePage: async ({ page }, use) => use(new CheckoutStepOnePage(page)),
+  checkoutStepTwoPage: async ({ page }, use) => use(new CheckoutStepTwoPage(page)),
+  checkoutCompletePage: async ({ page }, use) => use(new CheckoutCompletePage(page)),
+
+  loggedInPage: async ({ page }, use) => {
+    const login = new LoginPage(page);
+    await login.goto();
+    const inventory = await login.login(users.standard.username, users.standard.password);
+    await use(inventory);
   },
 });
 
-export { expect, BASE_URL, testData };
+export { expect };
 
-/** Generates a string of the given length made of repeated alphabetic characters, for boundary-length inputs. */
-export function stringOfLength(length: number): string {
-  return 'a'.repeat(length);
+/** Generates a string of the given length made of a repeated character, for boundary-length inputs. */
+export function stringOfLength(length: number, char = 'a'): string {
+  return char.repeat(length);
+}
+
+/** Generates a deterministic alphanumeric string of the given length, for boundary-length inputs. */
+export function alphaNumericStringOfLength(length: number): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[i % chars.length];
+  }
+  return result;
 }
