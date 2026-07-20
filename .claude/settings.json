@@ -2,12 +2,12 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__playwright-test__generator_write_test",
+        "matcher": "mcp__playwright-test__generator_write_test|mcp__playwright-test__planner_save_plan",
         "hooks": [
           {
             "type": "command",
-            "command": "node \".claude/hooks/guard-generator-write-test.js\"",
-            "statusMessage": "Checking generator_write_test target path is inside tests/"
+            "command": "node \".claude/hooks/guard-mcp-file-writes.js\"",
+            "statusMessage": "Checking playwright-test MCP write target is inside its allowed directory"
           }
         ]
       }
