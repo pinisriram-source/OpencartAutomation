@@ -1,152 +1,138 @@
-// spec: specs/saucedemo-checkout-test-plan.md (Suite 1: Cart Review)
-// seed: tests/seed.spec.ts
+// spec: specs/saucedemo-checkout-test-plan.md
+// seed: tests/checkout/seed.spec.ts
+
 import { test, expect, loginAsStandardUser } from './fixtures/saucedemo.fixture';
 import products from './test-data/products.json';
 
-test.describe('Cart Review', () => {
-  test('TC-CART-001 Cart displays a single item with full details', async ({
-    loginPage,
+test.describe('Cart Review (AC1)', () => {
+  test.beforeEach(async ({ loginPage }) => {
+    await loginAsStandardUser(loginPage);
+  });
+
+  test('TC-CHECKOUT-001 cart displays a single item with correct name, description, price and quantity', async ({
     inventoryPage,
     cartPage,
   }) => {
-    // 1. Preconditions: fresh session, log in as standard_user.
-    await loginAsStandardUser(loginPage);
-    await expect(inventoryPage.page).toHaveURL(/inventory\.html/);
-    await expect(inventoryPage.inventoryItems).toHaveCount(6);
+    // 3. Click the 'Add to cart' button on the Sauce Labs Backpack tile
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await expect(inventoryPage.removeButton(products.sauceLabsBackpack.slug)).toBeVisible();
+    await expect(inventoryPage.header.cartBadge).toHaveText('1');
 
-    // 2. Add 'Sauce Labs Backpack' to the cart.
-    await inventoryPage.addProductToCart(products.backpack.slug);
-    await expect(inventoryPage.removeButton(products.backpack.slug)).toBeVisible();
-    await expect(inventoryPage.cartBadge).toHaveText('1');
-
-    // 3. Click the cart icon to navigate to /cart.html.
-    await inventoryPage.goToCart();
+    // 4. Click the cart icon in the header
+    await inventoryPage.header.goToCart();
     await expect(cartPage.page).toHaveURL(/cart\.html/);
-    await expect(cartPage.title).toHaveText('Your Cart');
-    await expect(cartPage.cartQuantityLabel).toBeVisible();
-    await expect(cartPage.cartDescLabel).toBeVisible();
+    await expect(cartPage.pageTitle).toHaveText('Your Cart');
 
-    // 4. Verify the Sauce Labs Backpack line item in detail.
-    const row = cartPage.itemRow(products.backpack.name);
-    await expect(cartPage.quantity(row)).toHaveText('1');
-    await expect(cartPage.name(row)).toHaveText(products.backpack.name);
-    await expect(cartPage.description(row)).not.toBeEmpty();
-    await expect(cartPage.price(row)).toHaveText(`$${products.backpack.price}`);
-    await expect(cartPage.removeButtonInRow(row)).toBeVisible();
-
-    // 5. Verify page-level controls below the item list.
-    await expect(cartPage.continueShoppingButton).toBeEnabled();
-    await expect(cartPage.checkoutButton).toBeEnabled();
+    // 5. Inspect the single cart line item
+    const row = cartPage.itemByName(products.sauceLabsBackpack.name);
+    await expect(row.locator('[data-test="item-quantity"]')).toHaveText('1');
+    await expect(row.locator('[data-test="inventory-item-name"]')).toHaveText(products.sauceLabsBackpack.name);
+    await expect(row.locator('[data-test="inventory-item-desc"]')).not.toBeEmpty();
+    await expect(row.locator('[data-test="inventory-item-price"]')).toHaveText(`$${products.sauceLabsBackpack.price}`);
+    await expect(cartPage.continueShoppingButton).toBeVisible();
+    await expect(cartPage.checkoutButton).toBeVisible();
   });
 
-  test('TC-CART-002 Cart displays multiple items with correct details for each', async ({
-    loginPage,
+  test('TC-CHECKOUT-002 cart displays multiple items with correct details and an accurate badge count', async ({
     inventoryPage,
     cartPage,
   }) => {
-    // 1. Preconditions: log in with an empty cart.
-    await loginAsStandardUser(loginPage);
-    await expect(inventoryPage.cartBadge).toHaveCount(0);
+    // 1. Log in as standard_user and land on /inventory.html
+    await expect(inventoryPage.header.cartBadge).toHaveCount(0);
 
-    // 2. Add 'Sauce Labs Backpack' and 'Sauce Labs Bike Light' to the cart.
-    await inventoryPage.addProductsToCart([products.backpack.slug, products.bikeLight.slug]);
-    await expect(inventoryPage.cartBadge).toHaveText('2');
+    // 2. Click 'Add to cart' for Sauce Labs Backpack
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await expect(inventoryPage.header.cartBadge).toHaveText('1');
 
-    // 3. Navigate to /cart.html.
-    await inventoryPage.goToCart();
+    // 3. Click 'Add to cart' for Sauce Labs Bike Light
+    await inventoryPage.addToCart(products.sauceLabsBikeLight.slug);
+    await expect(inventoryPage.header.cartBadge).toHaveText('2');
+
+    // 4. Open the cart page (/cart.html)
+    await inventoryPage.header.goToCart();
     await expect(cartPage.cartItems).toHaveCount(2);
 
-    // 4. Verify each row independently.
-    const backpackRow = cartPage.itemRow(products.backpack.name);
-    await expect(cartPage.quantity(backpackRow)).toHaveText('1');
-    await expect(cartPage.description(backpackRow)).not.toBeEmpty();
-    await expect(cartPage.price(backpackRow)).toHaveText(`$${products.backpack.price}`);
-    await expect(cartPage.removeButtonInRow(backpackRow)).toBeVisible();
+    const backpackRow = cartPage.itemByName(products.sauceLabsBackpack.name);
+    await expect(backpackRow.locator('[data-test="item-quantity"]')).toHaveText('1');
+    await expect(backpackRow.locator('[data-test="inventory-item-price"]')).toHaveText(
+      `$${products.sauceLabsBackpack.price}`,
+    );
 
-    const bikeLightRow = cartPage.itemRow(products.bikeLight.name);
-    await expect(cartPage.quantity(bikeLightRow)).toHaveText('1');
-    await expect(cartPage.description(bikeLightRow)).not.toBeEmpty();
-    await expect(cartPage.price(bikeLightRow)).toHaveText(`$${products.bikeLight.price}`);
-    await expect(cartPage.removeButtonInRow(bikeLightRow)).toBeVisible();
-
-    // Item order matches the order the products were added in.
-    await expect(cartPage.cartItems.nth(0)).toContainText(products.backpack.name);
-    await expect(cartPage.cartItems.nth(1)).toContainText(products.bikeLight.name);
+    const bikeLightRow = cartPage.itemByName(products.sauceLabsBikeLight.name);
+    await expect(bikeLightRow.locator('[data-test="item-quantity"]')).toHaveText('1');
+    await expect(bikeLightRow.locator('[data-test="inventory-item-price"]')).toHaveText(
+      `$${products.sauceLabsBikeLight.price}`,
+    );
   });
 
-  test('TC-CART-003 Continue Shopping returns to Products page and preserves cart', async ({
-    loginPage,
+  test("TC-CHECKOUT-003 'Continue Shopping' button returns the user to the Products page and preserves cart contents", async ({
     inventoryPage,
     cartPage,
   }) => {
-    // 1. Preconditions: log in, add one item, navigate to /cart.html.
-    await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductToCart(products.backpack.slug);
-    await inventoryPage.goToCart();
-    await expect(cartPage.cartItems).toHaveCount(1);
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.header.goToCart();
 
-    // 2. Click the 'Continue Shopping' button.
-    await cartPage.continueShopping();
+    // 1. From /cart.html, click 'Continue Shopping'
+    await cartPage.continueShoppingButton.click();
     await expect(inventoryPage.page).toHaveURL(/inventory\.html/);
-    await expect(inventoryPage.cartBadge).toHaveText('1');
+    await expect(inventoryPage.pageTitle).toHaveText('Products');
+
+    // 2. Observe the previously added product's button and the cart badge
+    await expect(inventoryPage.removeButton(products.sauceLabsBackpack.slug)).toBeVisible();
+    await expect(inventoryPage.header.cartBadge).toHaveText('1');
   });
 
-  test('TC-CART-004 Checkout button navigates to Checkout Information with cart intact', async ({
-    loginPage,
-    inventoryPage,
-    cartPage,
-    checkoutInformationPage,
-  }) => {
-    // 1. Preconditions: log in, add at least one item, navigate to /cart.html.
-    await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductToCart(products.backpack.slug);
-    await inventoryPage.goToCart();
-    await expect(cartPage.cartItems).toHaveCount(1);
-
-    // 2. Click the 'Checkout' button.
-    await cartPage.goToCheckout();
-    await expect(checkoutInformationPage.page).toHaveURL(/checkout-step-one\.html/);
-    await expect(checkoutInformationPage.title).toHaveText('Checkout: Your Information');
-    await expect(checkoutInformationPage.cartBadge).toHaveText('1');
-  });
-
-  test('TC-CART-005 Removing an item updates the list and badge', async ({
-    loginPage,
+  test("TC-CHECKOUT-004 'Remove' button removes an item from the cart and decrements the badge", async ({
     inventoryPage,
     cartPage,
   }) => {
-    // 1. Preconditions: log in, add 'Sauce Labs Backpack' and 'Sauce Labs Bike Light', navigate to /cart.html.
-    await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductsToCart([products.backpack.slug, products.bikeLight.slug]);
-    await inventoryPage.goToCart();
-    await expect(cartPage.cartItems).toHaveCount(2);
-    await expect(cartPage.cartBadge).toHaveText('2');
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.addToCart(products.sauceLabsBikeLight.slug);
+    await inventoryPage.header.goToCart();
 
-    // 2. Click 'Remove' on the Sauce Labs Backpack row.
-    await cartPage.removeProductBySlug(products.backpack.slug);
-    await expect(cartPage.itemRow(products.backpack.name)).toHaveCount(0);
-    const bikeLightRow = cartPage.itemRow(products.bikeLight.name);
-    await expect(cartPage.quantity(bikeLightRow)).toHaveText('1');
-    await expect(cartPage.price(bikeLightRow)).toHaveText(`$${products.bikeLight.price}`);
-    await expect(cartPage.cartBadge).toHaveText('1');
+    // 1. On /cart.html, click 'Remove' under the Sauce Labs Bike Light row
+    await cartPage.removeItem(products.sauceLabsBikeLight.slug);
+
+    await expect(cartPage.itemByName(products.sauceLabsBikeLight.name)).toHaveCount(0);
+    await expect(cartPage.header.cartBadge).toHaveText('1');
+    await expect(cartPage.itemByName(products.sauceLabsBackpack.name)).toHaveCount(1);
   });
 
-  test('TC-CART-006-EmptyCart Cart page with zero items retains action buttons', async ({
-    loginPage,
+  test("TC-CHECKOUT-005 'Checkout' button navigates from Cart to the Checkout Information page", async ({
     inventoryPage,
     cartPage,
+    checkoutStepOnePage,
   }) => {
-    // 1. Preconditions: log in as standard_user with a cart that has never had items added.
-    await loginAsStandardUser(loginPage);
-    await expect(inventoryPage.cartBadge).toHaveCount(0);
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.header.goToCart();
 
-    // 2. Navigate to /cart.html.
-    await cartPage.open();
-    await expect(cartPage.cartQuantityLabel).toBeVisible();
-    await expect(cartPage.cartDescLabel).toBeVisible();
+    // 1. On /cart.html, click 'Checkout'
+    await cartPage.checkoutButton.click();
+
+    await expect(checkoutStepOnePage.page).toHaveURL(/checkout-step-one\.html/);
+    await expect(checkoutStepOnePage.pageTitle).toHaveText('Checkout: Your Information');
+    await expect(checkoutStepOnePage.firstNameInput).toBeVisible();
+    await expect(checkoutStepOnePage.lastNameInput).toBeVisible();
+    await expect(checkoutStepOnePage.postalCodeInput).toBeVisible();
+    await expect(checkoutStepOnePage.cancelButton).toBeVisible();
+    await expect(checkoutStepOnePage.continueButton).toBeVisible();
+  });
+
+  test("TC-CHECKOUT-006-EmptyCart clicking 'Checkout' with an empty cart is not blocked (edge case / Business Rule 3 deviation)", async ({
+    inventoryPage,
+    cartPage,
+    checkoutStepOnePage,
+  }) => {
+    // 1. Navigate to /cart.html with 0 items in the cart
+    await inventoryPage.header.goToCart();
     await expect(cartPage.cartItems).toHaveCount(0);
-    await expect(cartPage.continueShoppingButton).toBeEnabled();
-    // Confirmed live: Checkout remains clickable even with zero items (business-rule gap, see TC-CHECKOUT-ERROR-004).
-    await expect(cartPage.checkoutButton).toBeEnabled();
+    await expect(cartPage.header.cartBadge).toHaveCount(0);
+
+    // 2. Click 'Checkout'
+    await cartPage.checkoutButton.click();
+
+    // ACTUAL BEHAVIOR (documented deviation from Business Rule 3): the empty cart is allowed through
+    // to checkout with no warning, rather than being blocked.
+    await expect(checkoutStepOnePage.page).toHaveURL(/checkout-step-one\.html/);
   });
 });

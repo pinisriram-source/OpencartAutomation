@@ -1,6 +1,5 @@
 import { Page, Locator } from '@playwright/test';
 
-/** Page Object for the SauceDemo login page (https://www.saucedemo.com/). */
 export class LoginPage {
   readonly page: Page;
   readonly url = 'https://www.saucedemo.com/';

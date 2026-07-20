@@ -1,11 +1,12 @@
 import { Page, Locator } from '@playwright/test';
+import { AppHeader } from './AppHeader';
 
-/** Page Object for SauceDemo Checkout Step Two - "Overview" (/checkout-step-two.html). */
-export class CheckoutOverviewPage {
+/** The Checkout: Overview page (/checkout-step-two.html). */
+export class CheckoutStepTwoPage {
   readonly page: Page;
   readonly url = 'https://www.saucedemo.com/checkout-step-two.html';
-
-  readonly title: Locator;
+  readonly header: AppHeader;
+  readonly pageTitle: Locator;
   readonly cartItems: Locator;
   readonly paymentInfoLabel: Locator;
   readonly paymentInfoValue: Locator;
@@ -19,7 +20,8 @@ export class CheckoutOverviewPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.title = page.locator('[data-test="title"]');
+    this.header = new AppHeader(page);
+    this.pageTitle = page.locator('[data-test="title"]');
     this.cartItems = page.locator('[data-test="inventory-item"]');
     this.paymentInfoLabel = page.locator('[data-test="payment-info-label"]');
     this.paymentInfoValue = page.locator('[data-test="payment-info-value"]');
@@ -32,32 +34,20 @@ export class CheckoutOverviewPage {
     this.finishButton = page.locator('[data-test="finish"]');
   }
 
-  /** Locates a single overview line item row by the product's visible name. */
-  itemRow(productName: string): Locator {
-    return this.cartItems.filter({ hasText: productName });
+  async open(): Promise<void> {
+    await this.page.goto(this.url);
   }
 
-  quantity(row: Locator): Locator {
-    return row.locator('[data-test="item-quantity"]');
+  /** Locates an overview row by its visible product name. */
+  itemByName(name: string): Locator {
+    return this.cartItems.filter({ hasText: name });
   }
 
-  name(row: Locator): Locator {
-    return row.locator('[data-test="inventory-item-name"]');
-  }
-
-  description(row: Locator): Locator {
-    return row.locator('[data-test="inventory-item-desc"]');
-  }
-
-  price(row: Locator): Locator {
-    return row.locator('[data-test="inventory-item-price"]');
-  }
-
-  async clickFinish(): Promise<void> {
-    await this.finishButton.click();
-  }
-
-  async clickCancel(): Promise<void> {
+  async cancel(): Promise<void> {
     await this.cancelButton.click();
+  }
+
+  async finish(): Promise<void> {
+    await this.finishButton.click();
   }
 }

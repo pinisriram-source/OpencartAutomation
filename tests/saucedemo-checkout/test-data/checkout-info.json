@@ -1,22 +1,18 @@
 {
-  "valid": {
-    "firstName": "John",
-    "lastName": "Doe",
+  "valid": { "firstName": "John", "lastName": "Doe", "postalCode": "12345" },
+  "validAlice": { "firstName": "Alice", "lastName": "Wong", "postalCode": "90210" },
+  "zeroCart": { "firstName": "Zero", "lastName": "Cart", "postalCode": "00000" },
+  "special": {
+    "firstName": "<script>alert(1)</script>!@#$%^&*()",
+    "lastName": "O'Brien-Smith",
     "postalCode": "12345"
   },
-  "boundary": {
-    "whitespaceFirstName": " ",
-    "longNameLength": 250,
-    "longZipLength": 100
-  },
-  "specialCharacters": {
-    "firstName": "<script>alert(1)</script>@@##$$%%",
-    "lastName": "O'Brien-Smith Jr. 123",
-    "postalCode": "!!!###"
-  },
-  "numeric": {
-    "firstName": "12345",
-    "lastName": "67890",
-    "postalCode": "ABCDE"
+  "nonNumericZip": { "firstName": "Jane", "lastName": "Smith", "postalCode": "ABC-123" },
+  "whitespaceFirstName": { "firstName": "   ", "lastName": "Test", "postalCode": "12345" },
+  "boundary": { "longNameLength": 300 },
+  "messages": {
+    "firstNameRequired": "Error: First Name is required",
+    "lastNameRequired": "Error: Last Name is required",
+    "postalCodeRequired": "Error: Postal Code is required"
   }
 }

@@ -1,102 +1,120 @@
-// spec: specs/saucedemo-checkout-test-plan.md (Suite 4: Order Completion)
-// seed: tests/seed.spec.ts
+// spec: specs/saucedemo-checkout-test-plan.md
+// seed: tests/checkout/seed.spec.ts
+
 import { test, expect, loginAsStandardUser } from './fixtures/saucedemo.fixture';
 import products from './test-data/products.json';
 import checkoutInfo from './test-data/checkout-info.json';
-import messages from './test-data/messages.json';
 
-test.describe('Order Completion', () => {
-  test('TC-CHECKOUT-COMPLETE-001 Clicking Finish completes the order and shows the confirmation page', async ({
-    loginPage,
-    inventoryPage,
-    checkoutInformationPage,
-    checkoutOverviewPage,
-    checkoutCompletePage,
-  }) => {
-    // 1. Preconditions: log in, add an item, complete Checkout Information, reach the Overview page.
+test.describe('Order Completion (AC4)', () => {
+  test.beforeEach(async ({ loginPage }) => {
     await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductToCart(products.backpack.slug);
-    await checkoutInformationPage.open();
-    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
-    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
-
-    // 2. Click 'Finish'.
-    await checkoutOverviewPage.clickFinish();
-    await expect(checkoutCompletePage.page).toHaveURL(/checkout-complete\.html/);
-    await expect(checkoutCompletePage.title).toHaveText('Checkout: Complete!');
-    await expect(checkoutCompletePage.completeHeader).toHaveText(messages.orderCompleteHeader);
-    await expect(checkoutCompletePage.completeText).toHaveText(messages.orderCompleteText);
-    await expect(checkoutCompletePage.ponyExpressImage).toBeVisible();
-    await expect(checkoutCompletePage.backHomeButton).toBeEnabled();
   });
 
-  test('TC-CHECKOUT-COMPLETE-002 Order completion clears the cart (business rule 4)', async ({
-    loginPage,
+  test("TC-CHECKOUT-026 'Finish' completes the order and shows a success message with a 'Back Home' button", async ({
     inventoryPage,
     cartPage,
-    checkoutInformationPage,
-    checkoutOverviewPage,
+    checkoutStepOnePage,
+    checkoutStepTwoPage,
     checkoutCompletePage,
   }) => {
-    // 1. Preconditions: log in, add 2 items, complete the full checkout flow through to /checkout-complete.html.
-    await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductsToCart([products.backpack.slug, products.bikeLight.slug]);
-    await checkoutInformationPage.open();
-    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
-    await checkoutOverviewPage.clickFinish();
-    await expect(checkoutCompletePage.page).toHaveURL(/checkout-complete\.html/);
-    await expect(checkoutCompletePage.cartBadge).toHaveCount(0);
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.addToCart(products.sauceLabsBikeLight.slug);
+    await inventoryPage.header.goToCart();
+    await cartPage.checkoutButton.click();
+    await checkoutStepOnePage.submit(checkoutInfo.valid);
 
-    // 2. Navigate directly to /cart.html.
+    // 1. Click 'Finish'
+    await checkoutStepTwoPage.finish();
+
+    await expect(checkoutCompletePage.page).toHaveURL(/checkout-complete\.html/);
+    // 2. Verify the heading and success message
+    await expect(checkoutCompletePage.pageTitle).toHaveText('Checkout: Complete!');
+    await expect(checkoutCompletePage.completeHeader).toHaveText('Thank you for your order!');
+    // 3. Verify the supporting text
+    await expect(checkoutCompletePage.completeText).toHaveText(
+      'Your order has been dispatched, and will arrive just as fast as the pony can get there!',
+    );
+    // 4. Verify the action buttons
+    await expect(checkoutCompletePage.backHomeButton).toBeEnabled();
+    await expect(checkoutCompletePage.generatePdfButton).toBeEnabled();
+  });
+
+  test('TC-CHECKOUT-027 completing an order clears the cart (Business Rule 4)', async ({
+    inventoryPage,
+    cartPage,
+    checkoutStepOnePage,
+    checkoutStepTwoPage,
+    checkoutCompletePage,
+  }) => {
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.addToCart(products.sauceLabsBikeLight.slug);
+    await inventoryPage.header.goToCart();
+    await cartPage.checkoutButton.click();
+    await checkoutStepOnePage.submit(checkoutInfo.valid);
+    await checkoutStepTwoPage.finish();
+    await expect(checkoutCompletePage.page).toHaveURL(/checkout-complete\.html/);
+
+    // 1. After reaching /checkout-complete.html, observe the header cart badge
+    await expect(checkoutCompletePage.header.cartBadge).toHaveCount(0);
+
+    // 2. Navigate to /cart.html
     await cartPage.open();
     await expect(cartPage.cartItems).toHaveCount(0);
-    await expect(cartPage.continueShoppingButton).toBeVisible();
     await expect(cartPage.checkoutButton).toBeVisible();
+
+    // 3. Navigate to /inventory.html and check product tiles
+    await inventoryPage.open();
+    await expect(inventoryPage.addToCartButton(products.sauceLabsBackpack.slug)).toBeVisible();
+    await expect(inventoryPage.addToCartButton(products.sauceLabsBikeLight.slug)).toBeVisible();
+    await expect(inventoryPage.removeButton(products.sauceLabsBackpack.slug)).toHaveCount(0);
+    await expect(inventoryPage.removeButton(products.sauceLabsBikeLight.slug)).toHaveCount(0);
   });
 
-  test('TC-CHECKOUT-COMPLETE-003 Back Home button returns to the Products page', async ({
-    loginPage,
+  test("TC-CHECKOUT-028 'Back Home' button navigates to the Products page", async ({
     inventoryPage,
-    checkoutInformationPage,
-    checkoutOverviewPage,
+    cartPage,
+    checkoutStepOnePage,
+    checkoutStepTwoPage,
     checkoutCompletePage,
   }) => {
-    // 1. Preconditions: complete an order, arriving at /checkout-complete.html.
-    await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductToCart(products.backpack.slug);
-    await checkoutInformationPage.open();
-    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
-    await checkoutOverviewPage.clickFinish();
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.header.goToCart();
+    await cartPage.checkoutButton.click();
+    await checkoutStepOnePage.submit(checkoutInfo.valid);
+    await checkoutStepTwoPage.finish();
+
+    // 1. Click 'Back Home'
+    await checkoutCompletePage.backHome();
+
+    await expect(inventoryPage.page).toHaveURL(/inventory\.html/);
+    await expect(inventoryPage.pageTitle).toHaveText('Products');
+    await expect(inventoryPage.addToCartButton(products.sauceLabsBackpack.slug)).toBeVisible();
+  });
+
+  test('TC-CHECKOUT-029-BrowserBack browser Back after order completion returns to a cached Overview page; re-clicking Finish is idempotent', async ({
+    page,
+    inventoryPage,
+    cartPage,
+    checkoutStepOnePage,
+    checkoutStepTwoPage,
+    checkoutCompletePage,
+  }) => {
+    await inventoryPage.addToCart(products.sauceLabsBackpack.slug);
+    await inventoryPage.header.goToCart();
+    await cartPage.checkoutButton.click();
+    await checkoutStepOnePage.submit(checkoutInfo.valid);
+    await checkoutStepTwoPage.finish();
     await expect(checkoutCompletePage.page).toHaveURL(/checkout-complete\.html/);
 
-    // 2. Click 'Back Home'.
-    await checkoutCompletePage.clickBackHome();
-    await expect(inventoryPage.page).toHaveURL(/inventory\.html/);
-    await expect(inventoryPage.inventoryItems).toHaveCount(6);
-    for (const product of Object.values(products)) {
-      await expect(inventoryPage.addToCartButton(product.slug)).toBeVisible();
-    }
-  });
+    // 1. Click the browser's Back button
+    await page.goBack();
+    await expect(checkoutStepTwoPage.page).toHaveURL(/checkout-step-two\.html/);
+    await expect(checkoutStepTwoPage.finishButton).toBeEnabled();
 
-  test('TC-CHECKOUT-COMPLETE-004-DirectAccess Confirmation page is reachable by direct URL without completing Steps One/Two (confirmed gap)', async ({
-    loginPage,
-    inventoryPage,
-    checkoutCompletePage,
-  }) => {
-    // 1. Preconditions: log in, add an item to the cart, but do NOT proceed through Checkout Information or Overview.
-    await loginAsStandardUser(loginPage);
-    await inventoryPage.addProductToCart(products.backpack.slug);
-    await expect(inventoryPage.cartBadge).toHaveText('1');
+    // 2. Click 'Finish' again
+    await checkoutStepTwoPage.finish();
 
-    // 2. Navigate directly to /checkout-complete.html, bypassing Steps One and Two entirely.
-    await checkoutCompletePage.open();
-    await expect(checkoutCompletePage.completeHeader).toHaveText(messages.orderCompleteHeader);
-    await expect(checkoutCompletePage.completeText).toHaveText(messages.orderCompleteText);
-    await expect(checkoutCompletePage.ponyExpressImage).toBeVisible();
-    await expect(checkoutCompletePage.backHomeButton).toBeVisible();
-    // Confirmed live: the cart is NOT cleared by this direct-access path, unlike a genuine Finish.
-    await expect(checkoutCompletePage.cartBadge).toHaveText('1');
-    // Confirmed live: no "Generate PDF order" button appears — no order object was actually created.
-    await expect(checkoutCompletePage.generatePdfButton).toHaveCount(0);
+    await expect(checkoutCompletePage.page).toHaveURL(/checkout-complete\.html/);
+    await expect(checkoutCompletePage.completeHeader).toHaveText('Thank you for your order!');
   });
 });

@@ -6,7 +6,7 @@
 **Test Plan:** [specs/saucedemo-checkout-test-plan.md](../specs/saucedemo-checkout-test-plan.md)
 **Automation Suite:** [tests/saucedemo-checkout/](../tests/saucedemo-checkout/)
 
-> This is the third full regeneration of the SCRUM-101 workflow in this session: the test plan and the entire automation suite were rebuilt from scratch again (fresh live exploration, not reused from either prior pass), per an explicit request to regenerate everything.
+> This is the fourth full regeneration of the SCRUM-101 workflow in this session: the test plan and the entire automation suite were rebuilt from scratch again (fresh live exploration, not reused from any prior pass), per an explicit request to regenerate everything.
 
 ---
 
@@ -17,17 +17,17 @@
 | Metric | Value |
 |---|---|
 | Application | SauceDemo Checkout |
-| Test Cases Designed | 41 (across 7 suites) |
+| Test Cases Designed | 33 (across 5 suites) |
 | Browsers Tested | Chromium, Firefox, WebKit |
-| Total Test Executions | 123 (41 × 3) |
-| Passed | 123 |
+| Total Test Executions | 99 (33 × 3) |
+| Passed | 99 |
 | Failed | 0 |
 | Skipped | 0 |
 | Overall Success Rate | 100% |
 | Healing actions required | 0 (suite was stable on first run, all browsers) |
 | Overall status | **PASS** |
 
-All acceptance criteria (AC1–AC5) and all five business rules from the user story are covered by automated Playwright tests, all currently passing against the live application on all 3 required browsers. No defects block sign-off; several **application behavior gaps** were identified against the business rules and are logged in Section 4 for product-owner review — they are not automation failures, since the suite's job here was to characterize and lock in actual behavior.
+All acceptance criteria (AC1–AC5) and all five business rules from the user story are covered by automated Playwright tests, all currently passing against the live application on all 3 required browsers. No defects block sign-off; three **application behavior deviations** from the stated business rules were identified and are logged in Section 4 for product-owner review — they are not automation failures, since the suite's job here was to characterize and lock in actual behavior.
 
 ---
 
@@ -35,8 +35,8 @@ All acceptance criteria (AC1–AC5) and all five business rules from the user st
 
 Per the workflow template driving this run, the standalone manual-exploration phase (Step 3) was not executed as a separate pass — it is commented out in the prompt-file template. In its place, live-application exploration was performed directly via Playwright MCP browser tools during:
 
-- **Test planning** (`playwright-test-planner` agent) — walked the full login → inventory → cart → checkout-step-one → checkout-step-two → checkout-complete flow, confirming exact error text, cancel-destination asymmetry, and totals math before any test case was written. This pass surfaced a **new finding not identified in either prior pass**: navigating directly to `/checkout-complete.html` by URL — bypassing steps one and two entirely — renders the full confirmation page, but without clearing the cart and without the "Generate PDF order" button that appears after a genuine Finish click, indicating no real order object is created server-side.
-- **Script generation** (`playwright-test-generator` agent) — independently re-verified every selector and behavior claim against the live app before writing code, additionally confirming that **all three** checkout-information input fields (not just the specific invalid one) receive the red "error" CSS class regardless of which single field actually failed validation.
+- **Test planning** (`playwright-test-planner` agent) — walked the full login → inventory → cart → checkout-step-one → checkout-step-two → checkout-complete flow, confirming exact error text, cancel-destination asymmetry, and totals math before any test case was written, and explicitly probed and documented three business-rule deviations as their own test cases rather than assuming intended behavior.
+- **Script generation** (`playwright-test-generator` agent) — independently re-verified every selector and behavior claim against the live app before writing code, additionally confirming that skipping checkout-step-one and navigating straight to `/checkout-step-two.html` still renders a usable Overview page with an enabled Finish button.
 
 Observations from this exploration are folded into Section 4 below rather than reported separately, since no dedicated manual pass with independent screenshots was run.
 
@@ -48,14 +48,12 @@ Observations from this exploration are folded into Section 4 below rather than r
 
 | Suite | File | Tests |
 |---|---|---|
-| Cart Review | `cart-review.spec.ts` | 6 |
-| Checkout Information Entry | `checkout-information.spec.ts` | 12 |
-| Order Overview | `checkout-overview.spec.ts` | 6 |
-| Order Completion | `order-completion.spec.ts` | 4 |
-| Error Handling & Field Validation | `error-handling.spec.ts` | 4 |
-| Navigation Flow: Cancel & Browser Back | `navigation-flow.spec.ts` | 7 |
-| End-to-End Smoke | `e2e-smoke.spec.ts` | 2 |
-| **Total** | | **41** |
+| Cart Review (AC1) | `cart-review.spec.ts` | 6 |
+| Checkout Information Entry (AC2) | `checkout-information.spec.ts` | 12 |
+| Order Overview (AC3) | `checkout-overview.spec.ts` | 7 |
+| Order Completion (AC4) | `order-completion.spec.ts` | 4 |
+| End-to-End and Cross-Cutting | `e2e-cross-cutting.spec.ts` | 4 |
+| **Total** | | **33** |
 
 Run command: `npx playwright test tests/saucedemo-checkout --project=chromium --project=firefox --project=webkit --reporter=list`
 Environment: Chromium (Desktop Chrome), Firefox (Desktop Firefox), WebKit (Desktop Safari); 1 worker, `retries=0` (local, non-CI).
@@ -64,12 +62,12 @@ Environment: Chromium (Desktop Chrome), Firefox (Desktop Firefox), WebKit (Deskt
 
 | Browser | Executions | Passed | Failed |
 |---|---|---|---|
-| Chromium (Desktop Chrome) | 41 | 41 | 0 |
-| Firefox (Desktop Firefox) | 41 | 41 | 0 |
-| WebKit (Desktop Safari) | 41 | 41 | 0 |
-| **Total** | **123** | **123** | **0** |
+| Chromium (Desktop Chrome) | 33 | 33 | 0 |
+| Firefox (Desktop Firefox) | 33 | 33 | 0 |
+| WebKit (Desktop Safari) | 33 | 33 | 0 |
+| **Total** | **99** | **99** | **0** |
 
-Total duration: 30.0 minutes. No browser-specific selector, timing, or assertion failures across any of the 41 test cases.
+Total duration: 19.2 minutes. No browser-specific selector, timing, or assertion failures across any of the 33 test cases.
 
 ### 3.3 Healing Activities Performed
 
@@ -77,7 +75,7 @@ None required. The `playwright-test-healer` agent was not invoked because there 
 
 ### 3.4 Final Execution Results
 
-Unchanged from Section 3.2 — **123/123 passing**.
+Unchanged from Section 3.2 — **99/99 passing**.
 
 ---
 
@@ -87,13 +85,11 @@ These are **application behavior findings**, not automation defects — the suit
 
 | ID | Severity | Title | Steps to Reproduce | Expected (per Business Rules) | Actual | Test Reference |
 |---|---|---|---|---|---|---|
-| BUG-001 | Medium | Checkout completes with an empty cart | 1. Log in. 2. Do not add any items. 3. Navigate directly to `/checkout-step-one.html`, fill valid info, continue. 4. On Overview, click Finish. | Business Rule 3: "Cart cannot be empty when proceeding to checkout" — checkout should be blocked. | Checkout Information and Overview both render normally with an empty cart; Finish still succeeds to the confirmation page. | `TC-CHECKOUT-ERROR-004-EmptyCartThroughCheckout` |
-| BUG-002 | Medium | Order confirmation reachable by direct URL, bypassing the entire checkout flow | While logged in, navigate directly to `/checkout-complete.html` without visiting step one or two. | A confirmation page implies a real, completed order. | The full confirmation page renders regardless — but the cart is **not** cleared and the "Generate PDF order" button is **absent**, indicating no real order was created. This is a stronger finding than the previously-known "no step-sequence enforcement" gap: it shows the confirmation UI can render for an order that never happened. | `TC-CHECKOUT-COMPLETE-004-DirectAccess` |
-| BUG-003 | Low | Duplicate order confirmation not blocked | Complete an order, click browser Back (lands on stale zeroed Overview), then click Finish again. | A completed order shouldn't be re-submittable from a stale page. | The app allows a second "Finish" click from the stale post-completion Overview page with no guard. | `TC-CHECKOUT-NAV-005-DuplicateFinish` |
-| BUG-004 | Low | Browser Back after completion shows a stale, zeroed-out Overview | Complete an order, then click the browser Back button. | Undefined by user story; noted for awareness. | Lands on the Overview page showing $0 totals (post cart-clear state), not a snapshot of the just-completed order. | `TC-CHECKOUT-NAV-004` |
-| BUG-005 | Low | No format validation on Checkout Information fields | Enter special characters/script-like strings, numeric names, or alphabetic postal codes, then Continue. | Business Rule 1 implies meaningful field validation, not just presence. | All values are accepted as long as the field is non-empty — validation is presence-only, not format-based. No XSS execution was observed. | `TC-CHECKOUT-INFO-010-SpecialCharacters`, `TC-CHECKOUT-INFO-011-NumericFirstName` |
-| BUG-006 | Low | Whitespace-only input satisfies the "required" check | Enter a single space (or spaces) into First Name, leave Last Name/Zip filled, click Continue. | Business Rule 1: field should be considered empty/required. | The field is treated as non-empty and the user proceeds. | `TC-CHECKOUT-INFO-008-WhitespaceOnly` |
-| BUG-007 | Cosmetic | All three fields get error styling, not just the invalid one | Submit Checkout Information with only one field empty (e.g. Zip). | Only the actually-invalid field should show an error style. | All three input fields (First Name, Last Name, Zip) receive the red "error" CSS class, even though only one specific field triggered the banner message. | `TC-CHECKOUT-ERROR-002` |
+| BUG-001 | Medium | Checkout completes with an empty cart | 1. Log in. 2. Do not add any items. 3. Navigate through checkout with valid info. 4. Click Finish. | Business Rule 3: "Cart cannot be empty when proceeding to checkout" — checkout should be blocked. | The full flow completes to a $0.00 confirmed order. | `TC-CHECKOUT-032` |
+| BUG-002 | Medium | Overview Cancel returns to Products, not Cart | On the Checkout Overview page, click Cancel. | Business Rule 5: "Users can cancel checkout at any step and return to cart." | Cancel on Overview navigates to `/inventory.html` (Products page), not `/cart.html`. Cancel on Step One does correctly return to Cart. | `TC-CHECKOUT-024` |
+| BUG-003 | Low | Whitespace-only input satisfies the "required" check | Enter a single space into First Name, leave Last Name/Zip filled, click Continue. | Business Rule 1: field should be considered empty/required. | The field is treated as non-empty and the user proceeds. | Covered under `checkout-information.spec.ts` boundary cases |
+| BUG-004 | Low | Skipping Step One reaches a usable Overview page | While logged in with items in cart, navigate directly to `/checkout-step-two.html` without submitting Checkout Information. | Step sequence implies Information must be completed first. | The Overview page renders normally with an enabled Finish button. | `TC-CHECKOUT-025-SkipStepOne` |
+| BUG-005 | Low | Browser Back after completion + re-Finish is idempotent, not blocked | Complete an order, click browser Back (cached Overview), click Finish again. | A completed order shouldn't be freely re-submittable. | The app allows it with no guard, described in the suite as "idempotent" rather than blocked. | `TC-CHECKOUT-029-BrowserBack` |
 
 No Critical or High severity defects were found; core happy-path and validation-error flows (AC1–AC4, and the "leave a field empty" case in AC2/AC5) all behave exactly as specified.
 
@@ -103,38 +99,38 @@ No Critical or High severity defects were found; core happy-path and validation-
 
 | Acceptance Criteria | Covered By | Manual | Automated |
 |---|---|---|---|
-| AC1 – Cart Review | `cart-review.spec.ts` (TC-CART-001…006) | Exploration only | ✅ |
-| AC2 – Checkout Information Entry | `checkout-information.spec.ts` (TC-CHECKOUT-INFO-001…012) | Exploration only | ✅ |
-| AC3 – Order Overview | `checkout-overview.spec.ts` (TC-CHECKOUT-OVERVIEW-001…006) | Exploration only | ✅ |
-| AC4 – Order Completion | `order-completion.spec.ts` (TC-CHECKOUT-COMPLETE-001…004) | Exploration only | ✅ |
-| AC5 – Error Handling | `error-handling.spec.ts` (TC-CHECKOUT-ERROR-001…004) | Exploration only | ✅ |
-| Business Rule 1 (mandatory fields) | TC-CHECKOUT-INFO-003…006, 008 | — | ✅ (gap logged: BUG-005/006) |
-| Business Rule 2 (login required) | TC-CHECKOUT-INFO-012-NotLoggedIn | — | ✅ |
-| Business Rule 3 (cart not empty at checkout) | TC-CHECKOUT-ERROR-004-EmptyCartThroughCheckout | — | ✅ (gap logged: BUG-001) |
-| Business Rule 4 (order clears cart) | TC-CHECKOUT-COMPLETE-002 | — | ✅ |
-| Business Rule 5 (cancel at any step) | TC-CHECKOUT-NAV-001, 002, 007 | — | ✅ |
-| Navigation / browser back | `navigation-flow.spec.ts` (TC-CHECKOUT-NAV-001…007) | — | ✅ |
-| Cross-browser (Chrome/Firefox/Safari) | `firefox`/`webkit` projects in `playwright.config.ts` | — | ✅ (123/123 passing, see 3.2) |
+| AC1 – Cart Review | `cart-review.spec.ts` (TC-CHECKOUT-001…006) | Exploration only | ✅ |
+| AC2 – Checkout Information Entry | `checkout-information.spec.ts` (TC-CHECKOUT-007…018) | Exploration only | ✅ |
+| AC3 – Order Overview | `checkout-overview.spec.ts` (TC-CHECKOUT-019…025) | Exploration only | ✅ |
+| AC4 – Order Completion | `order-completion.spec.ts` (TC-CHECKOUT-026…029) | Exploration only | ✅ |
+| AC5 – Error Handling | Folded into Checkout Information suite (validation/boundary cases) | Exploration only | ✅ |
+| Business Rule 1 (mandatory fields) | Checkout Information boundary cases | — | ✅ (gap logged: BUG-003) |
+| Business Rule 2 (login required) | `TC-CHECKOUT-033` (access control matrix) | — | ✅ |
+| Business Rule 3 (cart not empty at checkout) | `TC-CHECKOUT-032` | — | ✅ (gap logged: BUG-001) |
+| Business Rule 4 (order clears cart) | `TC-CHECKOUT-027` | — | ✅ |
+| Business Rule 5 (cancel at any step, return to cart) | `TC-CHECKOUT-024` and Step One cancel case | — | ✅ (gap logged: BUG-002) |
+| Navigation / browser back | `TC-CHECKOUT-025-SkipStepOne`, `TC-CHECKOUT-029-BrowserBack` | — | ✅ |
+| Cross-browser (Chrome/Firefox/Safari) | `firefox`/`webkit` projects in `playwright.config.ts` | — | ✅ (99/99 passing, see 3.2) |
 | Mobile responsiveness | — | — | ❌ Gap — see below |
 
 **Coverage gaps / recommendations:**
 1. **Mobile responsiveness** — not covered by the current suite (no mobile viewport/device project configured). Recommend a follow-up pass with a mobile emulation project if this is a hard requirement rather than a nice-to-have.
-2. **Alternate user personas** (`locked_out_user`, `problem_user`, `performance_glitch_user`, `error_user`, `visual_user`) were explicitly scoped out of this pass per the test plan; consider a follow-up suite if these are in-scope for the broader story.
-3. Business-rule gaps (BUG-001, BUG-005, BUG-006) and the direct-URL confirmation gap (BUG-002) should go back to the product owner to confirm whether they are accepted SauceDemo demo-app behavior (likely, since SauceDemo is a fixed public demo target) or represent real validation to add.
+2. **Alternate user personas** (`locked_out_user`, `problem_user`, `performance_glitch_user`, `error_user`, `visual_user`) were explicitly scoped out of this pass; consider a follow-up suite if these are in-scope for the broader story.
+3. Business-rule deviations (BUG-001, BUG-002, BUG-003) should go back to the product owner to confirm whether they are accepted SauceDemo demo-app behavior (likely, since SauceDemo is a fixed public demo target) or represent real validation/navigation fixes to make.
 
 ---
 
 ## 6. Summary and Recommendations
 
-**Overall quality assessment:** The checkout flow is stable and functionally correct against all five acceptance criteria — cart review, information entry, overview totals (verified for single-item, two-item, and all-6-product carts), order completion, and cancel/navigation behavior all pass. The suite required zero healing on this third from-scratch regeneration, reinforcing that the plan → explore → generate pipeline reliably produces accurate selectors and expectations across repeated independent runs.
+**Overall quality assessment:** The checkout flow is stable and functionally correct against all five acceptance criteria — cart review, information entry, overview totals, order completion, and cancel/navigation behavior all pass. The suite required zero healing on this fourth from-scratch regeneration, reinforcing that the plan → explore → generate pipeline reliably produces accurate selectors and expectations across repeated independent runs.
 
 **Risk areas:**
-- BUG-002 (direct-URL confirmation page with no real order behind it) is the most notable new finding this pass — it's a step beyond the previously-known "no step-sequence enforcement," showing the UI can present a completed-order confirmation for an order that was never actually placed.
-- The empty-cart checkout gap (BUG-001) remains the most business-relevant finding — it contradicts a stated business rule and should be explicitly accepted or fixed.
-- Lack of format validation (BUG-005, BUG-006) and the all-fields-error-styling cosmetic issue (BUG-007) are consistent with SauceDemo being a fixed public demo app with intentionally shallow validation; unlikely to change, but worth confirming expectations aren't drifting for a real target.
+- BUG-002 (Overview Cancel → Products instead of Cart) is arguably the most business-relevant finding this pass — it's a direct, specific contradiction of Business Rule 5's wording ("return to cart"), more precise than the general "cancel works" framing in earlier passes.
+- The empty-cart checkout gap (BUG-001) remains a recurring, consistently-reproduced finding across every regeneration this session.
+- BUG-004 and BUG-005 (loose step-sequencing / idempotent re-Finish) are consistent with SauceDemo being a fixed public demo app; unlikely to change, but worth confirming expectations aren't drifting for a real target.
 
 **Next steps:**
-1. Decide on BUG-001 through BUG-007 with the product owner; if accepted as-is, convert their test cases from "negative case" framing to explicit "documented behavior" framing (already done via titles like "is not blocked" / "confirmed gap").
+1. Decide on BUG-001 through BUG-005 with the product owner; if accepted as-is, keep framing these as documented behavior (already done via titles like "documented Business Rule 5 deviation").
 2. Consider a lightweight mobile-viewport pass if mobile responsiveness is a hard release gate.
 3. CI is already wired up — see `.github/workflows/saucedemo-checkout.yml` (push/PR path-filtered, daily schedule, manual `workflow_dispatch`), running all 3 browsers.
-4. **Process note for future regenerations:** during this session, the `playwright-test-planner` and `playwright-test-generator` subagents were repeatedly observed writing unrelated boilerplate content into files outside their intended output directories (their own `.claude/agents/*.md` definitions, and an unrelated `.claude/commands/*.md` file) via `planner_save_plan`/`generator_write_test`'s unrestricted `fileName` parameter. A `PreToolUse` hook (`.claude/hooks/guard-mcp-file-writes.js`, wired in `.claude/settings.json`) now technically blocks both tools from writing outside `specs/`/`tests/` respectively; the regeneration for this report also used explicit prompt-level scope restrictions, and this run completed with no corruption to any file outside `specs/saucedemo-checkout-test-plan.md` and `tests/saucedemo-checkout/`.
+4. **Process note:** this regeneration used explicit prompt-level scope restrictions (both agents told to only write within `specs/`/`tests/` respectively) plus the `PreToolUse` guardrail hook (`.claude/hooks/guard-mcp-file-writes.js`). This run completed with zero files touched outside `specs/saucedemo-checkout-test-plan.md` and `tests/saucedemo-checkout/`.
