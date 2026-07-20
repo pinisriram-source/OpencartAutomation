@@ -1,235 +1,257 @@
-// spec: specs/saucedemo-checkout-test-plan.md (section 2. Checkout Information Entry)
+// spec: specs/saucedemo-checkout-test-plan.md (Suite 2: Checkout Information Entry)
 // seed: tests/seed.spec.ts
-
-import { test, expect, stringOfLength, alphaNumericStringOfLength } from './fixtures/saucedemo.fixture';
-import { LoginPage } from './pages/LoginPage';
+import { test, expect, loginAsStandardUser, stringOfLength } from './fixtures/saucedemo.fixture';
 import products from './test-data/products.json';
-import customer from './test-data/customer.json';
+import checkoutInfo from './test-data/checkout-info.json';
 import messages from './test-data/messages.json';
 
 test.describe('Checkout Information Entry', () => {
-  test('TC-CHECKOUT-INFO-001 - Checkout Information page displays required fields', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, click Checkout from the cart page.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-one\.html$/);
+  test('TC-CHECKOUT-INFO-001 Page displays all required fields and controls', async ({
+    loginPage,
+    inventoryPage,
+    cartPage,
+    checkoutInformationPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, click 'Checkout' from the cart page.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await inventoryPage.goToCart();
+    await cartPage.goToCheckout();
+    await expect(checkoutInformationPage.page).toHaveURL(/checkout-step-one\.html/);
 
-    // 1. Inspect the form.
-    await expect(checkoutStepOnePage.heading).toHaveText('Checkout: Your Information');
-    await expect(checkoutStepOnePage.firstNameInput).toBeVisible();
-    await expect(checkoutStepOnePage.firstNameInput).toBeEmpty();
-    await expect(checkoutStepOnePage.lastNameInput).toBeVisible();
-    await expect(checkoutStepOnePage.lastNameInput).toBeEmpty();
-    await expect(checkoutStepOnePage.postalCodeInput).toBeVisible();
-    await expect(checkoutStepOnePage.postalCodeInput).toBeEmpty();
-    await expect(checkoutStepOnePage.cancelButton).toBeVisible();
-    await expect(checkoutStepOnePage.continueButton).toBeVisible();
+    // 2. Inspect the form.
+    await expect(checkoutInformationPage.title).toHaveText('Checkout: Your Information');
+    await expect(checkoutInformationPage.firstNameInput).toHaveValue('');
+    await expect(checkoutInformationPage.lastNameInput).toHaveValue('');
+    await expect(checkoutInformationPage.postalCodeInput).toHaveValue('');
+    await expect(checkoutInformationPage.cancelButton).toBeVisible();
+    await expect(checkoutInformationPage.continueButton).toBeVisible();
   });
 
-  test('TC-CHECKOUT-INFO-002 - Valid data in all fields allows proceeding to Overview', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-002 Valid data in all fields proceeds to Overview', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1-3. Enter First Name, Last Name, Zip/Postal Code.
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await expect(checkoutStepOnePage.firstNameInput).toHaveValue(customer.valid.firstName);
-    await expect(checkoutStepOnePage.lastNameInput).toHaveValue(customer.valid.lastName);
-    await expect(checkoutStepOnePage.postalCodeInput).toHaveValue(customer.valid.postalCode);
-
-    // 4. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-two\.html$/);
-    await expect(checkoutStepOnePage.errorBanner).toBeHidden();
-    await expect(checkoutStepOnePage.heading).toHaveText('Checkout: Overview');
+    // 2. Enter First Name, Last Name, Zip/Postal Code, then click 'Continue'.
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
+    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
+    await expect(checkoutInformationPage.errorBanner).toHaveCount(0);
+    await expect(checkoutOverviewPage.title).toHaveText('Checkout: Overview');
   });
 
-  test('TC-CHECKOUT-INFO-003-EmptyFirstName - Leaving First Name empty blocks Continue with correct error', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-003-EmptyFirstName Empty First Name blocks Continue with the correct error', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1. Leave First Name empty. Enter Last Name and Zip.
-    await checkoutStepOnePage.fillInfo('', customer.valid.lastName, customer.valid.postalCode);
-
-    // 2. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-one\.html$/);
-    await expect(checkoutStepOnePage.errorBanner).toHaveText(messages.firstNameRequired);
-    await expect(checkoutStepOnePage.firstNameInput).toHaveClass(/error/);
+    // 2. Leave First Name empty. Enter Last Name and Zip, then click 'Continue'.
+    await checkoutInformationPage.submitInformation({
+      lastName: checkoutInfo.valid.lastName,
+      postalCode: checkoutInfo.valid.postalCode,
+    });
+    await expect(checkoutInformationPage.page).toHaveURL(/checkout-step-one\.html/);
+    await expect(checkoutInformationPage.errorBanner).toHaveText(messages.firstNameRequired);
+    await expect(checkoutInformationPage.isFieldMarkedInvalid(checkoutInformationPage.firstNameInput)).resolves.toBe(true);
+    await expect(checkoutInformationPage.isFieldMarkedInvalid(checkoutInformationPage.lastNameInput)).resolves.toBe(true);
+    await expect(checkoutInformationPage.isFieldMarkedInvalid(checkoutInformationPage.postalCodeInput)).resolves.toBe(true);
   });
 
-  test('TC-CHECKOUT-INFO-004-EmptyLastName - Leaving Last Name empty blocks Continue with correct error', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-004-EmptyLastName Empty Last Name blocks Continue with the correct error', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1. Enter First Name. Leave Last Name empty. Enter Zip.
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, '', customer.valid.postalCode);
-
-    // 2. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-one\.html$/);
-    await expect(checkoutStepOnePage.errorBanner).toHaveText(messages.lastNameRequired);
+    // 2. Enter First Name. Leave Last Name empty. Enter Zip, then click 'Continue'.
+    await checkoutInformationPage.submitInformation({
+      firstName: checkoutInfo.valid.firstName,
+      postalCode: checkoutInfo.valid.postalCode,
+    });
+    await expect(checkoutInformationPage.page).toHaveURL(/checkout-step-one\.html/);
+    await expect(checkoutInformationPage.errorBanner).toHaveText(messages.lastNameRequired);
   });
 
-  test('TC-CHECKOUT-INFO-005-EmptyZip - Leaving Zip/Postal Code empty blocks Continue with correct error', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-005-EmptyZip Empty Zip/Postal Code blocks Continue with the correct error', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1. Enter First Name and Last Name. Leave Zip/Postal Code empty.
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, '');
-
-    // 2. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-one\.html$/);
-    await expect(checkoutStepOnePage.errorBanner).toHaveText(messages.postalCodeRequired);
+    // 2. Enter First Name and Last Name. Leave Zip/Postal Code empty, then click 'Continue'.
+    await checkoutInformationPage.submitInformation({
+      firstName: checkoutInfo.valid.firstName,
+      lastName: checkoutInfo.valid.lastName,
+    });
+    await expect(checkoutInformationPage.page).toHaveURL(/checkout-step-one\.html/);
+    await expect(checkoutInformationPage.errorBanner).toHaveText(messages.postalCodeRequired);
   });
 
-  test('TC-CHECKOUT-INFO-006-AllFieldsEmpty - Clicking Continue with all fields empty shows First Name error first', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await expect(checkoutStepOnePage.firstNameInput).toBeEmpty();
-    await expect(checkoutStepOnePage.lastNameInput).toBeEmpty();
-    await expect(checkoutStepOnePage.postalCodeInput).toBeEmpty();
+  test('TC-CHECKOUT-INFO-006-AllFieldsEmpty Clicking Continue with all fields empty enforces sequential field-by-field validation', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1. Without entering any data, click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-one\.html$/);
-    await expect(checkoutStepOnePage.errorBanner).toHaveText(messages.firstNameRequired);
+    // 2. Without entering any data, click 'Continue'.
+    await checkoutInformationPage.clickContinue();
+    await expect(checkoutInformationPage.page).toHaveURL(/checkout-step-one\.html/);
+    await expect(checkoutInformationPage.errorBanner).toHaveText(messages.firstNameRequired);
 
-    // 2. Fill First Name and click Continue again (leaving Last Name/Zip empty).
-    await checkoutStepOnePage.firstNameInput.fill(customer.valid.firstName);
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.errorBanner).toHaveText(messages.lastNameRequired);
+    // 3. Fill only First Name, leaving Last Name/Zip empty, and click 'Continue' again.
+    await checkoutInformationPage.fillInformation({ firstName: checkoutInfo.valid.firstName });
+    await checkoutInformationPage.clickContinue();
+    await expect(checkoutInformationPage.errorBanner).toHaveText(messages.lastNameRequired);
   });
 
-  test('TC-CHECKOUT-INFO-007 - Error message can be dismissed', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: trigger the 'Error: First Name is required' banner.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo('', customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.errorBanner).toHaveText(messages.firstNameRequired);
-    await expect(checkoutStepOnePage.errorDismissButton).toBeVisible();
+  test('TC-CHECKOUT-INFO-007 Error banner can be dismissed without losing entered data', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+  }) => {
+    // 1. Preconditions: trigger the 'Error: First Name is required' banner (Last Name/Zip already filled).
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation({
+      lastName: checkoutInfo.valid.lastName,
+      postalCode: checkoutInfo.valid.postalCode,
+    });
+    await expect(checkoutInformationPage.errorBanner).toBeVisible();
 
-    // 1. Click the close icon on the error banner.
-    await checkoutStepOnePage.dismissError();
-    await expect(checkoutStepOnePage.errorBanner).toBeHidden();
-    await expect(checkoutStepOnePage.lastNameInput).toHaveValue(customer.valid.lastName);
-    await expect(checkoutStepOnePage.postalCodeInput).toHaveValue(customer.valid.postalCode);
+    // 2. Click the close icon on the error banner.
+    await checkoutInformationPage.dismissError();
+    await expect(checkoutInformationPage.errorBanner).toHaveCount(0);
+    await expect(checkoutInformationPage.lastNameInput).toHaveValue(checkoutInfo.valid.lastName);
+    await expect(checkoutInformationPage.postalCodeInput).toHaveValue(checkoutInfo.valid.postalCode);
   });
 
-  test('TC-CHECKOUT-INFO-008-WhitespaceOnly - Whitespace-only input is evaluated for required-field validation', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-008-WhitespaceOnly Whitespace-only First Name satisfies the required-field check', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1. Enter a single space character into First Name, valid Last Name and Zip.
-    await checkoutStepOnePage.fillInfo(' ', customer.valid.lastName, customer.valid.postalCode);
-    await expect(checkoutStepOnePage.firstNameInput).toHaveValue(' ');
-
-    // 2. Click 'Continue'.
-    // Observed behavior: the app does NOT trim/require-check whitespace as empty, so it proceeds to Overview
-    // rather than showing "Error: First Name is required".
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-two\.html$/);
+    // 2. Enter a single space character into First Name, a valid Last Name and Zip, then click 'Continue'.
+    await checkoutInformationPage.submitInformation({
+      firstName: checkoutInfo.boundary.whitespaceFirstName,
+      lastName: checkoutInfo.valid.lastName,
+      postalCode: checkoutInfo.valid.postalCode,
+    });
+    // Confirmed live: whitespace-only satisfies "required" — no error, proceeds to Overview (flagged product gap).
+    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
   });
 
-  test('TC-CHECKOUT-INFO-009-VeryLongInput - Very long values in each field are accepted without truncation or crash', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-009-VeryLongInput Very long field values are accepted without truncation', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    const pageErrors: Error[] = [];
-    checkoutStepOnePage.page.on('pageerror', (err) => pageErrors.push(err));
+    // 2. Enter 250-char First Name/Last Name and a 100-char alphanumeric Zip (no maxlength attribute).
+    const longName = stringOfLength(checkoutInfo.boundary.longNameLength);
+    const longZip = stringOfLength(checkoutInfo.boundary.longZipLength, '9');
+    await checkoutInformationPage.fillInformation({ firstName: longName, lastName: longName, postalCode: longZip });
+    await expect(checkoutInformationPage.firstNameInput).toHaveValue(longName);
+    await expect(checkoutInformationPage.lastNameInput).toHaveValue(longName);
+    await expect(checkoutInformationPage.postalCodeInput).toHaveValue(longZip);
 
-    const longFirstName = stringOfLength(customer.boundary.longNameLength);
-    const longLastName = stringOfLength(customer.boundary.longNameLength);
-    const longZip = alphaNumericStringOfLength(customer.boundary.longPostalCodeLength);
-
-    // 1. Enter a 250-character string into First Name/Last Name, and a 100-character alphanumeric string into Zip.
-    await checkoutStepOnePage.fillInfo(longFirstName, longLastName, longZip);
-    await expect(checkoutStepOnePage.firstNameInput).toHaveValue(longFirstName);
-    await expect(checkoutStepOnePage.lastNameInput).toHaveValue(longLastName);
-    await expect(checkoutStepOnePage.postalCodeInput).toHaveValue(longZip);
-
-    // 2. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    expect(pageErrors).toHaveLength(0);
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-two\.html$/);
-    await expect(checkoutStepOnePage.heading).toHaveText('Checkout: Overview');
+    // 3. Click 'Continue'.
+    await checkoutInformationPage.clickContinue();
+    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
+    await expect(checkoutOverviewPage.title).toHaveText('Checkout: Overview');
   });
 
-  test('TC-CHECKOUT-INFO-010-SpecialCharacters - Special characters and script-like input are accepted as literal text (no validation, no XSS execution)', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-010-SpecialCharacters Special characters and script-like input are accepted as literal text with no XSS execution', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    let dialogFired = false;
-    checkoutStepOnePage.page.on('dialog', async (dialog) => {
-      dialogFired = true;
-      await dialog.dismiss();
+    // No JS dialog should ever fire while typing or navigating; fail the test if one appears.
+    checkoutInformationPage.page.on('dialog', (dialog) => {
+      throw new Error(`Unexpected dialog fired (possible XSS execution): ${dialog.message()}`);
     });
 
-    // 1-3. Enter special/script-like characters into all three fields.
-    await checkoutStepOnePage.fillInfo(
-      customer.specialCharacters.firstName,
-      customer.specialCharacters.lastName,
-      customer.specialCharacters.postalCode,
-    );
-    await expect(checkoutStepOnePage.firstNameInput).toHaveValue(customer.specialCharacters.firstName);
-    await expect(checkoutStepOnePage.lastNameInput).toHaveValue(customer.specialCharacters.lastName);
-    await expect(checkoutStepOnePage.postalCodeInput).toHaveValue(customer.specialCharacters.postalCode);
+    // 2. Enter the special-character/script-like test data into First Name, Last Name, and Zip.
+    await checkoutInformationPage.fillInformation(checkoutInfo.specialCharacters);
+    await expect(checkoutInformationPage.firstNameInput).toHaveValue(checkoutInfo.specialCharacters.firstName);
+    await expect(checkoutInformationPage.lastNameInput).toHaveValue(checkoutInfo.specialCharacters.lastName);
+    await expect(checkoutInformationPage.postalCodeInput).toHaveValue(checkoutInfo.specialCharacters.postalCode);
 
-    // 4. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.errorBanner).toBeHidden();
-    expect(dialogFired).toBe(false);
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-two\.html$/);
-    await expect(checkoutStepOnePage.heading).toHaveText('Checkout: Overview');
+    // 3. Click 'Continue'.
+    await checkoutInformationPage.clickContinue();
+    await expect(checkoutInformationPage.errorBanner).toHaveCount(0);
+    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
+    await expect(checkoutOverviewPage.title).toHaveText('Checkout: Overview');
   });
 
-  test('TC-CHECKOUT-INFO-011-NumericFirstName - Numeric/non-alphabetic values in Name fields are accepted (no format validation)', async ({ loggedInPage, cartPage, checkoutStepOnePage }) => {
-    // Preconditions: add an item to cart, navigate to /checkout-step-one.html.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
+  test('TC-CHECKOUT-INFO-011-NumericFirstName Numeric names and alphabetic postal codes are accepted (no format validation)', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in, add an item to cart, navigate to /checkout-step-one.html.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
 
-    // 1. Enter numeric First/Last Name and alphabetic Zip.
-    await checkoutStepOnePage.fillInfo(
-      customer.numericFirstName.firstName,
-      customer.numericFirstName.lastName,
-      customer.numericFirstName.postalCode,
-    );
-
-    // 2. Click 'Continue'.
-    await checkoutStepOnePage.continueCheckout();
-    await expect(checkoutStepOnePage.errorBanner).toBeHidden();
-    await expect(checkoutStepOnePage.page).toHaveURL(/\/checkout-step-two\.html$/);
+    // 2. Enter the numeric/alphabetic test data as specified, then click 'Continue'.
+    await checkoutInformationPage.submitInformation(checkoutInfo.numeric);
+    await expect(checkoutInformationPage.errorBanner).toHaveCount(0);
+    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
   });
 
-  test('TC-CHECKOUT-INFO-012-NotLoggedIn - Direct navigation to checkout page while logged out redirects to login with an error', async ({ page }) => {
-    // Preconditions: fresh, unauthenticated browser context (default Playwright test isolation - no login performed).
-    const loginPage = new LoginPage(page);
-
-    // 1. Navigate directly to https://www.saucedemo.com/checkout-step-one.html.
-    await page.goto('https://www.saucedemo.com/checkout-step-one.html');
-    await expect(page).toHaveURL('https://www.saucedemo.com/');
-    await expect(loginPage.errorBanner).toHaveText(messages.notLoggedInCheckoutStepOne);
-    await expect(loginPage.usernameInput).toBeEmpty();
-    await expect(loginPage.passwordInput).toBeEmpty();
+  test('TC-CHECKOUT-INFO-012-NotLoggedIn Direct navigation to checkout while logged out redirects to login with an error', async ({
+    loginPage,
+  }) => {
+    // 1. Preconditions: fresh browser context/session — never logged in.
+    // 2. Navigate directly to https://www.saucedemo.com/checkout-step-one.html.
+    await loginPage.page.goto('https://www.saucedemo.com/checkout-step-one.html');
+    await expect(loginPage.page).toHaveURL('https://www.saucedemo.com/');
+    await expect(loginPage.errorBanner).toHaveText(
+      messages.notLoggedInTemplate.replace('{path}', '/checkout-step-one.html'),
+    );
+    await expect(loginPage.usernameInput).toHaveValue('');
+    await expect(loginPage.passwordInput).toHaveValue('');
   });
 });

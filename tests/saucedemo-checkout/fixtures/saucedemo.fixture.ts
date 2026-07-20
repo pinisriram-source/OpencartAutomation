@@ -1,52 +1,55 @@
 import { test as base, expect } from '@playwright/test';
-import { LoginPage } from '../pages/LoginPage';
-import { InventoryPage } from '../pages/InventoryPage';
-import { CartPage } from '../pages/CartPage';
-import { CheckoutStepOnePage } from '../pages/CheckoutStepOnePage';
-import { CheckoutStepTwoPage } from '../pages/CheckoutStepTwoPage';
-import { CheckoutCompletePage } from '../pages/CheckoutCompletePage';
-import users from '../test-data/users.json';
+import { LoginPage } from '../pages/login.page';
+import { InventoryPage } from '../pages/inventory.page';
+import { CartPage } from '../pages/cart.page';
+import { CheckoutInformationPage } from '../pages/checkout-information.page';
+import { CheckoutOverviewPage } from '../pages/checkout-overview.page';
+import { CheckoutCompletePage } from '../pages/checkout-complete.page';
+import credentials from '../test-data/credentials.json';
 
 type SauceDemoFixtures = {
   loginPage: LoginPage;
   inventoryPage: InventoryPage;
   cartPage: CartPage;
-  checkoutStepOnePage: CheckoutStepOnePage;
-  checkoutStepTwoPage: CheckoutStepTwoPage;
+  checkoutInformationPage: CheckoutInformationPage;
+  checkoutOverviewPage: CheckoutOverviewPage;
   checkoutCompletePage: CheckoutCompletePage;
-  /** Logs in as the standard user (fresh, cart-less session) and lands on the Products page. */
-  loggedInPage: InventoryPage;
 };
 
 export const test = base.extend<SauceDemoFixtures>({
-  loginPage: async ({ page }, use) => use(new LoginPage(page)),
-  inventoryPage: async ({ page }, use) => use(new InventoryPage(page)),
-  cartPage: async ({ page }, use) => use(new CartPage(page)),
-  checkoutStepOnePage: async ({ page }, use) => use(new CheckoutStepOnePage(page)),
-  checkoutStepTwoPage: async ({ page }, use) => use(new CheckoutStepTwoPage(page)),
-  checkoutCompletePage: async ({ page }, use) => use(new CheckoutCompletePage(page)),
-
-  loggedInPage: async ({ page }, use) => {
-    const login = new LoginPage(page);
-    await login.goto();
-    const inventory = await login.login(users.standard.username, users.standard.password);
-    await use(inventory);
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
+  },
+  inventoryPage: async ({ page }, use) => {
+    await use(new InventoryPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+  checkoutInformationPage: async ({ page }, use) => {
+    await use(new CheckoutInformationPage(page));
+  },
+  checkoutOverviewPage: async ({ page }, use) => {
+    await use(new CheckoutOverviewPage(page));
+  },
+  checkoutCompletePage: async ({ page }, use) => {
+    await use(new CheckoutCompletePage(page));
   },
 });
 
 export { expect };
 
-/** Generates a string of the given length made of a repeated character, for boundary-length inputs. */
-export function stringOfLength(length: number, char = 'a'): string {
-  return char.repeat(length);
+/**
+ * Logs in as the standard_user persona used throughout this checkout regression suite.
+ * Each Playwright test runs in its own fresh browser context, so the session (and cart)
+ * always starts empty/logged-out before this is called.
+ */
+export async function loginAsStandardUser(loginPage: LoginPage): Promise<void> {
+  await loginPage.open();
+  await loginPage.login(credentials.standardUser.username, credentials.standardUser.password);
 }
 
-/** Generates a deterministic alphanumeric string of the given length, for boundary-length inputs. */
-export function alphaNumericStringOfLength(length: number): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += chars[i % chars.length];
-  }
-  return result;
+/** Generates a string of the given length made of a repeated character, for boundary-length inputs. */
+export function stringOfLength(length: number, char = 'A'): string {
+  return char.repeat(length);
 }

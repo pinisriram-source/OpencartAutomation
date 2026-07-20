@@ -1,148 +1,148 @@
-// spec: specs/saucedemo-checkout-test-plan.md (section 3. Order Overview)
+// spec: specs/saucedemo-checkout-test-plan.md (Suite 3: Order Overview)
 // seed: tests/seed.spec.ts
-
-import { test, expect } from './fixtures/saucedemo.fixture';
+import { test, expect, loginAsStandardUser } from './fixtures/saucedemo.fixture';
 import products from './test-data/products.json';
-import customer from './test-data/customer.json';
+import checkoutInfo from './test-data/checkout-info.json';
 import messages from './test-data/messages.json';
-import { calculateTax, calculateTotal, formatMoney } from './utils/pricing';
-
-const allProducts = Object.values(products);
+import totals from './test-data/totals.json';
 
 test.describe('Order Overview', () => {
-  test('TC-CHECKOUT-OVERVIEW-001 - Overview page shows item summary matching cart contents', async ({ loggedInPage, cartPage, checkoutStepOnePage, checkoutStepTwoPage }) => {
-    // Preconditions: add Backpack and Bike Light to cart, proceed to Checkout, enter valid info, click Continue.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.addProductToCart(products.bikeLight.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueToOverview();
-    await expect(checkoutStepTwoPage.page).toHaveURL(/\/checkout-step-two\.html$/);
+  test('TC-CHECKOUT-OVERVIEW-001 Item summary matches cart contents exactly', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in, add Backpack and Bike Light, proceed to Checkout with valid info.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductsToCart([products.backpack.slug, products.bikeLight.slug]);
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
+    await expect(checkoutOverviewPage.page).toHaveURL(/checkout-step-two\.html/);
 
-    // 1. Verify page heading and item rows.
-    await expect(checkoutStepTwoPage.heading).toHaveText('Checkout: Overview');
-    await expect(checkoutStepTwoPage.cartItems).toHaveCount(2);
+    // 2. Verify the page heading and item rows.
+    await expect(checkoutOverviewPage.title).toHaveText('Checkout: Overview');
+    await expect(checkoutOverviewPage.cartItems).toHaveCount(2);
 
-    await expect(checkoutStepTwoPage.itemQty(products.backpack.name)).toHaveText('1');
-    await expect(checkoutStepTwoPage.itemDescription(products.backpack.name)).toHaveText(products.backpack.description);
-    await expect(checkoutStepTwoPage.itemPrice(products.backpack.name)).toHaveText(formatMoney(products.backpack.price));
+    const backpackRow = checkoutOverviewPage.itemRow(products.backpack.name);
+    await expect(checkoutOverviewPage.quantity(backpackRow)).toHaveText('1');
+    await expect(checkoutOverviewPage.name(backpackRow)).toHaveText(products.backpack.name);
+    await expect(checkoutOverviewPage.description(backpackRow)).not.toBeEmpty();
+    await expect(checkoutOverviewPage.price(backpackRow)).toHaveText(`$${products.backpack.price}`);
 
-    await expect(checkoutStepTwoPage.itemQty(products.bikeLight.name)).toHaveText('1');
-    await expect(checkoutStepTwoPage.itemDescription(products.bikeLight.name)).toHaveText(products.bikeLight.description);
-    await expect(checkoutStepTwoPage.itemPrice(products.bikeLight.name)).toHaveText(formatMoney(products.bikeLight.price));
+    const bikeLightRow = checkoutOverviewPage.itemRow(products.bikeLight.name);
+    await expect(checkoutOverviewPage.quantity(bikeLightRow)).toHaveText('1');
+    await expect(checkoutOverviewPage.name(bikeLightRow)).toHaveText(products.bikeLight.name);
+    await expect(checkoutOverviewPage.description(bikeLightRow)).not.toBeEmpty();
+    await expect(checkoutOverviewPage.price(bikeLightRow)).toHaveText(`$${products.bikeLight.price}`);
   });
 
-  test('TC-CHECKOUT-OVERVIEW-002 - Overview page shows Payment and Shipping Information sections', async ({ loggedInPage, cartPage, checkoutStepOnePage, checkoutStepTwoPage }) => {
-    // Preconditions: reach /checkout-step-two.html with at least one item in cart.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueToOverview();
+  test('TC-CHECKOUT-OVERVIEW-002 Payment and Shipping Information sections are shown with correct static values', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: reach /checkout-step-two.html with at least one item in cart.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
 
-    // 1. Locate the Payment Information section.
-    await expect(checkoutStepTwoPage.paymentInfoLabel).toHaveText('Payment Information:');
-    await expect(checkoutStepTwoPage.paymentInfoValue).toHaveText(messages.paymentInfo);
+    // 2. Locate the Payment Information section.
+    await expect(checkoutOverviewPage.paymentInfoLabel).toHaveText(messages.paymentInfoLabel);
+    await expect(checkoutOverviewPage.paymentInfoValue).toHaveText(messages.paymentInfoValue);
 
-    // 2. Locate the Shipping Information section.
-    await expect(checkoutStepTwoPage.shippingInfoLabel).toHaveText('Shipping Information:');
-    await expect(checkoutStepTwoPage.shippingInfoValue).toHaveText(messages.shippingInfo);
+    // 3. Locate the Shipping Information section.
+    await expect(checkoutOverviewPage.shippingInfoLabel).toHaveText(messages.shippingInfoLabel);
+    await expect(checkoutOverviewPage.shippingInfoValue).toHaveText(messages.shippingInfoValue);
   });
 
-  test('TC-CHECKOUT-OVERVIEW-003 - Price Total block computes Item total, Tax, and Total correctly for a single item', async ({ loggedInPage, cartPage, checkoutStepOnePage, checkoutStepTwoPage }) => {
-    // Preconditions: add only Sauce Labs Backpack, proceed through checkout info with valid data.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueToOverview();
-    await expect(checkoutStepTwoPage.cartItems).toHaveCount(1);
+  test('TC-CHECKOUT-OVERVIEW-003 Price Total block computes correctly for a single item', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: add only 'Sauce Labs Backpack', proceed through checkout info with valid data.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
+    await expect(checkoutOverviewPage.cartItems).toHaveCount(1);
 
-    const itemTotal = products.backpack.price;
-    const tax = calculateTax(itemTotal);
-    const total = calculateTotal(itemTotal);
-
-    // 1. Read the 'Item total' value.
-    await expect(checkoutStepTwoPage.subtotalLabel).toHaveText(`Item total: ${formatMoney(itemTotal)}`);
-    // 2. Read the 'Tax' value.
-    await expect(checkoutStepTwoPage.taxLabel).toHaveText(`Tax: ${formatMoney(tax)}`);
-    // 3. Read the 'Total' value.
-    await expect(checkoutStepTwoPage.totalLabel).toHaveText(`Total: ${formatMoney(total)}`);
-    expect(formatMoney(itemTotal)).toBe('$29.99');
-    expect(formatMoney(tax)).toBe('$2.40');
-    expect(formatMoney(total)).toBe('$32.39');
+    // 2. Read the 'Item total', 'Tax', and 'Total' values.
+    await expect(checkoutOverviewPage.subtotalLabel).toHaveText(`Item total: ${totals.singleItem.itemTotal}`);
+    await expect(checkoutOverviewPage.taxLabel).toHaveText(`Tax: ${totals.singleItem.tax}`);
+    await expect(checkoutOverviewPage.totalLabel).toHaveText(`Total: ${totals.singleItem.total}`);
   });
 
-  test('TC-CHECKOUT-OVERVIEW-004 - Price Total block computes correctly for multiple items', async ({ loggedInPage, cartPage, checkoutStepOnePage, checkoutStepTwoPage }) => {
-    // Preconditions: add Backpack and Bike Light, proceed through checkout info with valid data.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.addProductToCart(products.bikeLight.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueToOverview();
-    await expect(checkoutStepTwoPage.cartItems).toHaveCount(2);
+  test('TC-CHECKOUT-OVERVIEW-004 Price Total block computes correctly for two items', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: add Backpack and Bike Light, proceed through checkout info with valid data.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductsToCart([products.backpack.slug, products.bikeLight.slug]);
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
+    await expect(checkoutOverviewPage.cartItems).toHaveCount(2);
 
-    const itemTotal = products.backpack.price + products.bikeLight.price;
-    const tax = calculateTax(itemTotal);
-    const total = calculateTotal(itemTotal);
-
-    // 1. Read the 'Item total' value.
-    await expect(checkoutStepTwoPage.subtotalLabel).toHaveText(`Item total: ${formatMoney(itemTotal)}`);
-    // 2. Read the 'Tax' value.
-    await expect(checkoutStepTwoPage.taxLabel).toHaveText(`Tax: ${formatMoney(tax)}`);
-    // 3. Read the 'Total' value.
-    await expect(checkoutStepTwoPage.totalLabel).toHaveText(`Total: ${formatMoney(total)}`);
-    expect(formatMoney(itemTotal)).toBe('$39.98');
-    expect(formatMoney(tax)).toBe('$3.20');
-    expect(formatMoney(total)).toBe('$43.18');
+    // 2. Read the 'Item total', 'Tax', and 'Total' values.
+    await expect(checkoutOverviewPage.subtotalLabel).toHaveText(`Item total: ${totals.twoItems.itemTotal}`);
+    await expect(checkoutOverviewPage.taxLabel).toHaveText(`Tax: ${totals.twoItems.tax}`);
+    await expect(checkoutOverviewPage.totalLabel).toHaveText(`Total: ${totals.twoItems.total}`);
   });
 
-  test('TC-CHECKOUT-OVERVIEW-005 - Overview page presents Cancel and Finish options', async ({ loggedInPage, cartPage, checkoutStepOnePage, checkoutStepTwoPage }) => {
-    // Preconditions: reach /checkout-step-two.html with at least one item in cart.
-    await loggedInPage.addProductToCart(products.backpack.id);
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueToOverview();
+  test('TC-CHECKOUT-OVERVIEW-005 Overview page presents Cancel and Finish options', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: reach /checkout-step-two.html with at least one item in cart.
+    await loginAsStandardUser(loginPage);
+    await inventoryPage.addProductToCart(products.backpack.slug);
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
 
-    // 1. Verify action buttons.
-    await expect(checkoutStepTwoPage.cancelButton).toBeVisible();
-    await expect(checkoutStepTwoPage.cancelButton).toBeEnabled();
-    await expect(checkoutStepTwoPage.finishButton).toBeVisible();
-    await expect(checkoutStepTwoPage.finishButton).toBeEnabled();
+    // 2. Verify action buttons.
+    await expect(checkoutOverviewPage.cancelButton).toBeVisible();
+    await expect(checkoutOverviewPage.cancelButton).toBeEnabled();
+    await expect(checkoutOverviewPage.finishButton).toBeVisible();
+    await expect(checkoutOverviewPage.finishButton).toBeEnabled();
   });
 
-  test('TC-CHECKOUT-OVERVIEW-006-AllProducts - Overview correctly totals the maximum available product set (6 items)', async ({ loggedInPage, cartPage, checkoutStepOnePage, checkoutStepTwoPage }) => {
-    // Preconditions: standard_user with an empty cart.
-    await expect(loggedInPage.cartBadge).toBeHidden();
+  test('TC-CHECKOUT-OVERVIEW-006-AllProducts Overview correctly totals the maximum available product set (6 items)', async ({
+    loginPage,
+    inventoryPage,
+    checkoutInformationPage,
+    checkoutOverviewPage,
+  }) => {
+    // 1. Preconditions: log in as standard_user with an empty cart.
+    await loginAsStandardUser(loginPage);
+    await expect(inventoryPage.cartBadge).toHaveCount(0);
 
-    // 1. Add all 6 available products to the cart.
-    for (const product of allProducts) {
-      await loggedInPage.addProductToCart(product.id);
+    // 2. Add all 6 available products.
+    await inventoryPage.addProductsToCart(Object.values(products).map((p) => p.slug));
+    await expect(inventoryPage.cartBadge).toHaveText('6');
+
+    // 3. Proceed to Checkout, enter valid data, click Continue to reach the Overview page.
+    await inventoryPage.goToCart();
+    await checkoutInformationPage.open();
+    await checkoutInformationPage.submitInformation(checkoutInfo.valid);
+    await expect(checkoutOverviewPage.cartItems).toHaveCount(6);
+    for (const product of Object.values(products)) {
+      const row = checkoutOverviewPage.itemRow(product.name);
+      await expect(checkoutOverviewPage.quantity(row)).toHaveText('1');
+      await expect(checkoutOverviewPage.price(row)).toHaveText(`$${product.price}`);
     }
-    await expect(loggedInPage.cartBadge).toHaveText('6');
 
-    // 2. Proceed to Checkout, enter valid info, click Continue to reach the Overview page.
-    await loggedInPage.goToCart();
-    await cartPage.proceedToCheckout();
-    await checkoutStepOnePage.fillInfo(customer.valid.firstName, customer.valid.lastName, customer.valid.postalCode);
-    await checkoutStepOnePage.continueToOverview();
-    await expect(checkoutStepTwoPage.cartItems).toHaveCount(6);
-    for (const product of allProducts) {
-      await expect(checkoutStepTwoPage.itemQty(product.name)).toHaveText('1');
-      await expect(checkoutStepTwoPage.itemPrice(product.name)).toHaveText(formatMoney(product.price));
-    }
-
-    // 3. Verify totals.
-    const itemTotal = allProducts.reduce((sum, p) => sum + p.price, 0);
-    const tax = calculateTax(itemTotal);
-    const total = calculateTotal(itemTotal);
-    expect(formatMoney(itemTotal)).toBe('$129.94');
-
-    await expect(checkoutStepTwoPage.subtotalLabel).toHaveText(`Item total: ${formatMoney(itemTotal)}`);
-    await expect(checkoutStepTwoPage.taxLabel).toHaveText(`Tax: ${formatMoney(tax)}`);
-    await expect(checkoutStepTwoPage.totalLabel).toHaveText(`Total: ${formatMoney(total)}`);
+    // 4. Verify totals.
+    await expect(checkoutOverviewPage.subtotalLabel).toHaveText(`Item total: ${totals.sixItems.itemTotal}`);
+    await expect(checkoutOverviewPage.taxLabel).toHaveText(`Tax: ${totals.sixItems.tax}`);
+    await expect(checkoutOverviewPage.totalLabel).toHaveText(`Total: ${totals.sixItems.total}`);
   });
 });

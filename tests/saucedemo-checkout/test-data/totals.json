@@ -1,0 +1,27 @@
+{
+  "singleItem": {
+    "itemTotal": "$29.99",
+    "tax": "$2.40",
+    "total": "$32.39"
+  },
+  "twoItems": {
+    "itemTotal": "$39.98",
+    "tax": "$3.20",
+    "total": "$43.18"
+  },
+  "threeItems": {
+    "itemTotal": "$55.97",
+    "tax": "$4.48",
+    "total": "$60.45"
+  },
+  "sixItems": {
+    "itemTotal": "$129.94",
+    "tax": "$10.40",
+    "total": "$140.34"
+  },
+  "emptyCart": {
+    "itemTotal": "$0",
+    "tax": "$0.00",
+    "total": "$0.00"
+  }
+}
