@@ -1,16 +1,12 @@
 import { Page, Locator } from '@playwright/test';
-import { AppHeader } from './AppHeader';
 
-/** The Checkout: Overview page (/checkout-step-two.html). */
 export class CheckoutStepTwoPage {
   readonly page: Page;
   readonly url = 'https://www.saucedemo.com/checkout-step-two.html';
-  readonly header: AppHeader;
-  readonly pageTitle: Locator;
+
+  readonly title: Locator;
   readonly cartItems: Locator;
-  readonly paymentInfoLabel: Locator;
   readonly paymentInfoValue: Locator;
-  readonly shippingInfoLabel: Locator;
   readonly shippingInfoValue: Locator;
   readonly subtotalLabel: Locator;
   readonly taxLabel: Locator;
@@ -20,12 +16,9 @@ export class CheckoutStepTwoPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.header = new AppHeader(page);
-    this.pageTitle = page.locator('[data-test="title"]');
+    this.title = page.locator('[data-test="title"]');
     this.cartItems = page.locator('[data-test="inventory-item"]');
-    this.paymentInfoLabel = page.locator('[data-test="payment-info-label"]');
     this.paymentInfoValue = page.locator('[data-test="payment-info-value"]');
-    this.shippingInfoLabel = page.locator('[data-test="shipping-info-label"]');
     this.shippingInfoValue = page.locator('[data-test="shipping-info-value"]');
     this.subtotalLabel = page.locator('[data-test="subtotal-label"]');
     this.taxLabel = page.locator('[data-test="tax-label"]');
@@ -38,9 +31,25 @@ export class CheckoutStepTwoPage {
     await this.page.goto(this.url);
   }
 
-  /** Locates an overview row by its visible product name. */
-  itemByName(name: string): Locator {
-    return this.cartItems.filter({ hasText: name });
+  /** Scopes to the order-summary row for a given product name. */
+  lineItem(productName: string): Locator {
+    return this.cartItems.filter({ hasText: productName });
+  }
+
+  quantity(productName: string): Locator {
+    return this.lineItem(productName).locator('[data-test="item-quantity"]');
+  }
+
+  name(productName: string): Locator {
+    return this.lineItem(productName).locator('[data-test="inventory-item-name"]');
+  }
+
+  description(productName: string): Locator {
+    return this.lineItem(productName).locator('[data-test="inventory-item-desc"]');
+  }
+
+  price(productName: string): Locator {
+    return this.lineItem(productName).locator('[data-test="inventory-item-price"]');
   }
 
   async cancel(): Promise<void> {

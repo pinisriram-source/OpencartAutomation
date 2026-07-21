@@ -8,7 +8,7 @@ export class LoginPage {
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
   readonly errorBanner: Locator;
-  readonly errorCloseButton: Locator;
+  readonly errorDismissButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -16,7 +16,7 @@ export class LoginPage {
     this.passwordInput = page.locator('[data-test="password"]');
     this.loginButton = page.locator('[data-test="login-button"]');
     this.errorBanner = page.locator('[data-test="error"]');
-    this.errorCloseButton = page.locator('[data-test="error-button"]');
+    this.errorDismissButton = page.locator('[data-test="error-button"]');
   }
 
   async open(): Promise<void> {
