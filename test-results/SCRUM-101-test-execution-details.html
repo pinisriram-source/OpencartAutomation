@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SCRUM-101 Test Execution Details</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#f7f8fa; --surface:#ffffff; --surface-2:#f1f3f6;
+    --text:#1b1f24; --text-muted:#5b6270; --border:#e2e5ea;
+    --brand:#3454d1;
+    --pass:#1a7f4b; --pass-bg:#e6f6ee; --pass-border:#b7e4cc;
+    --gap:#8a5a00; --gap-bg:#fdf1d6; --gap-border:#f0d998;
+    --shadow: 0 1px 2px rgba(20,20,30,.04), 0 1px 12px rgba(20,20,30,.05);
+    --radius:12px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14161a; --surface:#1c1f25; --surface-2:#22262d;
+      --text:#e7e9ee; --text-muted:#9aa1ad; --border:#2c313a;
+      --brand:#7d94ff;
+      --pass:#59d698; --pass-bg:#0e2a1e; --pass-border:#1f4d36;
+      --gap:#e8b84b; --gap-bg:#332705; --gap-border:#5a4610;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 20px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f8fa; --surface:#ffffff; --surface-2:#f1f3f6;
+    --text:#1b1f24; --text-muted:#5b6270; --border:#e2e5ea;
+    --pass:#1a7f4b; --pass-bg:#e6f6ee; --pass-border:#b7e4cc;
+    --gap:#8a5a00; --gap-bg:#fdf1d6; --gap-border:#f0d998;
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161a; --surface:#1c1f25; --surface-2:#22262d;
+    --text:#e7e9ee; --text-muted:#9aa1ad; --border:#2c313a;
+    --pass:#59d698; --pass-bg:#0e2a1e; --pass-border:#1f4d36;
+    --gap:#e8b84b; --gap-bg:#332705; --gap-border:#5a4610;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.55;}
+  .wrap{max-width:1180px; margin:0 auto; padding:32px 20px 80px;}
+  header.report-head{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px 28px 24px; margin-bottom:24px;}
+  header.report-head h1{margin:0 0 14px; font-size:1.5rem; letter-spacing:-.01em;}
+  .meta{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px 24px; font-size:.92rem; color:var(--text-muted);}
+  .meta b{color:var(--text); font-weight:600;}
+  .meta a{color:var(--brand); text-decoration:none;}
+  .meta a:hover{text-decoration:underline;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-bottom:24px;}
+  .stat{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px;}
+  .stat .num{font-size:1.5rem; font-weight:700;}
+  .stat .label{font-size:.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; margin-top:2px;}
+  .stat.headline{background:var(--pass-bg); border-color:var(--pass-border);}
+  .stat.headline .num{color:var(--pass);}
+  section{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px 28px; margin-bottom:20px;}
+  section h2{margin:0 0 6px; font-size:1.1rem; padding-bottom:10px; border-bottom:1px solid var(--border);}
+  section p.sub{color:var(--text-muted); font-size:.86rem; margin:10px 0 14px;}
+  code{background:var(--surface-2); border:1px solid var(--border); border-radius:4px; padding:1px 5px; font-size:.82em; font-family:ui-monospace,SFMono-Regular,Consolas,monospace;}
+  .table-scroll{overflow-x:auto; margin:10px 0;}
+  table{border-collapse:collapse; width:100%; font-size:.82rem;}
+  th,td{border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top;}
+  th{background:var(--surface-2); font-weight:600; white-space:nowrap; position:sticky; top:0;}
+  tr:last-child td{font-weight:600;}
+  .pass-cell{color:var(--pass); font-weight:600; white-space:nowrap;}
+  .gap-tag{display:inline-block; margin-left:4px; font-size:.72rem; color:var(--gap); background:var(--gap-bg); border:1px solid var(--gap-border); border-radius:999px; padding:0 7px;}
+  .badge-pass{display:inline-block; padding:2px 9px; border-radius:999px; font-size:.7rem; font-weight:700; letter-spacing:.02em; text-transform:uppercase; background:var(--pass-bg); color:var(--pass); border:1px solid var(--pass-border);}
+  .num-col{text-align:center; white-space:nowrap;}
+  footer{text-align:center; font-size:.78rem; color:var(--text-muted); margin-top:32px;}
+  @media print{ body{background:#fff;} section{box-shadow:none; break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="report-head">
+    <h1>Test Execution Details — SCRUM-101: E-commerce Checkout Process</h1>
+    <div class="meta">
+      <div><b>Application Under Test:</b> SauceDemo (<a href="https://www.saucedemo.com" target="_blank" rel="noopener">saucedemo.com</a>)</div>
+      <div><b>Report Date:</b> 2026-07-21</div>
+      <div><b>Automation Suite:</b> <a href="../tests/saucedemo-checkout/">tests/saucedemo-checkout/</a></div>
+      <div><b>Summary Report:</b> <a href="SCRUM-101-checkout-test-report.html">SCRUM-101-checkout-test-report.html</a></div>
+    </div>
+  </header>
+
+  <div class="stat-grid">
+    <div class="stat headline"><div class="num">100%</div><div class="label">Success Rate</div></div>
+    <div class="stat"><div class="num">32</div><div class="label">Test Cases</div></div>
+    <div class="stat"><div class="num">3</div><div class="label">Browsers</div></div>
+    <div class="stat"><div class="num">96</div><div class="label">Executions</div></div>
+    <div class="stat"><div class="num">6</div><div class="label">Use Cases</div></div>
+    <div class="stat"><div class="num">0</div><div class="label">Failed</div></div>
+  </div>
+
+  <section>
+    <h2>Full Test Execution Matrix</h2>
+    <p class="sub">Every automated test case, individually, with per-browser status, mapped to the business use case (Acceptance Criteria) and Business Rule it validates. Run command: <code>npx playwright test tests/saucedemo-checkout --project=chromium --project=firefox --project=webkit</code></p>
+    <div class="table-scroll">
+      <table>
+        <tr><th>#</th><th>Test Case ID</th><th>Title</th><th>Use Case</th><th>Business Rule</th><th>Chromium</th><th>Firefox</th><th>WebKit</th><th>Overall</th></tr>
+        <tr><td>1</td><td><code>TC-CART-001</code></td><td>Cart displays single added item with correct name, description, price, and quantity</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>2</td><td><code>TC-CART-002</code></td><td>Cart displays multiple items with correct per-item details</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>3</td><td><code>TC-CART-003</code></td><td>Removing an item from the cart updates the list and badge count</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>4</td><td><code>TC-CART-004</code></td><td>Continue Shopping returns to Products page without altering cart contents</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>5</td><td><code>TC-CART-005</code></td><td>Checkout button from cart navigates to Checkout Information page</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>6</td><td><code>TC-CART-006-EmptyCart</code></td><td>Cart page with zero items shows no line items and no totals</td><td>AC1</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>7</td><td><code>TC-CHECKOUT-INFO-001</code></td><td>Checkout Information page displays all mandatory fields</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>8</td><td><code>TC-CHECKOUT-INFO-002</code></td><td>Valid First Name, Last Name, and Zip proceeds to Overview page</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>9</td><td><code>TC-CHECKOUT-INFO-003-EmptyFirstName</code></td><td>Leaving First Name empty blocks progression and shows required-field error</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>10</td><td><code>TC-CHECKOUT-INFO-004-EmptyLastName</code></td><td>Leaving Last Name empty blocks progression and shows required-field error</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>11</td><td><code>TC-CHECKOUT-INFO-005-EmptyZip</code></td><td>Leaving Zip/Postal Code empty blocks progression and shows required-field error</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>12</td><td><code>TC-CHECKOUT-INFO-006-AllFieldsEmpty</code></td><td>Submitting a completely blank form shows the First Name error first</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>13</td><td><code>TC-CHECKOUT-INFO-007</code></td><td>Checkout Information page requires an active login session</td><td>AC2</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>14</td><td><code>TC-CHECKOUT-INFO-008-EmptyCart</code></td><td>Reaching Checkout Information with an empty cart does not block the form</td><td>AC2</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-001</span></td></tr>
+        <tr><td>15</td><td><code>TC-CHECKOUT-OVERVIEW-001</code></td><td>Overview page shows correct item summary for a single-item cart</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>16</td><td><code>TC-CHECKOUT-OVERVIEW-002</code></td><td>Overview page totals recalculate correctly for a multi-item cart</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>17</td><td><code>TC-CHECKOUT-OVERVIEW-003</code></td><td>Cancel on Overview page returns to Products page (not Cart)</td><td>AC3</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-002</span></td></tr>
+        <tr><td>18</td><td><code>TC-CHECKOUT-OVERVIEW-004-EmptyCart</code></td><td>Overview page with an empty cart shows zeroed totals and an empty item table</td><td>AC3</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-001</span></td></tr>
+        <tr><td>19</td><td><code>TC-CHECKOUT-COMPLETE-001</code></td><td>Clicking Finish completes the order and shows the confirmation page</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>20</td><td><code>TC-CHECKOUT-COMPLETE-002</code></td><td>Order completion clears the cart</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>21</td><td><code>TC-CHECKOUT-COMPLETE-003</code></td><td>Back Home returns to the Products page</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>22</td><td><code>TC-CHECKOUT-COMPLETE-004</code></td><td>Browser Back button after order completion does not restore the purchased cart</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>23</td><td><code>TC-CHECKOUT-INFO-009-SpecialCharacters</code></td><td>Special characters and markup in Name fields are accepted (no format validation)</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-004</span></td></tr>
+        <tr><td>24</td><td><code>TC-CHECKOUT-INFO-010-WhitespaceOnly</code></td><td>Whitespace-only input in a required field is treated as non-empty (accepted)</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-003</span></td></tr>
+        <tr><td>25</td><td><code>TC-CHECKOUT-INFO-011-LongInput</code></td><td>Very long input values are accepted in all three fields</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>26</td><td><code>TC-CHECKOUT-INFO-012-SingleCharacter</code></td><td>Minimum boundary — single-character values in each field are accepted</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>27</td><td><code>TC-CHECKOUT-INFO-013-ReSubmitAfterError</code></td><td>Correcting a flagged field and resubmitting clears the error and proceeds</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>28</td><td><code>TC-CHECKOUT-NAV-001</code></td><td>Cancel on Checkout Information returns to the Cart page with cart intact</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>29</td><td><code>TC-CHECKOUT-NAV-002</code></td><td>End-to-end cancel-and-resume: cancelling at Overview and re-entering checkout preserves cart and requires re-entry of info</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>30</td><td><code>TC-CHECKOUT-NAV-003</code></td><td>Browser Back button from Checkout Information returns to Cart without data loss</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>31</td><td><code>TC-CHECKOUT-NAV-004</code></td><td>Browser Back button from Checkout Overview returns to Checkout Information with fields cleared</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-005</span></td></tr>
+        <tr><td>32</td><td><code>TC-CHECKOUT-NAV-005</code></td><td>Full guest-to-confirmation happy path in a single continuous run</td><td>AC1–AC4</td><td>BR1–BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td colspan="5">Total</td><td class="num-col">32/32</td><td class="num-col">32/32</td><td class="num-col">32/32</td><td class="num-col">96/96</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Coverage by Business Use Case</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Business Use Case</th><th>Test Cases</th><th>Count</th><th>Executions (×3)</th><th>Result</th></tr>
+        <tr><td>AC1 — Cart Review</td><td><code>TC-CART-001…006</code></td><td>6</td><td>18</td><td class="pass-cell">✅ 18/18</td></tr>
+        <tr><td>AC2 — Checkout Information Entry</td><td><code>TC-CHECKOUT-INFO-001…008</code></td><td>8</td><td>24</td><td class="pass-cell">✅ 24/24</td></tr>
+        <tr><td>AC3 — Order Overview</td><td><code>TC-CHECKOUT-OVERVIEW-001…004</code></td><td>4</td><td>12</td><td class="pass-cell">✅ 12/12</td></tr>
+        <tr><td>AC4 — Order Completion</td><td><code>TC-CHECKOUT-COMPLETE-001…004</code></td><td>4</td><td>12</td><td class="pass-cell">✅ 12/12</td></tr>
+        <tr><td>AC5 — Error Handling</td><td><code>TC-CHECKOUT-INFO-009…013</code></td><td>5</td><td>15</td><td class="pass-cell">✅ 15/15</td></tr>
+        <tr><td>NAV — Navigation Flow (cross-cutting)</td><td><code>TC-CHECKOUT-NAV-001…005</code></td><td>5</td><td>15</td><td class="pass-cell">✅ 15/15</td></tr>
+        <tr><td>Total</td><td></td><td>32</td><td>96</td><td class="pass-cell">✅ 96/96</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Coverage by Business Rule</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Business Rule</th><th>Test Cases Exercising It</th><th>Result</th></tr>
+        <tr><td>BR1 — All checkout fields mandatory</td><td>9 cases (<code>TC-CHECKOUT-INFO-001…006</code>, <code>009…013</code>)</td><td class="pass-cell">✅ Passes; format/whitespace gaps logged as <span class="gap-tag">BUG-003</span> <span class="gap-tag">BUG-004</span></td></tr>
+        <tr><td>BR2 — Login required for checkout</td><td><code>TC-CHECKOUT-INFO-007</code></td><td class="pass-cell">✅ Passes as expected</td></tr>
+        <tr><td>BR3 — Cart cannot be empty at checkout</td><td><code>TC-CART-006-EmptyCart</code>, <code>TC-CHECKOUT-INFO-008-EmptyCart</code>, <code>TC-CHECKOUT-OVERVIEW-004-EmptyCart</code></td><td>Tests pass (assert real behavior); rule itself violated by the app — <span class="gap-tag">BUG-001</span></td></tr>
+        <tr><td>BR4 — Order confirmation clears the cart</td><td><code>TC-CHECKOUT-COMPLETE-002</code>, <code>TC-CHECKOUT-COMPLETE-004</code></td><td class="pass-cell">✅ Passes as expected</td></tr>
+        <tr><td>BR5 — Cancel at any step returns to cart</td><td><code>TC-CHECKOUT-NAV-001</code>, <code>TC-CHECKOUT-NAV-002</code>, <code>TC-CHECKOUT-OVERVIEW-003</code></td><td>Tests pass (assert real behavior); Overview Cancel goes to Products, not Cart — <span class="gap-tag">BUG-002</span></td></tr>
+      </table>
+    </div>
+    <p class="sub">Every row is a passing automation result — assertions match the application's real, observed behavior. Rows tagged with a BUG-xxx reference indicate the <em>application</em> deviates from the business rule as stated in the user story, not that the test failed. Full details in the <a href="SCRUM-101-checkout-test-report.html#defects">summary report's Defects Log</a>.</p>
+  </section>
+
+  <section>
+    <h2>Environment</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Item</th><th>Value</th></tr>
+        <tr><td>Test runner</td><td>Playwright 1.61.1</td></tr>
+        <tr><td>Browsers</td><td>Chromium (Desktop Chrome), Firefox (Desktop Firefox), WebKit (Desktop Safari)</td></tr>
+        <tr><td>Workers</td><td>1 (sequential)</td></tr>
+        <tr><td>Retries</td><td>0 (local run)</td></tr>
+        <tr><td>Run duration</td><td>20.8 minutes</td></tr>
+        <tr><td>Application URL</td><td>https://www.saucedemo.com</td></tr>
+        <tr><td>Test account</td><td><code>standard_user</code> / <code>secret_sauce</code></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>Generated from test-results/SCRUM-101-test-execution-details.md — SauceDemo Checkout, SCRUM-101</footer>
+
+</div>
+</body>
+</html>
