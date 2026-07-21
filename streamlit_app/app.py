@@ -8,11 +8,15 @@ by business use case, coverage by business rule, and the defects log.
 """
 
 import json
+import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+
+from github_commit import create_file
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -22,6 +26,18 @@ MUTED_BG = "#e1e0d9"
 SECONDARY_INK = "#52514e"
 
 DATA_PATH = Path(__file__).parent / "data" / "test_results.json"
+
+# --- Target repo for the "Submit New Request" form ---
+GITHUB_OWNER = "pinisriram-source"
+GITHUB_REPO = "OpencartAutomation"
+GITHUB_BRANCH = "main"
+
+
+def get_github_token() -> str:
+    try:
+        return st.secrets.get("GITHUB_TOKEN", "")
+    except Exception:
+        return ""
 
 st.set_page_config(
     page_title="SCRUM-101 Checkout Test Report",
@@ -63,8 +79,15 @@ k6.metric("Failed", summary["failed"], delta=None)
 
 st.divider()
 
-tab_overview, tab_matrix, tab_usecase, tab_rules, tab_defects = st.tabs(
-    ["Overview", "Test Execution Matrix", "Coverage by Use Case", "Coverage by Business Rule", "Defects Log"]
+tab_overview, tab_matrix, tab_usecase, tab_rules, tab_defects, tab_submit = st.tabs(
+    [
+        "Overview",
+        "Test Execution Matrix",
+        "Coverage by Use Case",
+        "Coverage by Business Rule",
+        "Defects Log",
+        "Submit New Request",
+    ]
 )
 
 # --- Overview tab -------------------------------------------------------------
@@ -273,6 +296,108 @@ with tab_defects:
     )
     styled_defects = defects_display.style.map(severity_style, subset=["Severity"])
     st.dataframe(styled_defects, use_container_width=True, height=280, hide_index=True)
+
+# --- Submit New Request tab ------------------------------------------------------
+with tab_submit:
+    st.subheader("Submit New Testing Request")
+    st.caption(
+        "This does **not** run any tests automatically. It commits a new request file "
+        f"to `user-stories/` in `{GITHUB_OWNER}/{GITHUB_REPO}` — a human (or Claude Code, "
+        "in a future session) then reads it and manually runs the plan → generate → "
+        "execute workflow, the same way SCRUM-101 was built."
+    )
+    st.warning(
+        "⚠️ This app and its GitHub repo are **public**. Anything submitted here becomes "
+        "visible in public commit history. Do not paste real credentials, secrets, or "
+        "confidential requirements — use placeholder/demo values only.",
+        icon="⚠️",
+    )
+
+    token_configured = bool(get_github_token())
+    if not token_configured:
+        st.info(
+            "GitHub token not configured — submissions will show an error until `GITHUB_TOKEN` "
+            "is set in this app's Secrets (Streamlit Cloud: Manage app → Settings → Secrets). "
+            "See `streamlit_app/README.md` for setup steps.",
+            icon="ℹ️",
+        )
+
+    with st.form("new_request_form", clear_on_submit=True):
+        title = st.text_input("Short title", placeholder="e.g. Guest checkout regression for MyStore")
+        app_url = st.text_input("Application URL", placeholder="https://example.com")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            test_username = st.text_input("Test username (optional, demo/placeholder only)")
+        with col2:
+            test_password = st.text_input("Test password (optional, demo/placeholder only)", type="password")
+
+        req_text = st.text_area(
+            "Requirements / Acceptance Criteria (paste text)",
+            height=200,
+            placeholder="Paste the user story, acceptance criteria, or requirements doc text here...",
+        )
+        req_file = st.file_uploader("...or upload a requirements file instead", type=["md", "txt"])
+
+        submitted = st.form_submit_button("Submit Request")
+
+    if submitted:
+        if not title.strip() or not app_url.strip():
+            st.error("Short title and Application URL are both required.")
+        elif not req_text.strip() and req_file is None:
+            st.error("Provide requirements either as pasted text or an uploaded file.")
+        else:
+            requirements_content = (
+                req_file.read().decode("utf-8") if req_file is not None else req_text
+            )
+            timestamp = datetime.now(timezone.utc)
+            slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:50] or "request"
+            filename = f"request-{slug}-{timestamp.strftime('%Y%m%d-%H%M%S')}.md"
+            path = f"user-stories/{filename}"
+
+            creds_section = ""
+            if test_username or test_password:
+                creds_section = (
+                    "\n## Test Credentials\n"
+                    f"- Username: `{test_username or '(not provided)'}`\n"
+                    f"- Password: `{test_password or '(not provided)'}`\n"
+                )
+
+            file_content = f"""# Testing Request: {title.strip()}
+
+**Submitted via:** Streamlit dashboard
+**Submitted date (UTC):** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}
+**Status:** Pending — not yet processed
+
+## Application URL
+{app_url.strip()}
+{creds_section}
+## Requirements / Acceptance Criteria
+
+{requirements_content.strip()}
+
+---
+*Next step: run the plan → generate → execute workflow (e.g. via Claude Code /
+the qa-endtoend-promptFile pattern) referencing this file to produce a test plan
+and automation suite.*
+"""
+
+            result = create_file(
+                owner=GITHUB_OWNER,
+                repo=GITHUB_REPO,
+                branch=GITHUB_BRANCH,
+                path=path,
+                content=file_content,
+                commit_message=f"docs(request): new testing request — {title.strip()}",
+                token=get_github_token(),
+            )
+
+            if result.success:
+                st.success(f"Request submitted and committed to `{path}`.")
+                if result.html_url:
+                    st.markdown(f"[View the committed file on GitHub]({result.html_url})")
+            else:
+                st.error(f"Could not submit request: {result.message}")
 
 st.divider()
 st.caption(
