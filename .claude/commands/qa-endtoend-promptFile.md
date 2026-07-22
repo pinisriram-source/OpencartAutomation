@@ -1,3 +1,20 @@
+> **Usage:** Before running these prompts, substitute the placeholders below
+> for the specific request being processed (e.g. a file submitted through the
+> Streamlit "Submit New Request" form):
+>
+> | Placeholder | Meaning | Example |
+> |---|---|---|
+> | `<USER_STORY_FILE>` | Path to the user story / submitted request file | `user-stories/request-my-title-20260722-104414.md` |
+> | `<STORY_ID>` | Short identifier for this story/request | `MY-TITLE` |
+> | `<TEST_PLAN_PATH>` | Where the test plan is saved | `specs/my-title-test-plan.md` |
+> | `<TEST_SUITE_DIR>` | Where the automation suite is saved | `tests/my-title/` |
+>
+> The test report path uses `<STORY_ID>` directly: `test-results/<STORY_ID>-checkout-test-report.md`.
+>
+> This file previously hardcoded these to the original SCRUM-101/SauceDemo
+> run; keep that as a worked reference if useful, but don't leave the
+> placeholders unfilled when running against a different request.
+
 # STEP 1: Read User Story
 
 **Prompt**
@@ -5,7 +22,7 @@
 ```text
 I need to start a new testing workflow. Please read the user story from the file:
 
-user-stories/SCRUM-101-ecommerce-checkout.md
+<USER_STORY_FILE>
 
 Summarize the key requirements, acceptance criteria, and testing scope.
 ```
@@ -24,7 +41,7 @@ Summarize the key requirements, acceptance criteria, and testing scope.
 **Prompt**
 
 ```text
-Based on the user story SCRUM-101 that we just reviewed, use the
+Based on the user story <STORY_ID> that we just reviewed, use the
 playwright-test-planner agent to:
 
 1. Read the application URL and test credentials from the user story.
@@ -43,7 +60,7 @@ including:
 
 4. Save the test plan as:
 
-specs/saucedemo-checkout-test-plan.md
+<TEST_PLAN_PATH>
 
 Ensure each test scenario includes:
 
@@ -71,7 +88,7 @@ browser tools.
 
 Please read the test plan from:
 
-specs/saucedemo-checkout-test-plan.md
+<TEST_PLAN_PATH>
 
 Then execute the test scenarios defined in that plan.
 
@@ -113,7 +130,7 @@ Please review:
 
 1. Test plan from:
 
-specs/saucedemo-checkout-test-plan.md
+<TEST_PLAN_PATH>
 
 2. Exploratory testing results from Step 3
 (for actual element selectors and UI insights)
@@ -131,7 +148,7 @@ Generate Playwright JavaScript automation scripts.
 
 2. Organize scripts into appropriate test suite files in:
 
-tests/saucedemo-checkout/
+<TEST_SUITE_DIR>
 
 3. Use the test case names and steps from the test plan.
 
@@ -157,7 +174,7 @@ After generating the scripts, run the tests to verify they pass.
 
 ### Expected Output
 
-* Test suite files created in **tests/saucedemo-checkout/**
+* Test suite files created in **<TEST_SUITE_DIR>**
 * Scripts using robust selectors discovered during exploratory testing
 * All scripts follow Playwright best practices
 * Initial test generation complete
@@ -175,7 +192,7 @@ failures using the playwright-test-healer agent.
 
 1. Run all automation scripts in:
 
-tests/saucedemo-checkout/
+<TEST_SUITE_DIR>
 
 2. Identify any failing tests.
 
@@ -210,7 +227,7 @@ tests/saucedemo-checkout/
 
 * All automation tests executed
 * Failing tests identified and healed using **test-healer agent**
-* Healed test scripts updated in **tests/saucedemo-checkout/**
+* Healed test scripts updated in **<TEST_SUITE_DIR>**
 * Final stable test execution results
 * Summary of healing activities performed
 
@@ -235,7 +252,7 @@ Please compile results from:
 
 Structure the report as:
 
-test-results/SCRUM-101-checkout-test-report.md
+test-results/<STORY_ID>-checkout-test-report.md
 
 Include:
 
@@ -333,7 +350,7 @@ Please perform the following Git operations:
 
 3. Create a commit with the message:
 
-feat(tests): Add complete test suite for SCRUM-101 checkout workflow
+feat(tests): Add complete test suite for <STORY_ID> workflow
 
 • Add user story documentation
 
@@ -345,7 +362,7 @@ feat(tests): Add complete test suite for SCRUM-101 checkout workflow
 
 • Include validation, navigation, and edge case tests
 
-Resolves SCRUM-101
+Resolves <STORY_ID>
 
 4. Push all changes to the Git repository.
 
@@ -369,27 +386,27 @@ I want to demonstrate a complete end-to-end QA workflow using natural language a
 
 STEP 1 - READ USER STORY:
 First, read the user story from:
-user-stories/SCRUM-101-ecommerce-checkout.md
+<USER_STORY_FILE>
 
 Provide a brief summary of what needs to be tested.
 
 STEP 2 - CREATE TEST PLAN:
 Use the playwright-test-planner agent to create a comprehensive test plan based on the user story. The agent should explore the application URL from the user story and cover all acceptance criteria. Save it as:
-specs/saucedemo-checkout-test-plan.md
+<TEST_PLAN_PATH>
 
 STEP 3 - EXPLORATORY TESTING:
-Read the test plan from specs/saucedemo-checkout-test-plan.md and use Playwright browser tools to manually execute each test scenario. Document findings with screenshots and note any issues discovered.
+Read the test plan from <TEST_PLAN_PATH> and use Playwright browser tools to manually execute each test scenario. Document findings with screenshots and note any issues discovered.
 
 STEP 4 - GENERATE AUTOMATION SCRIPTS:
-Review both the test plan (specs/saucedemo-checkout-test-plan.md) and exploratory testing results from Step 3. Use the playwright-test-generator agent to create JavaScript automation scripts leveraging the element selectors and insights discovered during manual testing. Save scripts in:
-tests/saucedemo-checkout/
+Review both the test plan (<TEST_PLAN_PATH>) and exploratory testing results from Step 3. Use the playwright-test-generator agent to create JavaScript automation scripts leveraging the element selectors and insights discovered during manual testing. Save scripts in:
+<TEST_SUITE_DIR>
 
 STEP 5 - EXECUTE AND HEAL TESTS:
-Run all automation scripts from tests/saucedemo-checkout/. Use the playwright-test-healer agent to identify and auto-heal any failing tests. Re-run tests until all are stable and passing. Document healing activities.
+Run all automation scripts from <TEST_SUITE_DIR>. Use the playwright-test-healer agent to identify and auto-heal any failing tests. Re-run tests until all are stable and passing. Document healing activities.
 
 STEP 6 - CREATE TEST REPORT:
 Create a comprehensive test execution report at:
-test-results/SCRUM-101-checkout-test-report.md
+test-results/<STORY_ID>-checkout-test-report.md
 
 Compile results from Step 3 (manual testing), Step 4 (script generation), and Step 5 (execution and healing). Include PASS/FAIL status, healing summary, defects log, and test coverage analysis.
 
