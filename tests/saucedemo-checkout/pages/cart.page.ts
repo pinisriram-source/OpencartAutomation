@@ -10,6 +10,9 @@ export class CartPage {
   readonly cartItems: Locator;
   readonly continueShoppingButton: Locator;
   readonly checkoutButton: Locator;
+  readonly subtotalLabel: Locator;
+  readonly taxLabel: Locator;
+  readonly totalLabel: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -18,6 +21,11 @@ export class CartPage {
     this.cartItems = page.locator('[data-test="inventory-item"]');
     this.continueShoppingButton = page.locator('[data-test="continue-shopping"]');
     this.checkoutButton = page.locator('[data-test="checkout"]');
+    // These are not expected to exist on the Cart page (see TC-CART-011); kept here so tests can
+    // assert their absence using the same page object rather than raw locators.
+    this.subtotalLabel = page.locator('[data-test="subtotal-label"]');
+    this.taxLabel = page.locator('[data-test="tax-label"]');
+    this.totalLabel = page.locator('[data-test="total-label"]');
   }
 
   async open(): Promise<void> {
@@ -35,6 +43,11 @@ export class CartPage {
 
   name(productName: string): Locator {
     return this.lineItem(productName).locator('[data-test="inventory-item-name"]');
+  }
+
+  /** The clickable product-name link within a cart row; navigates to that product's detail page. */
+  nameLink(productName: string): Locator {
+    return this.lineItem(productName).locator('[data-test$="-title-link"]');
   }
 
   description(productName: string): Locator {
@@ -59,5 +72,9 @@ export class CartPage {
 
   async checkout(): Promise<void> {
     await this.checkoutButton.click();
+  }
+
+  async openProductDetail(productName: string): Promise<void> {
+    await this.nameLink(productName).click();
   }
 }

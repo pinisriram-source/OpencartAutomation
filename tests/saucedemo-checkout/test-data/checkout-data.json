@@ -1,25 +1,45 @@
 {
   "credentials": {
-    "standardUser": { "username": "standard_user", "password": "secret_sauce" }
+    "standardUser": { "username": "standard_user", "password": "secret_sauce" },
+    "invalidUser": { "username": "invalid_user", "password": "wrong_password" }
   },
   "products": {
     "backpack": { "name": "Sauce Labs Backpack", "price": "$29.99" },
-    "bikeLight": { "name": "Sauce Labs Bike Light", "price": "$9.99" }
+    "bikeLight": { "name": "Sauce Labs Bike Light", "price": "$9.99" },
+    "boltTShirt": { "name": "Sauce Labs Bolt T-Shirt", "price": "$15.99" },
+    "fleeceJacket": { "name": "Sauce Labs Fleece Jacket", "price": "$49.99" },
+    "onesie": { "name": "Sauce Labs Onesie", "price": "$7.99" },
+    "redShirt": { "name": "Test.allTheThings() T-Shirt (Red)", "price": "$15.99" }
   },
   "customers": {
     "johnDoe": { "firstName": "John", "lastName": "Doe", "postalCode": "12345" },
     "aliceWonder": { "firstName": "Alice", "lastName": "Wonder", "postalCode": "54321" },
-    "janeSmith": { "firstName": "Jane", "lastName": "Smith", "postalCode": "99999" }
+    "janeSmith": { "firstName": "Jane", "lastName": "Smith", "postalCode": "99999" },
+    "canadianZip": { "firstName": "John", "lastName": "Doe", "postalCode": "A1B 2C3" },
+    "minimalBoundary": { "firstName": "A", "lastName": "B", "postalCode": "1" }
+  },
+  "edgeCaseInputs": {
+    "whitespaceOnly": "   ",
+    "specialCharsZip": "!@#$%",
+    "scriptInjection": "<script>alert(1)</script>",
+    "sqlInjectionZip": "' OR '1'='1",
+    "unicodeEmojiLastName": "Smîth 😀"
   },
   "messages": {
     "firstNameRequired": "Error: First Name is required",
     "lastNameRequired": "Error: Last Name is required",
     "postalCodeRequired": "Error: Postal Code is required",
-    "loginRequiredForCheckout": "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in."
+    "invalidLogin": "Epic sadface: Username and password do not match any user in this service",
+    "loginRequiredForCart": "Epic sadface: You can only access '/cart.html' when you are logged in.",
+    "loginRequiredForCheckoutStepOne": "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in.",
+    "loginRequiredForCheckoutStepTwo": "Epic sadface: You can only access '/checkout-step-two.html' when you are logged in.",
+    "loginRequiredForCheckoutComplete": "Epic sadface: You can only access '/checkout-complete.html' when you are logged in."
   },
   "totals": {
     "singleBackpack": { "itemTotal": "Item total: $29.99", "tax": "Tax: $2.40", "total": "Total: $32.39" },
     "backpackAndBikeLight": { "itemTotal": "Item total: $39.98", "tax": "Tax: $3.20", "total": "Total: $43.18" },
+    "threeItems": { "itemTotal": "Item total: $87.97", "tax": "Tax: $7.04", "total": "Total: $95.01" },
+    "onesieOnly": { "itemTotal": "Item total: $7.99", "tax": "Tax: $0.64", "total": "Total: $8.63" },
     "empty": { "itemTotal": "Item total: $0", "tax": "Tax: $0.00", "total": "Total: $0.00" }
   },
   "paymentInfo": "SauceCard #31337",

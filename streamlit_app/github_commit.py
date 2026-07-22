@@ -69,3 +69,53 @@ def create_file(
         return CommitResult(False, "A file already exists at that path, or the request was invalid (422).")
 
     return CommitResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")
+
+
+def trigger_workflow(
+    owner: str,
+    repo: str,
+    workflow_file: str,
+    ref: str,
+    token: str,
+) -> CommitResult:
+    """Trigger a `workflow_dispatch` run of an existing GitHub Actions workflow.
+
+    Requires a token with `Actions: Read and write` permission (in addition to
+    `Contents: Read and write`). Fails clearly rather than raising -- the caller
+    is a Streamlit form and should show `result.message` to the user.
+    """
+    if not token:
+        return CommitResult(False, "No GitHub token configured (see README for setup).")
+
+    url = f"{GITHUB_API}/repos/{owner}/{repo}/actions/workflows/{workflow_file}/dispatches"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    payload = {"ref": ref}
+
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=20)
+    except requests.RequestException as exc:
+        return CommitResult(False, f"Network error contacting GitHub: {exc}")
+
+    if resp.status_code == 204:
+        return CommitResult(True, "Workflow run triggered.")
+
+    if resp.status_code == 401:
+        return CommitResult(False, "GitHub rejected the token (401 Unauthorized). Check GITHUB_TOKEN in secrets.")
+    if resp.status_code == 403:
+        return CommitResult(
+            False,
+            "GitHub token lacks permission to trigger workflows (403 Forbidden). "
+            "The token needs 'Actions: Read and write' permission on this repo.",
+        )
+    if resp.status_code == 404:
+        return CommitResult(
+            False,
+            "Workflow not found (404). Check the workflow file name and that it has a "
+            "`workflow_dispatch` trigger.",
+        )
+
+    return CommitResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")

@@ -1,476 +1,668 @@
-# SauceDemo E-Commerce Checkout Process Test Plan (SCRUM-101)
+# SauceDemo Checkout Process Test Plan (SCRUM-101)
 
 ## Application Overview
 
-## Application Under Test
-SauceDemo (https://www.saucedemo.com) — a demo e-commerce storefront ("Swag Labs") used for QA training/automation practice. This plan covers the end-to-end checkout workflow for user story SCRUM-101: Cart Review -> Checkout Information -> Checkout Overview -> Order Completion.
+**Application Under Test:** https://www.saucedemo.com (Swag Labs demo e-commerce app)
+**Test Credentials:** standard_user / secret_sauce
+**Source Requirement:** user-stories/request-qaaiautomation-20260722-060822.md — SCRUM-101 "E-commerce Checkout Process"
 
-Test credentials: username `standard_user`, password `secret_sauce` (same password applies to all accepted usernames: standard_user, locked_out_user, problem_user, performance_glitch_user, error_user, visual_user).
+**Scope:** This plan covers the full checkout journey — Cart Review (AC1), Checkout Information Entry (AC2), Order Overview (AC3), Order Completion (AC4), and Error Handling (AC5) — plus cross-cutting negative, boundary, and navigation-flow scenarios, validated against the five stated business rules:
+1. All checkout form fields are mandatory.
+2. Users must be logged in to access checkout.
+3. Cart cannot be empty when proceeding to checkout.
+4. Order confirmation should clear the cart.
+5. Users can cancel checkout at any step and return to cart.
 
-## Workflow Verified via Live Exploration (2026-07-21)
-1. **Login** (`/`) — standard_user / secret_sauce logs in and lands on `/inventory.html`.
-2. **Inventory / Products page** (`/inventory.html`) — 6 products, each with name, description, price, and an "Add to cart" button that toggles to "Remove" once added. A cart badge showing item count appears next to the cart icon in the header once 1+ items are added; the badge is absent when the cart is empty.
-3. **Cart page** (`/cart.html`, "Your Cart") — lists each line item with QTY, product name (link), description, price, and a "Remove" button per line. No cart-level subtotal/total is shown on this page (totals first appear on the Overview page). Footer actions: "Continue Shopping" (returns to `/inventory.html`) and "Checkout" (proceeds to `/checkout-step-one.html`).
-4. **Checkout Step One — Your Information** (`/checkout-step-one.html`) — First Name, Last Name, and Zip/Postal Code text fields (plain text inputs; no format/pattern enforcement observed — special characters, letters in the zip field, and HTML/script-like content are all accepted without a validation error as long as the field is non-empty). "Cancel" returns to `/cart.html`. "Continue" validates only for field presence, one error at a time, in field order: empty First Name shows "Error: First Name is required"; with First Name filled, empty Last Name shows "Error: Last Name is required"; with both filled, empty Zip/Postal Code shows "Error: Postal Code is required". The error banner has a red heading with an "x" dismiss icon, and the offending field(s) get a red input outline/icon.
-5. **Checkout Step Two — Overview** (`/checkout-step-two.html`) — Shows QTY/Description table of cart items (name, description, price per line, no per-line total needed since qty is fixed at 1 per line in this app), "Payment Information: SauceCard #31337", "Shipping Information: Free Pony Express Delivery!", and a "Price Total" block with "Item total", "Tax", and "Total" (Total = Item total + Tax). Verified math: 1 item ($29.99) → Item total $29.99, Tax $2.40, Total $32.39; 2 items ($29.99 + $9.99 = $39.98) → Item total $39.98, Tax $3.20, Total $43.18 (tax computed at 8%, rounded to 2 decimals). "Cancel" returns to `/inventory.html` (NOT the cart — different from Step One's Cancel target). "Finish" completes the order.
-6. **Checkout Complete** (`/checkout-complete.html`) — Shows a "Checkout: Complete!" header, pony image, "Thank you for your order!" heading, a dispatch message, a "Back Home" button (returns to `/inventory.html`), and a "Generate PDF order" button. The cart is emptied on order completion — the header cart badge disappears and cart/overview pages show 0 items/$0 totals afterward, including when reached via browser Back navigation after completion.
+**Test Case ID Convention:** `TC-<MODULE>-<NNN>` per project convention (CLAUDE.md), grouped into six suites: CART, CHECKOUT, OVERVIEW, COMPLETE, ERROR, NAV.
 
-## Additional Behaviors Confirmed
-- **Login required for checkout**: navigating directly to `/checkout-step-one.html` without an authenticated session redirects to the login page (`/`) and displays "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in."
-- **Empty cart is NOT blocked by the UI**: navigating directly to `/checkout-step-one.html` with 0 items in the cart still renders the information form, and completing it advances to `/checkout-step-two.html` showing an empty item table with "Item total: $0", "Tax: $0.00", "Total: $0.00", and an enabled "Finish" button. This contradicts the stated business rule "Cart cannot be empty when proceeding to checkout" — treat as a rule to verify/flag as a defect if strict blocking is required by SCRUM-101.
-- **No client-side format validation**: First/Last Name accept special characters, punctuation, and injected markup (e.g. `<script>...</script>`) without error and without executing as script (renders as inert text server-side/DOM-escaped); Zip/Postal Code accepts non-numeric characters. Only presence (non-empty) is validated.
-- Cart quantity per product line is fixed at 1 in this app (no in-cart quantity stepper); "Remove" is the only per-line action in the cart.
+**Assumptions / starting state:** Unless a test case states otherwise, assume a fresh browser session, user not yet logged in, and an empty cart. Tests are written to be independent and runnable in any order; each test performs its own login/cart-seeding setup.
+
+**Important findings from exploratory testing (live app, verified 2026-07-22) that affect expected results below — flagged inline as "Actual behavior" / "Gap vs AC/Rule" where the live application's real behavior differs from the literal wording of the acceptance criteria or business rules:**
+- The Cart page (`cart.html`) does **not** display a subtotal/total price anywhere — no price total is shown until the Order Overview (checkout-step-two) page. This contradicts AC1's "I should see the total price calculation" as written for the cart page.
+- Field validation errors are surfaced **one at a time**, in the order First Name → Last Name → Postal Code; the app does not show all missing-field errors simultaneously.
+- Field validation only checks for non-empty (presence). It does NOT reject whitespace-only values, special characters, script/SQL-injection-style strings, unicode/emoji, or unusually long strings in First Name/Last Name/Zip — all are silently accepted and the user proceeds to the Overview page. This is a gap vs AC5's expectation of "appropriate validation error messages" for invalid data.
+- Cancel on the Checkout Information page (step one) returns the user to the **Cart** page, matching business rule 5.
+- Cancel on the Order Overview page (step two) returns the user to the **Products (inventory) page**, NOT the Cart page — a discrepancy vs the literal wording of business rule 5 ("return to cart"), though cart contents remain intact either way.
+- Business rule 3 ("cart cannot be empty when proceeding to checkout") is **not enforced**: the Checkout button remains active on an empty cart, and checkout-step-one.html / checkout-step-two.html can be reached directly via URL with zero items in cart.
+- The Checkout Information page (step one) can be bypassed entirely: navigating directly to `checkout-step-two.html` with items in the cart renders a full Order Overview without ever requiring First Name/Last Name/Zip to be entered — a gap vs AC2/business rule 1 ("all fields mandatory").
+- Business rule 2 (must be logged in) IS enforced server-side: unauthenticated direct access to `/cart.html`, `/checkout-step-one.html`, `/checkout-step-two.html`, or `/checkout-complete.html` redirects to the login page with the message: `Epic sadface: You can only access '<path>' when you are logged in.`
+- Business rule 4 (order confirmation clears cart) IS correctly implemented: after Finish, the cart badge disappears and all product tiles revert to "Add to cart".
+- Using the browser Back button after order completion returns to a stale Order Overview page showing an empty item list and $0.00 totals, but with an active Finish button; clicking Finish again re-navigates to the Confirmation page despite the cart being empty — a potential defect worth flagging to the dev team.
+- The Order Confirmation page also exposes a "Generate PDF order" button not mentioned in the AC, and cart/order data (Payment Info: "SauceCard #31337", Shipping Info: "Free Pony Express Delivery!") is fixed/static across all orders.
+
+These findings are written into the relevant test cases below as the expected (actual) result, with explicit notes where the result diverges from the AC/business-rule wording so failures are self-explanatory and traceable to a specific finding rather than a mis-specified test.
 
 ## Test Scenarios
 
-### 1. AC1 - Cart Review
+### 1. Cart Review
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 1.1. TC-CART-001: Cart displays single added item with correct name, description, price, and quantity
+#### 1.1. TC-CART-001: Cart displays all added items with name, description, and price
 
-**File:** `tests/checkout/cart-review.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CART-001 | Module: Cart | Priority: Critical | Type: Functional / Smoke | Preconditions: User is logged in as standard_user; cart is empty. Test Data: Product = 'Sauce Labs Backpack' ($29.99). Traceability: AC1, Key Workflow #1
-  2. 1. Login at https://www.saucedemo.com with standard_user / secret_sauce
-    - expect: User is redirected to /inventory.html and the Products grid is visible
-  3. 2. Click 'Add to cart' on 'Sauce Labs Backpack'
-    - expect: Button label changes to 'Remove'
-    - expect: Header cart badge shows '1'
-  4. 3. Click the cart icon to open /cart.html
-    - expect: Page title 'Your Cart' is displayed
-  5. 4. Inspect the single line item row
-    - expect: QTY column shows '1'
-    - expect: Product name 'Sauce Labs Backpack' is shown as a link
-    - expect: Full product description text matches the inventory page description
-    - expect: Price shown is '$29.99'
-    - expect: A 'Remove' button is present on the line item
-  6. 5. Verify page-level controls
-    - expect: 'Continue Shopping' button is visible and enabled
-    - expect: 'Checkout' button is visible and enabled
-
-#### 1.2. TC-CART-002: Cart displays multiple items with correct per-item details
-
-**File:** `tests/checkout/cart-review.spec.ts`
+**File:** `tests/cart-review/cart-review.spec.ts`
 
 **Steps:**
-  1. Test Case ID: TC-CART-002 | Module: Cart | Priority: High | Type: Functional | Preconditions: User logged in; cart empty. Test Data: 'Sauce Labs Backpack' ($29.99), 'Sauce Labs Bike Light' ($9.99). Traceability: AC1
-  2. 1. Login as standard_user and on /inventory.html click 'Add to cart' for 'Sauce Labs Backpack' then for 'Sauce Labs Bike Light'
-    - expect: Header cart badge shows '2'
-    - expect: Both buttons now read 'Remove'
-  3. 2. Navigate to /cart.html
-    - expect: Two line items are listed, one per added product
-  4. 3. Verify each row independently
-    - expect: Row 1: QTY '1', name 'Sauce Labs Backpack', description present, price '$29.99', 'Remove' button
-    - expect: Row 2: QTY '1', name 'Sauce Labs Bike Light', description present, price '$9.99', 'Remove' button
-  5. 4. Verify item order and no cross-contamination of data between rows
-    - expect: Each row's name, description, and price correspond correctly to the product that was added (no mismatches)
+  1. Login as standard_user / secret_sauce
+    - expect: Redirected to /inventory.html (Products page)
+  2. Add 'Sauce Labs Backpack' and 'Sauce Labs Bike Light' to cart from the Products page
+    - expect: Cart badge in header shows '2'
+    - expect: Each item's button changes from 'Add to cart' to 'Remove'
+  3. Navigate to the Cart page (click cart icon)
+    - expect: URL is /cart.html
+    - expect: Page heading reads 'Your Cart'
+    - expect: Both items are listed with their name, full description text, and price ($29.99 and $9.99 respectively)
 
-#### 1.3. TC-CART-003: Removing an item from the cart updates the list and badge count
+#### 1.2. TC-CART-002: Cart shows correct quantity per line item
 
-**File:** `tests/checkout/cart-review.spec.ts`
+**File:** `tests/cart-review/cart-review.spec.ts`
 
 **Steps:**
-  1. Test Case ID: TC-CART-003 | Module: Cart | Priority: High | Type: Functional | Preconditions: User logged in; 2 items in cart ('Sauce Labs Backpack', 'Sauce Labs Bike Light'). Test Data: same as TC-CART-002. Traceability: AC1
-  2. 1. From /cart.html, click 'Remove' on the 'Sauce Labs Bike Light' row
-    - expect: The 'Sauce Labs Bike Light' row disappears from the cart list
-    - expect: Header cart badge updates from '2' to '1'
-  3. 2. Verify remaining item
-    - expect: Only 'Sauce Labs Backpack' row remains with correct name/description/price/qty
-  4. 3. Remove the last remaining item ('Sauce Labs Backpack')
-    - expect: Cart list is empty (no rows)
-    - expect: Header cart badge disappears entirely (no count shown)
+  1. Login and add one item to the cart, then open the Cart page
+    - expect: QTY column shows '1' for the added item
 
-#### 1.4. TC-CART-004: 'Continue Shopping' returns to Products page without altering cart contents
+#### 1.3. TC-CART-003: 'Continue Shopping' button returns to Products page
 
-**File:** `tests/checkout/cart-review.spec.ts`
+**File:** `tests/cart-review/cart-review.spec.ts`
 
 **Steps:**
-  1. Test Case ID: TC-CART-004 | Module: Cart | Priority: Medium | Type: Functional | Preconditions: User logged in; 1 item in cart. Test Data: 'Sauce Labs Backpack'. Traceability: AC1
-  2. 1. From /cart.html with 1 item present, click 'Continue Shopping'
-    - expect: Browser navigates to /inventory.html
-  3. 2. Verify cart state is preserved
-    - expect: Header cart badge still shows '1'
-    - expect: 'Sauce Labs Backpack' Add-to-cart button still reads 'Remove' on the Products grid
-  4. 3. Re-open the cart via the cart icon
-    - expect: The previously added item is still present in the cart with the same name/description/price/qty
+  1. Login, add an item to cart, open Cart page, click 'Continue Shopping'
+    - expect: Redirected to /inventory.html
+    - expect: Cart badge count is preserved (item still in cart)
 
-#### 1.5. TC-CART-005: 'Checkout' button from cart navigates to Checkout Information page
+#### 1.4. TC-CART-004: 'Checkout' button navigates to Checkout Information page
 
-**File:** `tests/checkout/cart-review.spec.ts`
+**File:** `tests/cart-review/cart-review.spec.ts`
 
 **Steps:**
-  1. Test Case ID: TC-CART-005 | Module: Cart | Priority: Critical | Type: Functional / Smoke | Preconditions: User logged in; at least 1 item in cart. Test Data: 'Sauce Labs Backpack'. Traceability: AC1, AC2, Key Workflow #1
-  2. 1. From /cart.html, click 'Checkout'
-    - expect: Browser navigates to /checkout-step-one.html
+  1. Login, add an item to cart, open Cart page, click 'Checkout'
+    - expect: Redirected to /checkout-step-one.html
     - expect: Page heading reads 'Checkout: Your Information'
 
-#### 1.6. TC-CART-006-EmptyCart: Cart page with zero items shows no line items and no totals
+#### 1.5. TC-CART-005: Removing an item from the cart updates the list and badge count
 
-**File:** `tests/checkout/cart-review.spec.ts`
+**File:** `tests/cart-review/cart-review.spec.ts`
 
 **Steps:**
-  1. Test Case ID: TC-CART-006-EmptyCart | Module: Cart | Priority: Medium | Type: Boundary | Preconditions: User logged in; cart empty (no items ever added, or all removed). Test Data: none. Traceability: AC1, Business Rule 3
-  2. 1. Login as standard_user and navigate directly to /cart.html without adding any product
-    - expect: Page loads with heading 'Your Cart'
-    - expect: No line items are rendered
-    - expect: Header cart badge is not shown
-  3. 2. Verify page controls remain available
-    - expect: 'Continue Shopping' and 'Checkout' buttons are both still visible/enabled even with an empty cart
+  1. Login and add two different items to cart, open Cart page
+    - expect: Cart badge shows '2', both items listed
+  2. Click 'Remove' on one of the line items
+    - expect: That item disappears from the cart list immediately
+    - expect: Cart badge updates to '1'
 
-### 2. AC2 - Checkout Information Entry
+#### 1.6. TC-CART-006-EmptyCart: Cart page renders correctly with zero items
+
+**File:** `tests/cart-review/cart-review.spec.ts`
+
+**Steps:**
+  1. Login with a fresh session (no items ever added), navigate directly to /cart.html
+    - expect: Page loads without error, heading 'Your Cart' is shown
+    - expect: No line items and no cart badge count are displayed
+    - expect: 'Continue Shopping' and 'Checkout' buttons are both still visible and enabled
+
+#### 1.7. TC-CART-007: Cart persists across navigation to a product detail page and back
+
+**File:** `tests/cart-review/cart-review.spec.ts`
+
+**Steps:**
+  1. Login, add an item to cart, click into a product's detail page, then navigate back to the Cart page
+    - expect: The previously added item is still present in the cart with correct price
+
+#### 1.8. TC-CART-008: Cart contents persist after a full page refresh
+
+**File:** `tests/cart-review/cart-review.spec.ts`
+
+**Steps:**
+  1. Login, add two items to cart, open Cart page, refresh the browser
+    - expect: Both items remain listed after reload
+    - expect: Cart badge count is unchanged
+
+#### 1.9. TC-CART-009-AllProducts: Adding all six catalog products displays each correctly in cart
+
+**File:** `tests/cart-review/cart-review.spec.ts`
+
+**Steps:**
+  1. Login and click 'Add to cart' for all six products on the Products page
+    - expect: Cart badge shows '6'
+  2. Open the Cart page
+    - expect: All six products are listed, each with correct name, description, and price, and no items are missing or duplicated
+
+#### 1.10. TC-CART-010: Cart item name is a clickable link to its Product Detail page
+
+**File:** `tests/cart-review/cart-review.spec.ts`
+
+**Steps:**
+  1. Login, add an item to cart, open Cart page, click the item's name link
+    - expect: Navigates to that product's detail page showing the same product name and price
+
+#### 1.11. TC-CART-011-NoTotalOnCartPage: Cart page does not display a subtotal/total price (AC1 discrepancy)
+
+**File:** `tests/cart-review/cart-review.spec.ts`
+
+**Steps:**
+  1. Login, add two items with known prices to the cart, open the Cart page
+    - expect: No subtotal, tax, or total price element is rendered anywhere on the Cart page — actual app behavior differs from AC1's stated expectation that cart review includes 'the total price calculation'; the total first appears later on the Order Overview page
+
+### 2. Checkout Information Entry
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 2.1. TC-CHECKOUT-INFO-001: Checkout Information page displays all mandatory fields
+#### 2.1. TC-CHECKOUT-001: Checkout button redirects to Checkout Information page with required fields
 
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-001 | Module: Checkout-Information | Priority: Critical | Type: Functional / Smoke | Preconditions: User logged in; 1+ items in cart; user is on /cart.html. Test Data: none. Traceability: AC2
-  2. 1. Click 'Checkout' from the cart
-    - expect: Redirected to /checkout-step-one.html with heading 'Checkout: Your Information'
-  3. 2. Inspect the form
-    - expect: A 'First Name' text field is present and empty
-    - expect: A 'Last Name' text field is present and empty
-    - expect: A 'Zip/Postal Code' text field is present and empty
-    - expect: 'Cancel' and 'Continue' buttons are both visible and enabled
-
-#### 2.2. TC-CHECKOUT-INFO-002: Valid First Name, Last Name, and Zip proceeds to Overview page
-
-**File:** `tests/checkout/checkout-information.spec.ts`
+**File:** `tests/checkout-information/checkout-information.spec.ts`
 
 **Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-002 | Module: Checkout-Information | Priority: Critical | Type: Functional / Smoke | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name='John', Last Name='Doe', Zip='12345'. Traceability: AC2, AC3, Key Workflow #1
-  2. 1. Enter 'John' in First Name, 'Doe' in Last Name, '12345' in Zip/Postal Code
-    - expect: Each field reflects the typed value
-  3. 2. Click 'Continue'
-    - expect: No error message is shown
-    - expect: Browser navigates to /checkout-step-two.html with heading 'Checkout: Overview'
-
-#### 2.3. TC-CHECKOUT-INFO-003-EmptyFirstName: Leaving First Name empty blocks progression and shows required-field error
-
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-003-EmptyFirstName | Module: Checkout-Information | Priority: Critical | Type: Negative | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html with all fields empty. Test Data: First Name='' (empty), Last Name='Doe', Zip='12345'. Traceability: AC2, AC5, Business Rule 1
-  2. 1. Leave First Name empty; enter 'Doe' in Last Name and '12345' in Zip
-    - expect: Fields reflect entered/empty state as specified
-  3. 2. Click 'Continue'
-    - expect: Page remains on /checkout-step-one.html (no navigation occurs)
-    - expect: An error banner is displayed reading exactly 'Error: First Name is required'
-    - expect: The First Name field is visually flagged (red outline/icon)
-  4. 3. Click the 'x' dismiss icon on the error banner
-    - expect: The error banner is dismissed/hidden
-
-#### 2.4. TC-CHECKOUT-INFO-004-EmptyLastName: Leaving Last Name empty blocks progression and shows required-field error
-
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-004-EmptyLastName | Module: Checkout-Information | Priority: Critical | Type: Negative | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name='John', Last Name='' (empty), Zip='12345'. Traceability: AC2, AC5, Business Rule 1
-  2. 1. Enter 'John' in First Name, leave Last Name empty, enter '12345' in Zip
-    - expect: Fields reflect entered/empty state as specified
-  3. 2. Click 'Continue'
-    - expect: Page remains on /checkout-step-one.html (no navigation occurs)
-    - expect: An error banner is displayed reading exactly 'Error: Last Name is required'
-
-#### 2.5. TC-CHECKOUT-INFO-005-EmptyZip: Leaving Zip/Postal Code empty blocks progression and shows required-field error
-
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-005-EmptyZip | Module: Checkout-Information | Priority: Critical | Type: Negative | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name='John', Last Name='Doe', Zip='' (empty). Traceability: AC2, AC5, Business Rule 1
-  2. 1. Enter 'John' in First Name, 'Doe' in Last Name, leave Zip/Postal Code empty
-    - expect: Fields reflect entered/empty state as specified
-  3. 2. Click 'Continue'
-    - expect: Page remains on /checkout-step-one.html (no navigation occurs)
-    - expect: An error banner is displayed reading exactly 'Error: Postal Code is required'
-
-#### 2.6. TC-CHECKOUT-INFO-006-AllFieldsEmpty: Submitting a completely blank form shows the First Name error first
-
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-006-AllFieldsEmpty | Module: Checkout-Information | Priority: High | Type: Negative / Boundary | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html with all fields blank. Test Data: all fields empty. Traceability: AC2, AC5, Business Rule 1
-  2. 1. Without entering any data, click 'Continue' immediately
-    - expect: Page remains on /checkout-step-one.html
-    - expect: Error banner reads 'Error: First Name is required' (validation stops at the first empty required field, in First Name -> Last Name -> Zip order)
-  3. 2. Fill only First Name with 'A' and click 'Continue' again
-    - expect: Error banner updates to 'Error: Last Name is required'
-
-#### 2.7. TC-CHECKOUT-INFO-007: Checkout information page requires an active login session
-
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-007 | Module: Checkout-Information | Priority: Critical | Type: Negative / Security | Preconditions: No active session (logged out; cookies/local storage cleared). Test Data: direct URL https://www.saucedemo.com/checkout-step-one.html. Traceability: AC2, Business Rule 2
-  2. 1. Without logging in, navigate directly to https://www.saucedemo.com/checkout-step-one.html
-    - expect: Browser is redirected to the login page (/)
-    - expect: An error banner is shown reading "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in."
-
-#### 2.8. TC-CHECKOUT-INFO-008-EmptyCart: Reaching checkout information with an empty cart does not block the form (flag if strict blocking is required)
-
-**File:** `tests/checkout/checkout-information.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-008-EmptyCart | Module: Checkout-Information | Priority: Medium | Type: Negative / Boundary | Preconditions: User logged in; cart is empty. Test Data: direct URL /checkout-step-one.html. Traceability: AC2, Business Rule 3
-  2. 1. With an empty cart, navigate directly to /checkout-step-one.html
-    - expect: Current observed behavior: the Your Information form still renders normally (no cart-empty block/redirect). Record as a defect/flag if SCRUM-101 requires the app to block checkout entry entirely when the cart is empty.
-
-### 3. AC3 - Order Overview
-
-**Seed:** `tests/seed.spec.ts`
-
-#### 3.1. TC-CHECKOUT-OVERVIEW-001: Overview page shows correct item summary for a single-item cart
-
-**File:** `tests/checkout/checkout-overview.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-OVERVIEW-001 | Module: Checkout-Overview | Priority: Critical | Type: Functional / Smoke | Preconditions: User logged in; cart contains 'Sauce Labs Backpack' ($29.99); valid info submitted on Step One. Test Data: First Name='Alice', Last Name='Wonder', Zip='54321'. Traceability: AC3, Key Workflow #1
-  2. 1. Complete checkout information with the given test data and click 'Continue'
-    - expect: Redirected to /checkout-step-two.html, heading 'Checkout: Overview'
-  3. 2. Verify the item summary table
-    - expect: QTY '1' shown for 'Sauce Labs Backpack'
-    - expect: Product name, description, and price '$29.99' match the cart contents exactly
-  4. 3. Verify Payment and Shipping Information blocks
-    - expect: 'Payment Information:' section shows 'SauceCard #31337'
-    - expect: 'Shipping Information:' section shows 'Free Pony Express Delivery!'
-  5. 4. Verify Price Total block
-    - expect: 'Item total: $29.99'
-    - expect: 'Tax: $2.40'
-    - expect: 'Total: $32.39' (Item total + Tax, arithmetically correct)
-  6. 5. Verify page actions
-    - expect: 'Cancel' and 'Finish' buttons are both visible and enabled
-
-#### 3.2. TC-CHECKOUT-OVERVIEW-002: Overview page totals recalculate correctly for a multi-item cart
-
-**File:** `tests/checkout/checkout-overview.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-OVERVIEW-002 | Module: Checkout-Overview | Priority: Critical | Type: Functional / Regression | Preconditions: User logged in; cart contains 'Sauce Labs Backpack' ($29.99) and 'Sauce Labs Bike Light' ($9.99); valid info submitted. Test Data: First Name='John', Last Name='Doe', Zip='12345'. Traceability: AC3, AC1, Key Workflow #1
-  2. 1. Reach /checkout-step-two.html with both items in cart
-    - expect: Two rows appear in the item summary, one per product, each with correct QTY '1', name, description, and unit price
-  3. 2. Verify Price Total block
-    - expect: 'Item total: $39.98' (29.99 + 9.99)
-    - expect: 'Tax: $3.20'
-    - expect: 'Total: $43.18' (Item total + Tax)
-
-#### 3.3. TC-CHECKOUT-OVERVIEW-003: 'Cancel' on Overview page returns to Products page (not Cart)
-
-**File:** `tests/checkout/checkout-overview.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-OVERVIEW-003 | Module: Checkout-Overview | Priority: High | Type: Functional / Navigation | Preconditions: User logged in; on /checkout-step-two.html with 1+ items and valid info submitted. Test Data: any valid info. Traceability: AC3, Business Rule 5
-  2. 1. Click 'Cancel' on the Overview page
-    - expect: Browser navigates to /inventory.html (Products page) — note this differs from Step One's Cancel, which returns to /cart.html
-  3. 2. Verify cart state is unaffected by cancelling
-    - expect: Header cart badge still reflects the same item count as before cancelling (order was not placed, cart not cleared)
-
-#### 3.4. TC-CHECKOUT-OVERVIEW-004-EmptyCart: Overview page with an empty cart shows zeroed totals and an empty item table
-
-**File:** `tests/checkout/checkout-overview.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-OVERVIEW-004-EmptyCart | Module: Checkout-Overview | Priority: Medium | Type: Negative / Boundary | Preconditions: User logged in; cart is empty; user forces navigation through Step One with an empty cart. Test Data: First Name='Jane', Last Name='Smith', Zip='99999'. Traceability: AC3, Business Rule 3
-  2. 1. With an empty cart, submit valid info on /checkout-step-one.html and click 'Continue'
-    - expect: Redirected to /checkout-step-two.html
-  3. 2. Verify item table and totals
-    - expect: No item rows are shown in the QTY/Description table
-    - expect: 'Item total: $0'
-    - expect: 'Tax: $0.00'
-    - expect: 'Total: $0.00'
-    - expect: 'Finish' button remains enabled — record as a defect/flag if SCRUM-101 requires blocking order completion for an empty cart
-
-### 4. AC4 - Order Completion
-
-**Seed:** `tests/seed.spec.ts`
-
-#### 4.1. TC-CHECKOUT-COMPLETE-001: Clicking Finish completes the order and shows the confirmation page
-
-**File:** `tests/checkout/checkout-complete.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-COMPLETE-001 | Module: Checkout-Complete | Priority: Critical | Type: Functional / Smoke | Preconditions: User logged in; 1+ items in cart; valid info submitted; user is on /checkout-step-two.html. Test Data: any valid cart + info combination. Traceability: AC4, Key Workflow #1
-  2. 1. Click 'Finish' on the Overview page
-    - expect: Browser navigates to /checkout-complete.html with heading 'Checkout: Complete!'
-  3. 2. Verify confirmation content
-    - expect: A pony/success image is displayed
-    - expect: Heading 'Thank you for your order!' is visible
-    - expect: A confirmation/dispatch message is displayed
-    - expect: A 'Back Home' button is visible and enabled
-
-#### 4.2. TC-CHECKOUT-COMPLETE-002: Order completion clears the cart
-
-**File:** `tests/checkout/checkout-complete.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-COMPLETE-002 | Module: Checkout-Complete | Priority: Critical | Type: Functional / Regression | Preconditions: User logged in; cart had 2 items prior to completing checkout. Test Data: 'Sauce Labs Backpack', 'Sauce Labs Bike Light'. Traceability: AC4, Business Rule 4
-  2. 1. Complete a full checkout (info -> overview -> Finish) with 2 items in the cart
-    - expect: Order completes and /checkout-complete.html is shown
-  3. 2. Verify the header cart badge on the confirmation page
-    - expect: No cart badge/count is displayed (cart is empty)
-  4. 3. Navigate to /cart.html directly
-    - expect: Cart page shows no line items
-  5. 4. Navigate directly to /checkout-step-two.html
-    - expect: Item table is empty and totals show 'Item total: $0', 'Tax: $0.00', 'Total: $0.00', confirming the cart remains cleared
-
-#### 4.3. TC-CHECKOUT-COMPLETE-003: 'Back Home' returns to the Products page
-
-**File:** `tests/checkout/checkout-complete.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-COMPLETE-003 | Module: Checkout-Complete | Priority: High | Type: Functional / Navigation | Preconditions: User logged in; on /checkout-complete.html after a completed order. Test Data: none. Traceability: AC4
-  2. 1. Click 'Back Home'
-    - expect: Browser navigates to /inventory.html
-    - expect: Products grid is displayed with all 'Add to cart' buttons reset (no items pre-added, since cart was cleared)
-
-#### 4.4. TC-CHECKOUT-COMPLETE-004: Browser back button after order completion does not restore the purchased cart
-
-**File:** `tests/checkout/checkout-complete.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-COMPLETE-004 | Module: Checkout-Complete | Priority: High | Type: Negative / Navigation | Preconditions: User logged in; order just completed via Finish; browser is on /checkout-complete.html. Test Data: any completed order. Traceability: AC4, Business Rule 4
-  2. 1. Click the browser's Back button
-    - expect: Browser navigates back to /checkout-step-two.html (cached history entry)
-  3. 2. Verify the content of this back-navigated Overview page
-    - expect: Item table is empty and Price Total shows 'Item total: $0', 'Tax: $0.00', 'Total: $0.00' — the already-completed order's items are NOT re-shown/re-purchasable, confirming the cart-clear persisted through back navigation
-
-### 5. AC5 - Error Handling and Edge Cases
-
-**Seed:** `tests/seed.spec.ts`
-
-#### 5.1. TC-CHECKOUT-INFO-009-SpecialCharacters: Special characters and markup in Name fields are accepted (no format validation)
-
-**File:** `tests/checkout/checkout-error-handling.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-009-SpecialCharacters | Module: Checkout-Information | Priority: High | Type: Negative / Security | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name='<script>alert(1)</script>!@#$%', Last Name="O'Brien-Smith", Zip='abc!@#'. Traceability: AC5
-  2. 1. Enter the special-character/markup test data into First Name, Last Name, and Zip/Postal Code respectively
-    - expect: Fields accept and display the entered text without truncation or client-side rejection
-  3. 2. Click 'Continue'
-    - expect: No 'required' validation error is shown (all fields were non-empty)
-    - expect: Browser navigates to /checkout-step-two.html
-    - expect: No JavaScript alert/dialog is triggered (the script-like input is not executed) — confirm no unexpected dialog appears
-  4. 3. Note for reporting
-    - expect: Current behavior does NOT reject special characters or enforce numeric-only Zip; if SCRUM-101 requires stricter input validation (e.g., numeric zip, character whitelist), record this as a defect against AC5
-
-#### 5.2. TC-CHECKOUT-INFO-010-WhitespaceOnly: Whitespace-only input in a required field is treated as non-empty (accepted)
-
-**File:** `tests/checkout/checkout-error-handling.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-010-WhitespaceOnly | Module: Checkout-Information | Priority: Medium | Type: Boundary / Negative | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name='   ' (3 spaces), Last Name='Doe', Zip='12345'. Traceability: AC5, AC2
-  2. 1. Enter '   ' (spaces only) into First Name; fill Last Name and Zip with valid data
-    - expect: Field shows the whitespace content (may appear visually empty)
-  3. 2. Click 'Continue'
-    - expect: Document actual behavior: verify whether the app treats whitespace-only input as satisfying the 'required' check (navigates to Step Two) or rejects it with 'Error: First Name is required'. Flag a mismatch against expected behavior if whitespace-only should be rejected as effectively empty.
-
-#### 5.3. TC-CHECKOUT-INFO-011-LongInput: Very long input values are accepted in all three fields
-
-**File:** `tests/checkout/checkout-error-handling.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-011-LongInput | Module: Checkout-Information | Priority: Medium | Type: Boundary | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name = 300-character alphabetic string, Last Name = 300-character alphabetic string, Zip = 100-character numeric string. Traceability: AC5
-  2. 1. Enter the 300-character string into First Name and Last Name, and the 100-character string into Zip/Postal Code
-    - expect: Each field accepts the full input with no visible max-length truncation (or note the actual max-length if the browser/app enforces one)
-  3. 2. Click 'Continue'
-    - expect: No required-field error is shown
-    - expect: Browser navigates to /checkout-step-two.html without error or layout breakage
-  4. 3. Visually inspect the Overview page layout
-    - expect: Page renders without overflow/clipping issues that would hide the Price Total or Finish button (UI robustness check)
-
-#### 5.4. TC-CHECKOUT-INFO-012-SingleCharacter: Minimum boundary — single-character values in each field are accepted
-
-**File:** `tests/checkout/checkout-error-handling.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-012-SingleCharacter | Module: Checkout-Information | Priority: Low | Type: Boundary | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: First Name='A', Last Name='B', Zip='1'. Traceability: AC5
-  2. 1. Enter 'A' in First Name, 'B' in Last Name, '1' in Zip/Postal Code
-    - expect: Fields accept the single-character values
-  3. 2. Click 'Continue'
-    - expect: No required-field error is shown
-    - expect: Browser navigates to /checkout-step-two.html successfully
-
-#### 5.5. TC-CHECKOUT-INFO-013-ReSubmitAfterError: Correcting a flagged field and resubmitting clears the error and proceeds
-
-**File:** `tests/checkout/checkout-error-handling.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-INFO-013-ReSubmitAfterError | Module: Checkout-Information | Priority: High | Type: Negative then Functional | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html. Test Data: Step 1 — all fields empty; Step 2 — First Name='John', Last Name='Doe', Zip='12345'. Traceability: AC5, AC2
-  2. 1. Click 'Continue' with all fields empty
-    - expect: Error banner 'Error: First Name is required' is shown; page stays on /checkout-step-one.html
-  3. 2. Fill in First Name='John', Last Name='Doe', Zip='12345' and click 'Continue' again
-    - expect: The error banner is no longer shown
-    - expect: Browser successfully navigates to /checkout-step-two.html
-
-### 6. Navigation Flow and Cross-Cutting Tests
-
-**Seed:** `tests/seed.spec.ts`
-
-#### 6.1. TC-CHECKOUT-NAV-001: 'Cancel' on Checkout Information returns to the Cart page with cart intact
-
-**File:** `tests/checkout/checkout-navigation.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-NAV-001 | Module: Checkout-Information | Priority: High | Type: Functional / Navigation | Preconditions: User logged in; 1+ items in cart; on /checkout-step-one.html (fields may be partially filled). Test Data: any partial or empty field values. Traceability: AC2, Business Rule 5
-  2. 1. Optionally enter partial data into First Name/Last Name/Zip, then click 'Cancel'
-    - expect: Browser navigates to /cart.html
-  3. 2. Verify cart contents are unaffected by cancelling
-    - expect: All previously added items are still present in the cart with correct qty/price
-    - expect: Header cart badge count is unchanged from before entering checkout
-
-#### 6.2. TC-CHECKOUT-NAV-002: End-to-end cancel-and-resume — cancelling at Overview and re-entering checkout preserves cart and requires re-entry of info
-
-**File:** `tests/checkout/checkout-navigation.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-NAV-002 | Module: Checkout-Overview | Priority: Medium | Type: Functional / Navigation | Preconditions: User logged in; 1 item in cart; valid info previously submitted, user is on /checkout-step-two.html. Test Data: First Name='John', Last Name='Doe', Zip='12345'. Traceability: AC3, Business Rule 5
-  2. 1. Click 'Cancel' on the Overview page
-    - expect: Browser navigates to /inventory.html
-    - expect: Header cart badge still shows the original item count (order not placed)
-  3. 2. Re-open the cart and click 'Checkout' again
-    - expect: Browser returns to /checkout-step-one.html
-    - expect: First Name, Last Name, and Zip fields are empty again (previously entered info is not retained/pre-filled)
-
-#### 6.3. TC-CHECKOUT-NAV-003: Browser Back button from Checkout Information returns to Cart without data loss
-
-**File:** `tests/checkout/checkout-navigation.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-NAV-003 | Module: Checkout-Information | Priority: Medium | Type: Functional / Navigation | Preconditions: User logged in; 1+ items in cart; navigated from /cart.html to /checkout-step-one.html via the Checkout button. Test Data: none. Traceability: AC2
-  2. 1. Use the browser's Back button (not the in-page Cancel link) while on /checkout-step-one.html
-    - expect: Browser navigates back to /cart.html
-  3. 2. Verify cart contents
-    - expect: All items previously in the cart are still listed with correct details
-
-#### 6.4. TC-CHECKOUT-NAV-004: Browser Back button from Checkout Overview returns to Checkout Information with fields cleared
-
-**File:** `tests/checkout/checkout-navigation.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-NAV-004 | Module: Checkout-Overview | Priority: Medium | Type: Functional / Navigation | Preconditions: User logged in; 1+ items in cart; valid info submitted; currently on /checkout-step-two.html. Test Data: First Name='John', Last Name='Doe', Zip='12345'. Traceability: AC3, AC2
-  2. 1. Use the browser's Back button while on /checkout-step-two.html
-    - expect: Browser navigates back to /checkout-step-one.html
-  3. 2. Inspect the First Name, Last Name, and Zip fields
-    - expect: Document actual behavior: fields may render empty (form not repopulated from history) — verify and record whether this matches expected UX; if fields are empty, submitting 'Continue' again immediately will show a required-field error rather than silently reusing prior values
-
-#### 6.5. TC-CHECKOUT-NAV-005: Full guest-to-confirmation happy path in a single continuous run
-
-**File:** `tests/checkout/checkout-navigation.spec.ts`
-
-**Steps:**
-  1. Test Case ID: TC-CHECKOUT-NAV-005 | Module: Cart / Checkout-Information / Checkout-Overview / Checkout-Complete | Priority: Critical | Type: Smoke / Regression | Preconditions: Fresh login, empty cart. Test Data: username='standard_user', password='secret_sauce'; products = 'Sauce Labs Backpack' ($29.99) + 'Sauce Labs Bike Light' ($9.99); info = First Name='John', Last Name='Doe', Zip='12345'. Traceability: AC1, AC2, AC3, AC4, Key Workflow #1 (primary revenue path)
-  2. 1. Login with standard_user/secret_sauce
-    - expect: Redirected to /inventory.html
-  3. 2. Add 'Sauce Labs Backpack' and 'Sauce Labs Bike Light' to the cart
-    - expect: Cart badge shows '2'
-  4. 3. Open the cart and verify both items are listed correctly, then click 'Checkout'
+  1. Login, add an item to cart, go to Cart page, click 'Checkout'
     - expect: Redirected to /checkout-step-one.html
-  5. 4. Enter First Name='John', Last Name='Doe', Zip='12345' and click 'Continue'
-    - expect: Redirected to /checkout-step-two.html with Item total $39.98, Tax $3.20, Total $43.18
-  6. 5. Click 'Finish'
-    - expect: Redirected to /checkout-complete.html with 'Thank you for your order!' and a 'Back Home' button
-  7. 6. Click 'Back Home'
-    - expect: Redirected to /inventory.html with no cart badge shown (cart cleared)
+    - expect: Fields for First Name, Last Name, and Zip/Postal Code are visible
+    - expect: 'Cancel' and 'Continue' buttons are visible
+
+#### 2.2. TC-CHECKOUT-002: Valid data in all fields and Continue proceeds to Overview page
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. On Checkout Information page, enter First Name='Jane', Last Name='Smith', Zip='12345', click Continue
+    - expect: Redirected to /checkout-step-two.html
+    - expect: Page heading reads 'Checkout: Overview'
+
+#### 2.3. TC-CHECKOUT-003-EmptyFirstName: Error shown when First Name is empty
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. On Checkout Information page, leave all fields empty, click Continue
+    - expect: Page remains on /checkout-step-one.html
+    - expect: Error banner reads 'Error: First Name is required'
+    - expect: First Name field is visually flagged with an error indicator
+
+#### 2.4. TC-CHECKOUT-004-EmptyLastName: Error shown when Last Name is empty
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Enter First Name='John' only, leave Last Name and Zip empty, click Continue
+    - expect: Error banner reads 'Error: Last Name is required'
+    - expect: Page remains on /checkout-step-one.html
+
+#### 2.5. TC-CHECKOUT-005-EmptyZip: Error shown when Postal Code is empty
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Enter First Name='John', Last Name='Doe', leave Zip empty, click Continue
+    - expect: Error banner reads 'Error: Postal Code is required'
+    - expect: Page remains on /checkout-step-one.html
+
+#### 2.6. TC-CHECKOUT-006-AllFieldsEmpty: Only the first missing-field error is shown when all fields are empty
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. With all three fields empty, click Continue
+    - expect: Only the First Name required error is displayed (not a combined list of all three errors) — confirms sequential single-error validation behavior
+
+#### 2.7. TC-CHECKOUT-007: Error banner dismiss (X) control clears the message
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Trigger the First Name required error, then click the 'X' dismiss icon on the error banner
+    - expect: Error banner is removed from the page
+    - expect: Form fields remain empty/unchanged
+
+#### 2.8. TC-CHECKOUT-008: Invalid field is visually highlighted with an error icon
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Click Continue with all fields empty
+    - expect: First Name, Last Name, and Zip input containers each display a red error icon/outline, not only a text banner
+
+#### 2.9. TC-CHECKOUT-009-WhitespaceOnly: Whitespace-only values are accepted (validation gap)
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Enter three spaces ('   ') into First Name, Last Name, and Zip, then click Continue
+    - expect: Actual behavior: no validation error is raised and the app proceeds to /checkout-step-two.html — this is a gap vs the intent of 'mandatory fields', since whitespace is not trimmed/rejected
+
+#### 2.10. TC-CHECKOUT-010-SpecialCharacters: Special characters in Zip are accepted (AC5 gap)
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Enter First Name='John', Last Name='Doe', Zip='!@#$%', click Continue
+    - expect: Actual behavior: no format-validation error is shown; the app proceeds to the Overview page — this contradicts AC5's expectation of a validation error for special characters/invalid data
+
+#### 2.11. TC-CHECKOUT-011-LongInput: Very long input string in First Name is accepted
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Enter a 250+ character string into First Name, valid Last Name and Zip, click Continue
+    - expect: No client-side max-length error occurs; the app proceeds to the Overview page without truncation errors or a crash (note actual rendering behavior of the long value, if any, on the Overview page)
+
+#### 2.12. TC-CHECKOUT-012-NumericAndAlphaZip: Zip field accepts both numeric and alphanumeric postal codes
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Complete checkout info with Zip='12345' (numeric) and Continue
+    - expect: Proceeds to Overview page successfully
+  2. Repeat with Zip='A1B 2C3' (alphanumeric, Canadian-style)
+    - expect: Proceeds to Overview page successfully with no format error, confirming no country-specific postal format validation exists
+
+#### 2.13. TC-CHECKOUT-013: Cancel button on Checkout Information page returns to Cart with items intact
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. From Checkout Information page (reached with 2 items in cart), click 'Cancel'
+    - expect: Redirected to /cart.html
+    - expect: Both cart items are still listed (cart not cleared)
+
+#### 2.14. TC-CHECKOUT-014: Cart badge count persists on the Checkout Information page header
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Add 2 items to cart and proceed to Checkout Information page
+    - expect: Header cart icon shows badge count '2' on this page as well
+
+#### 2.15. TC-CHECKOUT-015-DirectURLWithItems: Direct URL navigation to checkout-step-one.html works when logged in with items in cart
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Login, add an item to cart, then navigate directly to https://www.saucedemo.com/checkout-step-one.html via the address bar
+    - expect: Page loads normally showing the Checkout Information form (no redirect/error), since the user is authenticated
+
+#### 2.16. TC-CHECKOUT-016-EmptyCartAccess: Checkout Information page is reachable even with an empty cart (business rule 3 gap)
+
+**File:** `tests/checkout-information/checkout-information.spec.ts`
+
+**Steps:**
+  1. Login with an empty cart, navigate directly to /checkout-step-one.html
+    - expect: Actual behavior: the page loads normally with the form fields available and no 'cart is empty' block/redirect — this contradicts business rule 3 ('cart cannot be empty when proceeding to checkout')
+
+### 3. Order Overview
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 3.1. TC-OVERVIEW-001: Overview page lists all cart items with qty, name, description, price
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Login, add 2 items to cart, complete Checkout Information with valid data, arrive at Overview page
+    - expect: Both items are listed with correct QTY (1 each), name, description text, and price, matching what was shown on the Cart page
+
+#### 3.2. TC-OVERVIEW-002: Payment Information section is displayed
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Reach the Overview page with valid checkout info
+    - expect: 'Payment Information:' section is shown with value 'SauceCard #31337'
+
+#### 3.3. TC-OVERVIEW-003: Shipping Information section is displayed
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Reach the Overview page with valid checkout info
+    - expect: 'Shipping Information:' section is shown with value 'Free Pony Express Delivery!'
+
+#### 3.4. TC-OVERVIEW-004: Item Total equals the sum of individual item prices
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Add 'Sauce Labs Backpack' ($29.99) and 'Sauce Labs Bike Light' ($9.99) to cart, proceed to Overview
+    - expect: 'Item total: $39.98' is displayed, matching the sum of the two item prices
+
+#### 3.5. TC-OVERVIEW-005: Tax and Total amounts are displayed and Total = Item Total + Tax
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. With Item total of $39.98 on the Overview page, read the Tax and Total lines
+    - expect: A 'Tax:' line and a 'Total:' line are both present
+    - expect: Total value equals Item total + Tax value (e.g. $39.98 + $3.20 = $43.18) within expected rounding
+
+#### 3.6. TC-OVERVIEW-006: Cancel and Finish buttons are both present and enabled
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Reach the Overview page
+    - expect: 'Cancel' button is visible and enabled
+    - expect: 'Finish' button is visible and enabled
+
+#### 3.7. TC-OVERVIEW-007: Cancel button on Overview redirects to Products page (actual behavior)
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. From the Overview page (with items in cart), click 'Cancel'
+    - expect: Actual behavior: redirected to /inventory.html (Products page), NOT back to /cart.html — a discrepancy vs the literal wording of business rule 5 ('return to cart'); cart contents remain intact (badge count unchanged)
+
+#### 3.8. TC-OVERVIEW-008: Finish button navigates to the Order Confirmation page
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. From the Overview page, click 'Finish'
+    - expect: Redirected to /checkout-complete.html
+    - expect: Page heading reads 'Checkout: Complete!'
+
+#### 3.9. TC-OVERVIEW-009-MultipleItems: Totals recalculate correctly with 3+ differently priced items
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Add 'Sauce Labs Backpack' ($29.99), 'Sauce Labs Fleece Jacket' ($49.99), and 'Sauce Labs Onesie' ($7.99) to cart, proceed to Overview
+    - expect: Item total equals $87.97
+    - expect: Tax and Total are recalculated to reflect this new item total, with Total = Item total + Tax
+
+#### 3.10. TC-OVERVIEW-010-SingleItem: Totals are correct with exactly one item in cart
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Add only 'Sauce Labs Onesie' ($7.99) to cart, proceed to Overview
+    - expect: Item total: $7.99
+    - expect: Total = $7.99 + displayed Tax value
+
+#### 3.11. TC-OVERVIEW-011-SkipInformationPage: Overview page is directly reachable, bypassing Checkout Information entirely
+
+**File:** `tests/order-overview/order-overview.spec.ts`
+
+**Steps:**
+  1. Login, add an item to cart, then navigate directly to /checkout-step-two.html without ever visiting /checkout-step-one.html
+    - expect: Actual behavior: the full Order Overview page renders normally with item list, payment/shipping info, and correct totals — First Name/Last Name/Zip were never required, which is a gap vs AC2/business rule 1 ('all checkout form fields are mandatory')
+
+### 4. Order Completion
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 4.1. TC-COMPLETE-001: Finish displays the order confirmation success message
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. Complete the full checkout flow (cart -> info -> overview -> Finish)
+    - expect: Redirected to /checkout-complete.html
+    - expect: Heading 'Thank you for your order!' is displayed
+    - expect: Descriptive text 'Your order has been dispatched, and will arrive just as fast as the pony can get there!' is displayed
+
+#### 4.2. TC-COMPLETE-002: Pony Express confirmation image is displayed
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. Reach the Order Confirmation page
+    - expect: A 'Pony Express' image/icon is visible above the thank-you message
+
+#### 4.3. TC-COMPLETE-003: 'Back Home' button is present and navigates to the Products page
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. On the Order Confirmation page, click 'Back Home'
+    - expect: Redirected to /inventory.html
+    - expect: Page heading reads 'Products'
+
+#### 4.4. TC-COMPLETE-004: Cart is cleared immediately after order completion (business rule 4)
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. Complete checkout for 2 items and reach the Order Confirmation page
+    - expect: The header cart badge/count is no longer displayed on the confirmation page
+  2. Click 'Back Home' to return to the Products page
+    - expect: Every product tile shows 'Add to cart' (not 'Remove'), confirming the cart was fully cleared
+
+#### 4.5. TC-COMPLETE-005: Cart remains empty after returning to Products page post-completion
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. After completing an order and clicking Back Home, navigate to /cart.html directly
+    - expect: Cart page shows zero line items and no total, confirming persistence of the cleared state
+
+#### 4.6. TC-COMPLETE-006: 'Generate PDF order' button is present on the confirmation page
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. Reach the Order Confirmation page
+    - expect: A 'Generate PDF order' button is visible alongside 'Back Home' (an extra UI element not mentioned in AC4, worth confirming with product owner if intentional)
+
+#### 4.7. TC-COMPLETE-007-RefreshConfirmation: Refreshing the confirmation page preserves the completion state
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. On the Order Confirmation page, refresh the browser
+    - expect: The 'Thank you for your order!' message and Back Home button still render correctly
+    - expect: Cart remains empty (no badge reappears)
+
+#### 4.8. TC-COMPLETE-008: Header shows no cart badge on the confirmation page
+
+**File:** `tests/order-completion/order-completion.spec.ts`
+
+**Steps:**
+  1. Reach the Order Confirmation page after checking out with items
+    - expect: No numeric badge is rendered on the cart icon in the header
+
+### 5. Error Handling / Boundary
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 5.1. TC-ERROR-001-UnauthCart: Unauthenticated direct access to Cart page is blocked
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. Without logging in (or after logging out), navigate directly to https://www.saucedemo.com/cart.html
+    - expect: Redirected to the login page (/)
+    - expect: Error banner reads: "Epic sadface: You can only access '/cart.html' when you are logged in."
+
+#### 5.2. TC-ERROR-002-UnauthCheckoutInfo: Unauthenticated direct access to Checkout Information page is blocked
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. While logged out, navigate directly to /checkout-step-one.html
+    - expect: Redirected to login page with error: "Epic sadface: You can only access '/checkout-step-one.html' when you are logged in."
+
+#### 5.3. TC-ERROR-003-UnauthOverview: Unauthenticated direct access to Order Overview page is blocked
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. While logged out, navigate directly to /checkout-step-two.html
+    - expect: Redirected to login page with a corresponding 'you are logged in' required error naming '/checkout-step-two.html'
+
+#### 5.4. TC-ERROR-004-UnauthComplete: Unauthenticated direct access to Order Confirmation page is blocked
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. While logged out, navigate directly to /checkout-complete.html
+    - expect: Redirected to login page with a corresponding 'you are logged in' required error naming '/checkout-complete.html'
+
+#### 5.5. TC-ERROR-005-InvalidLogin: Invalid login credentials block all checkout access
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. On the login page, enter an invalid username/password combination and submit
+    - expect: Login fails with an error message and the user remains on the login page
+  2. Attempt to navigate directly to /checkout-step-one.html afterward
+    - expect: Still blocked and redirected to login (user was never authenticated)
+
+#### 5.6. TC-ERROR-006-SequentialValidation: Field validation errors surface one at a time in a fixed order
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. On Checkout Information page with all fields empty, click Continue
+    - expect: 'First Name is required' error shown
+  2. Fill First Name only, click Continue again
+    - expect: 'Last Name is required' error shown (First Name error no longer present)
+  3. Fill Last Name, click Continue again
+    - expect: 'Postal Code is required' error shown, confirming the fixed First Name -> Last Name -> Zip validation order
+
+#### 5.7. TC-ERROR-007-EmptyCartCheckoutButtonEnabled: Checkout button remains active on an empty cart (business rule 3 gap)
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. Login with an empty cart and open the Cart page
+    - expect: 'Checkout' button is rendered and clickable even though there are zero items — clicking it proceeds to /checkout-step-one.html rather than being blocked, contradicting business rule 3
+
+#### 5.8. TC-ERROR-008-ScriptInjection: Script-tag input is rendered as literal text, not executed
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. On Checkout Information page, enter '<script>alert(1)</script>' as First Name, valid Last Name and Zip, click Continue
+    - expect: No JavaScript alert/dialog is triggered
+    - expect: The app proceeds normally (or shows a standard required-field error only if another field is empty) with the string treated as inert text, confirming no XSS execution
+
+#### 5.9. TC-ERROR-009-SQLInjection: SQL-injection-style input is treated as literal text
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. Enter Zip = "' OR '1'='1" with valid First/Last Name, click Continue
+    - expect: No error, crash, or unexpected behavior occurs; the app proceeds to the Overview page treating the value as an ordinary string
+
+#### 5.10. TC-ERROR-010-UnicodeEmoji: Unicode/emoji characters in Last Name are accepted without crashing
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. Enter an emoji/unicode string (e.g. 'Smîth 😀') as Last Name, valid First Name and Zip, click Continue
+    - expect: No client error occurs; the app proceeds to the Overview page without garbling or crashing
+
+#### 5.11. TC-ERROR-011-FixOneFieldAtATime: Correcting fields one at a time surfaces the correct next error with no stale message
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. Trigger the First Name required error, then fill in First Name and Last Name (leaving Zip empty), click Continue
+    - expect: Only the 'Postal Code is required' error is now shown
+    - expect: The earlier First Name/Last Name error text is no longer present anywhere on the page
+
+#### 5.12. TC-ERROR-012-RefreshMidEntry: Refreshing the Checkout Information page mid-entry clears typed values
+
+**File:** `tests/error-handling/error-handling.spec.ts`
+
+**Steps:**
+  1. On the Checkout Information page, type values into First Name and Last Name but do not submit, then refresh the browser
+    - expect: After reload, all three fields are empty again — confirms unsaved form input is not persisted client-side
+
+### 6. Navigation Flow / Cross-Cutting
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 6.1. TC-NAV-001-HappyPathE2E: Full end-to-end checkout smoke path
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Login as standard_user/secret_sauce
+    - expect: Redirected to /inventory.html
+  2. Add 'Sauce Labs Backpack' to cart and open the Cart page
+    - expect: Item is listed on /cart.html
+  3. Click Checkout, fill First Name/Last Name/Zip with valid data, click Continue
+    - expect: Overview page (/checkout-step-two.html) shows the item, payment/shipping info, and totals
+  4. Click Finish
+    - expect: Confirmation page (/checkout-complete.html) shows 'Thank you for your order!'
+  5. Click 'Back Home'
+    - expect: Returned to /inventory.html with an empty cart (all buttons read 'Add to cart')
+
+#### 6.2. TC-NAV-002-CancelFromInfoToCart: Cancel on Checkout Information returns to Cart with items intact
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Add 2 items to cart, proceed to Checkout Information, click Cancel
+    - expect: Redirected to /cart.html
+    - expect: Both items remain listed (cart not cleared) — matches business rule 5
+
+#### 6.3. TC-NAV-003-CancelFromOverviewToProducts: Cancel on Overview returns to Products page, cart intact
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Add items to cart, complete Checkout Information, reach Overview, click Cancel
+    - expect: Redirected to /inventory.html (Products), not /cart.html — the actual redirect target for business rule 5 at this step
+  2. Open the Cart page afterward
+    - expect: The cart items added earlier are still present, confirming cart data was preserved despite the different redirect target
+
+#### 6.4. TC-NAV-004-BrowserBackAfterCompletion: Browser Back after order completion shows a stale, empty Overview page
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Complete a full checkout to reach the Order Confirmation page
+    - expect: Confirmation page is shown
+  2. Press the browser Back button
+    - expect: Actual behavior: browser navigates to /checkout-step-two.html again, but it now shows an empty item list with 'Item total: $0', 'Tax: $0.00', 'Total: $0.00' (since the cart was already cleared) while the Finish button remains active — flag to dev team as a potential UX defect
+
+#### 6.5. TC-NAV-005-ReFinishStaleOverview: Clicking Finish again from the stale post-completion Overview page still submits
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. From the stale, empty Overview page reached via Back after a completed order (see TC-NAV-004), click 'Finish' again
+    - expect: Actual behavior: the app navigates to /checkout-complete.html and shows the thank-you message again, despite the cart/order being empty — indicates the app does not guard against re-submitting a stale/completed order
+
+#### 6.6. TC-NAV-006-BrowserBackFromCheckoutInfo: Browser Back from Checkout Information returns to Cart page
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Add an item to cart, navigate Cart -> Checkout Information, then press the browser Back button
+    - expect: Browser returns to /cart.html with the item still listed
+
+#### 6.7. TC-NAV-007-DirectSkipToOverview: User can skip the mandatory Checkout Information step via direct URL
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Login, add an item to cart, and navigate directly to /checkout-step-two.html (skipping /checkout-step-one.html entirely)
+    - expect: Actual behavior: the Overview page renders fully with correct item/price/tax/total data, and clicking Finish successfully completes the order — confirming First Name/Last Name/Zip entry can be bypassed altogether, a gap vs business rule 1
+
+#### 6.8. TC-NAV-008-LogoutMidCheckout: Logging out mid-checkout redirects to Login and blocks further checkout access
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Login, add an item to cart, reach the Checkout Information page, then open the side menu and click 'Logout'
+    - expect: Redirected to the login page (/)
+  2. Attempt to navigate back to /checkout-step-one.html directly
+    - expect: Blocked with the 'Epic sadface: you can only access ... when logged in' message, confirming the session was fully terminated
+
+#### 6.9. TC-NAV-009-RefreshOverviewPage: Refreshing the Overview page (before completion) preserves order summary data
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Add an item to cart, complete Checkout Information, reach the Overview page, then refresh the browser
+    - expect: The same item, payment/shipping info, and item total/tax/total values are displayed after reload — no data loss occurs since the order has not yet been finished
+
+#### 6.10. TC-NAV-010-ResetAppState: 'Reset App State' menu option clears the cart
+
+**File:** `tests/navigation-flow/navigation-flow.spec.ts`
+
+**Steps:**
+  1. Login and add 2 items to cart, then open the side menu and click 'Reset App State'
+    - expect: Cart badge disappears from the header
+  2. Open the Cart page
+    - expect: Cart is empty, confirming 'Reset App State' clears cart contents

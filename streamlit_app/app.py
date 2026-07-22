@@ -16,7 +16,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from github_commit import create_file
+from github_commit import create_file, trigger_workflow
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -31,6 +31,7 @@ DATA_PATH = Path(__file__).parent / "data" / "test_results.json"
 GITHUB_OWNER = "pinisriram-source"
 GITHUB_REPO = "OpencartAutomation"
 GITHUB_BRANCH = "main"
+GITHUB_WORKFLOW_FILE = "saucedemo-checkout.yml"
 
 
 def get_github_token() -> str:
@@ -237,33 +238,33 @@ with tab_rules:
     rule_rows = [
         {
             "Business Rule": "BR1 — All checkout fields mandatory",
-            "Test Cases": "9 cases (TC-CHECKOUT-INFO-001…006, 009…013)",
-            "Result": "Passes; format/whitespace gaps logged",
+            "Test Cases": "16 cases (TC-CHECKOUT-001…016, TC-ERROR-006/011, TC-NAV-001/007)",
+            "Result": "Passes; whitespace/format/bypass gaps logged",
             "Gap": "BUG-003, BUG-004",
         },
         {
             "Business Rule": "BR2 — Login required for checkout",
-            "Test Cases": "TC-CHECKOUT-INFO-007",
-            "Result": "Passes as expected",
+            "Test Cases": "TC-ERROR-001…005, TC-NAV-008",
+            "Result": "Passes as expected — server-side enforcement confirmed",
             "Gap": "—",
         },
         {
             "Business Rule": "BR3 — Cart cannot be empty at checkout",
-            "Test Cases": "TC-CART-006-EmptyCart, TC-CHECKOUT-INFO-008-EmptyCart, TC-CHECKOUT-OVERVIEW-004-EmptyCart",
+            "Test Cases": "TC-CART-006-EmptyCart, TC-CHECKOUT-016-EmptyCartAccess, TC-ERROR-007-EmptyCartCheckoutButtonEnabled",
             "Result": "Tests pass; rule itself violated by the app",
-            "Gap": "BUG-001",
+            "Gap": "BUG-002",
         },
         {
             "Business Rule": "BR4 — Order confirmation clears the cart",
-            "Test Cases": "TC-CHECKOUT-COMPLETE-002, TC-CHECKOUT-COMPLETE-004",
+            "Test Cases": "TC-COMPLETE-004, TC-COMPLETE-005, TC-COMPLETE-008",
             "Result": "Passes as expected",
             "Gap": "—",
         },
         {
             "Business Rule": "BR5 — Cancel at any step returns to cart",
-            "Test Cases": "TC-CHECKOUT-NAV-001, TC-CHECKOUT-NAV-002, TC-CHECKOUT-OVERVIEW-003",
+            "Test Cases": "TC-CHECKOUT-013, TC-NAV-002, TC-NAV-006, TC-OVERVIEW-007, TC-NAV-003",
             "Result": "Tests pass; Overview Cancel goes to Products, not Cart",
-            "Gap": "BUG-002",
+            "Gap": "BUG-005",
         },
     ]
     st.dataframe(pd.DataFrame(rule_rows), use_container_width=True, hide_index=True)
@@ -301,10 +302,15 @@ with tab_defects:
 with tab_submit:
     st.subheader("Submit New Testing Request")
     st.caption(
-        "This does **not** run any tests automatically. It commits a new request file "
-        f"to `user-stories/` in `{GITHUB_OWNER}/{GITHUB_REPO}` — a human (or Claude Code, "
-        "in a future session) then reads it and manually runs the plan → generate → "
-        "execute workflow, the same way SCRUM-101 was built."
+        "Submitting this form (1) commits a new request file to `user-stories/` in "
+        f"`{GITHUB_OWNER}/{GITHUB_REPO}`, and (2) triggers the **existing** SauceDemo "
+        "checkout automation suite (68 test cases, already generated and reviewed) to "
+        "re-run on GitHub Actions. It does **not** run AI-driven test generation against "
+        "your submitted URL/requirements — that step still needs a human (or Claude Code, "
+        "in a future session) to review the request and run the plan → generate → execute "
+        "workflow manually. This boundary is intentional: this form is public and "
+        "unauthenticated, so auto-generating and committing new code from anonymous input "
+        "would be a real abuse risk."
     )
     st.warning(
         "⚠️ This app and its GitHub repo are **public**. Anything submitted here becomes "
@@ -318,7 +324,8 @@ with tab_submit:
         st.info(
             "GitHub token not configured — submissions will show an error until `GITHUB_TOKEN` "
             "is set in this app's Secrets (Streamlit Cloud: Manage app → Settings → Secrets). "
-            "See `streamlit_app/README.md` for setup steps.",
+            "The token needs both `Contents: Read and write` and `Actions: Read and write` "
+            "permissions. See `streamlit_app/README.md` for setup steps.",
             icon="ℹ️",
         )
 
@@ -396,6 +403,26 @@ and automation suite.*
                 st.success(f"Request submitted and committed to `{path}`.")
                 if result.html_url:
                     st.markdown(f"[View the committed file on GitHub]({result.html_url})")
+
+                run_result = trigger_workflow(
+                    owner=GITHUB_OWNER,
+                    repo=GITHUB_REPO,
+                    workflow_file=GITHUB_WORKFLOW_FILE,
+                    ref=GITHUB_BRANCH,
+                    token=get_github_token(),
+                )
+                if run_result.success:
+                    st.success(
+                        "Test run triggered on GitHub Actions (existing 68-test SauceDemo "
+                        "checkout suite, Chromium/Firefox/WebKit)."
+                    )
+                    st.markdown(
+                        f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_WORKFLOW_FILE})"
+                    )
+                else:
+                    st.warning(
+                        f"Request was committed, but the test run could not be triggered: {run_result.message}"
+                    )
             else:
                 st.error(f"Could not submit request: {result.message}")
 

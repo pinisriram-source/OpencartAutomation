@@ -5,6 +5,7 @@ import { CartPage } from '../pages/cart.page';
 import { CheckoutStepOnePage } from '../pages/checkout-step-one.page';
 import { CheckoutStepTwoPage } from '../pages/checkout-step-two.page';
 import { CheckoutCompletePage } from '../pages/checkout-complete.page';
+import { ProductDetailPage } from '../pages/product-detail.page';
 
 type SauceDemoFixtures = {
   loginPage: LoginPage;
@@ -13,6 +14,7 @@ type SauceDemoFixtures = {
   checkoutStepOnePage: CheckoutStepOnePage;
   checkoutStepTwoPage: CheckoutStepTwoPage;
   checkoutCompletePage: CheckoutCompletePage;
+  productDetailPage: ProductDetailPage;
 };
 
 export const test = base.extend<SauceDemoFixtures>({
@@ -33,6 +35,9 @@ export const test = base.extend<SauceDemoFixtures>({
   },
   checkoutCompletePage: async ({ page }, use) => {
     await use(new CheckoutCompletePage(page));
+  },
+  productDetailPage: async ({ page }, use) => {
+    await use(new ProductDetailPage(page));
   },
 });
 

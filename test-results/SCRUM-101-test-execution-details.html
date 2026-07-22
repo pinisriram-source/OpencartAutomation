@@ -75,7 +75,7 @@
     <h1>Test Execution Details — SCRUM-101: E-commerce Checkout Process</h1>
     <div class="meta">
       <div><b>Application Under Test:</b> SauceDemo (<a href="https://www.saucedemo.com" target="_blank" rel="noopener">saucedemo.com</a>)</div>
-      <div><b>Report Date:</b> 2026-07-21</div>
+      <div><b>Report Date:</b> 2026-07-22</div>
       <div><b>Automation Suite:</b> <a href="../tests/saucedemo-checkout/">tests/saucedemo-checkout/</a></div>
       <div><b>Summary Report:</b> <a href="SCRUM-101-checkout-test-report.html">SCRUM-101-checkout-test-report.html</a></div>
     </div>
@@ -83,9 +83,9 @@
 
   <div class="stat-grid">
     <div class="stat headline"><div class="num">100%</div><div class="label">Success Rate</div></div>
-    <div class="stat"><div class="num">32</div><div class="label">Test Cases</div></div>
+    <div class="stat"><div class="num">68</div><div class="label">Test Cases</div></div>
     <div class="stat"><div class="num">3</div><div class="label">Browsers</div></div>
-    <div class="stat"><div class="num">96</div><div class="label">Executions</div></div>
+    <div class="stat"><div class="num">204</div><div class="label">Executions</div></div>
     <div class="stat"><div class="num">6</div><div class="label">Use Cases</div></div>
     <div class="stat"><div class="num">0</div><div class="label">Failed</div></div>
   </div>
@@ -96,39 +96,75 @@
     <div class="table-scroll">
       <table>
         <tr><th>#</th><th>Test Case ID</th><th>Title</th><th>Use Case</th><th>Business Rule</th><th>Chromium</th><th>Firefox</th><th>WebKit</th><th>Overall</th></tr>
-        <tr><td>1</td><td><code>TC-CART-001</code></td><td>Cart displays single added item with correct name, description, price, and quantity</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>2</td><td><code>TC-CART-002</code></td><td>Cart displays multiple items with correct per-item details</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>3</td><td><code>TC-CART-003</code></td><td>Removing an item from the cart updates the list and badge count</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>4</td><td><code>TC-CART-004</code></td><td>Continue Shopping returns to Products page without altering cart contents</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>5</td><td><code>TC-CART-005</code></td><td>Checkout button from cart navigates to Checkout Information page</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>6</td><td><code>TC-CART-006-EmptyCart</code></td><td>Cart page with zero items shows no line items and no totals</td><td>AC1</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>7</td><td><code>TC-CHECKOUT-INFO-001</code></td><td>Checkout Information page displays all mandatory fields</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>8</td><td><code>TC-CHECKOUT-INFO-002</code></td><td>Valid First Name, Last Name, and Zip proceeds to Overview page</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>9</td><td><code>TC-CHECKOUT-INFO-003-EmptyFirstName</code></td><td>Leaving First Name empty blocks progression and shows required-field error</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>10</td><td><code>TC-CHECKOUT-INFO-004-EmptyLastName</code></td><td>Leaving Last Name empty blocks progression and shows required-field error</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>11</td><td><code>TC-CHECKOUT-INFO-005-EmptyZip</code></td><td>Leaving Zip/Postal Code empty blocks progression and shows required-field error</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>12</td><td><code>TC-CHECKOUT-INFO-006-AllFieldsEmpty</code></td><td>Submitting a completely blank form shows the First Name error first</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>13</td><td><code>TC-CHECKOUT-INFO-007</code></td><td>Checkout Information page requires an active login session</td><td>AC2</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>14</td><td><code>TC-CHECKOUT-INFO-008-EmptyCart</code></td><td>Reaching Checkout Information with an empty cart does not block the form</td><td>AC2</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-001</span></td></tr>
-        <tr><td>15</td><td><code>TC-CHECKOUT-OVERVIEW-001</code></td><td>Overview page shows correct item summary for a single-item cart</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>16</td><td><code>TC-CHECKOUT-OVERVIEW-002</code></td><td>Overview page totals recalculate correctly for a multi-item cart</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>17</td><td><code>TC-CHECKOUT-OVERVIEW-003</code></td><td>Cancel on Overview page returns to Products page (not Cart)</td><td>AC3</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-002</span></td></tr>
-        <tr><td>18</td><td><code>TC-CHECKOUT-OVERVIEW-004-EmptyCart</code></td><td>Overview page with an empty cart shows zeroed totals and an empty item table</td><td>AC3</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-001</span></td></tr>
-        <tr><td>19</td><td><code>TC-CHECKOUT-COMPLETE-001</code></td><td>Clicking Finish completes the order and shows the confirmation page</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>20</td><td><code>TC-CHECKOUT-COMPLETE-002</code></td><td>Order completion clears the cart</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>21</td><td><code>TC-CHECKOUT-COMPLETE-003</code></td><td>Back Home returns to the Products page</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>22</td><td><code>TC-CHECKOUT-COMPLETE-004</code></td><td>Browser Back button after order completion does not restore the purchased cart</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>23</td><td><code>TC-CHECKOUT-INFO-009-SpecialCharacters</code></td><td>Special characters and markup in Name fields are accepted (no format validation)</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-004</span></td></tr>
-        <tr><td>24</td><td><code>TC-CHECKOUT-INFO-010-WhitespaceOnly</code></td><td>Whitespace-only input in a required field is treated as non-empty (accepted)</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-003</span></td></tr>
-        <tr><td>25</td><td><code>TC-CHECKOUT-INFO-011-LongInput</code></td><td>Very long input values are accepted in all three fields</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>26</td><td><code>TC-CHECKOUT-INFO-012-SingleCharacter</code></td><td>Minimum boundary — single-character values in each field are accepted</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>27</td><td><code>TC-CHECKOUT-INFO-013-ReSubmitAfterError</code></td><td>Correcting a flagged field and resubmitting clears the error and proceeds</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>28</td><td><code>TC-CHECKOUT-NAV-001</code></td><td>Cancel on Checkout Information returns to the Cart page with cart intact</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>29</td><td><code>TC-CHECKOUT-NAV-002</code></td><td>End-to-end cancel-and-resume: cancelling at Overview and re-entering checkout preserves cart and requires re-entry of info</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>30</td><td><code>TC-CHECKOUT-NAV-003</code></td><td>Browser Back button from Checkout Information returns to Cart without data loss</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td>31</td><td><code>TC-CHECKOUT-NAV-004</code></td><td>Browser Back button from Checkout Overview returns to Checkout Information with fields cleared</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-005</span></td></tr>
-        <tr><td>32</td><td><code>TC-CHECKOUT-NAV-005</code></td><td>Full guest-to-confirmation happy path in a single continuous run</td><td>AC1–AC4</td><td>BR1–BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
-        <tr><td colspan="5">Total</td><td class="num-col">32/32</td><td class="num-col">32/32</td><td class="num-col">32/32</td><td class="num-col">96/96</td></tr>
+        <tr><td>1</td><td><code>TC-CART-001</code></td><td>Cart displays all added items with name, description, and price</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>2</td><td><code>TC-CART-002</code></td><td>Cart shows correct quantity per line item</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>3</td><td><code>TC-CART-003</code></td><td>\</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>4</td><td><code>TC-CART-004</code></td><td>\</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>5</td><td><code>TC-CART-005</code></td><td>Removing an item from the cart updates the list and badge count</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>6</td><td><code>TC-CART-006-EmptyCart</code></td><td>Cart page renders correctly with zero items</td><td>AC1</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-002</span></td></tr>
+        <tr><td>7</td><td><code>TC-CART-007</code></td><td>Cart persists across navigation to a product detail page and back</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>8</td><td><code>TC-CART-008</code></td><td>Cart contents persist after a full page refresh</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>9</td><td><code>TC-CART-009-AllProducts</code></td><td>Adding all six catalog products displays each correctly in cart</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>10</td><td><code>TC-CART-010</code></td><td>Cart item name is a clickable link to its Product Detail page</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>11</td><td><code>TC-CART-011-NoTotalOnCartPage</code></td><td>Cart page does not display a subtotal/total price (AC1 discrepancy)</td><td>AC1</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-001</span></td></tr>
+        <tr><td>12</td><td><code>TC-CHECKOUT-001</code></td><td>Checkout button redirects to Checkout Information page with required fields</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>13</td><td><code>TC-CHECKOUT-002</code></td><td>Valid data in all fields and Continue proceeds to Overview page</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>14</td><td><code>TC-CHECKOUT-003-EmptyFirstName</code></td><td>Error shown when First Name is empty</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>15</td><td><code>TC-CHECKOUT-004-EmptyLastName</code></td><td>Error shown when Last Name is empty</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>16</td><td><code>TC-CHECKOUT-005-EmptyZip</code></td><td>Error shown when Postal Code is empty</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>17</td><td><code>TC-CHECKOUT-006-AllFieldsEmpty</code></td><td>Only the first missing-field error is shown when all fields are empty</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>18</td><td><code>TC-CHECKOUT-007</code></td><td>Error banner dismiss (X) control clears the message</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>19</td><td><code>TC-CHECKOUT-008</code></td><td>Invalid field is visually highlighted with an error icon</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>20</td><td><code>TC-CHECKOUT-009-WhitespaceOnly</code></td><td>Whitespace-only values are accepted (validation gap)</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-004</span></td></tr>
+        <tr><td>21</td><td><code>TC-CHECKOUT-010-SpecialCharacters</code></td><td>Special characters in Zip are accepted (AC5 gap)</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-004</span></td></tr>
+        <tr><td>22</td><td><code>TC-CHECKOUT-011-LongInput</code></td><td>Very long input string in First Name is accepted</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-004</span></td></tr>
+        <tr><td>23</td><td><code>TC-CHECKOUT-012-NumericAndAlphaZip</code></td><td>Zip field accepts both numeric and alphanumeric postal codes</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>24</td><td><code>TC-CHECKOUT-013</code></td><td>Cancel button on Checkout Information page returns to Cart with items intact</td><td>AC2</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>25</td><td><code>TC-CHECKOUT-014</code></td><td>Cart badge count persists on the Checkout Information page header</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>26</td><td><code>TC-CHECKOUT-015-DirectURLWithItems</code></td><td>Direct URL navigation to checkout-step-one.html works when logged in with items in cart</td><td>AC2</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>27</td><td><code>TC-CHECKOUT-016-EmptyCartAccess</code></td><td>Checkout Information page is reachable even with an empty cart (business rule 3 gap)</td><td>AC2</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-002</span></td></tr>
+        <tr><td>28</td><td><code>TC-OVERVIEW-001</code></td><td>Overview page lists all cart items with qty, name, description, price</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>29</td><td><code>TC-OVERVIEW-002</code></td><td>Payment Information section is displayed</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>30</td><td><code>TC-OVERVIEW-003</code></td><td>Shipping Information section is displayed</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>31</td><td><code>TC-OVERVIEW-004</code></td><td>Item Total equals the sum of individual item prices</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>32</td><td><code>TC-OVERVIEW-005</code></td><td>Tax and Total amounts are displayed and Total = Item Total + Tax</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>33</td><td><code>TC-OVERVIEW-006</code></td><td>Cancel and Finish buttons are both present and enabled</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>34</td><td><code>TC-OVERVIEW-007</code></td><td>Cancel button on Overview redirects to Products page (actual behavior)</td><td>AC3</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-005</span></td></tr>
+        <tr><td>35</td><td><code>TC-OVERVIEW-008</code></td><td>Finish button navigates to the Order Confirmation page</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>36</td><td><code>TC-OVERVIEW-009-MultipleItems</code></td><td>Totals recalculate correctly with 3+ differently priced items</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>37</td><td><code>TC-OVERVIEW-010-SingleItem</code></td><td>Totals are correct with exactly one item in cart</td><td>AC3</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>38</td><td><code>TC-OVERVIEW-011-SkipInformationPage</code></td><td>Overview page is directly reachable, bypassing Checkout Information entirely</td><td>AC3</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-003</span></td></tr>
+        <tr><td>39</td><td><code>TC-COMPLETE-001</code></td><td>Finish displays the order confirmation success message</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>40</td><td><code>TC-COMPLETE-002</code></td><td>Pony Express confirmation image is displayed</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>41</td><td><code>TC-COMPLETE-003</code></td><td>\</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>42</td><td><code>TC-COMPLETE-004</code></td><td>Cart is cleared immediately after order completion (business rule 4)</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>43</td><td><code>TC-COMPLETE-005</code></td><td>Cart remains empty after returning to Products page post-completion</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>44</td><td><code>TC-COMPLETE-006</code></td><td>\</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-007</span></td></tr>
+        <tr><td>45</td><td><code>TC-COMPLETE-007-RefreshConfirmation</code></td><td>Refreshing the confirmation page preserves the completion state</td><td>AC4</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>46</td><td><code>TC-COMPLETE-008</code></td><td>Header shows no cart badge on the confirmation page</td><td>AC4</td><td>BR4</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>47</td><td><code>TC-ERROR-001-UnauthCart</code></td><td>Unauthenticated direct access to Cart page is blocked</td><td>AC5</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>48</td><td><code>TC-ERROR-002-UnauthCheckoutInfo</code></td><td>Unauthenticated direct access to Checkout Information page is blocked</td><td>AC5</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>49</td><td><code>TC-ERROR-003-UnauthOverview</code></td><td>Unauthenticated direct access to Order Overview page is blocked</td><td>AC5</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>50</td><td><code>TC-ERROR-004-UnauthComplete</code></td><td>Unauthenticated direct access to Order Confirmation page is blocked</td><td>AC5</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>51</td><td><code>TC-ERROR-005-InvalidLogin</code></td><td>Invalid login credentials block all checkout access</td><td>AC5</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>52</td><td><code>TC-ERROR-006-SequentialValidation</code></td><td>Field validation errors surface one at a time in a fixed order</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>53</td><td><code>TC-ERROR-007-EmptyCartCheckoutButtonEnabled</code></td><td>Checkout button remains active on an empty cart (business rule 3 gap)</td><td>AC5</td><td>BR3</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-002</span></td></tr>
+        <tr><td>54</td><td><code>TC-ERROR-008-ScriptInjection</code></td><td>Script-tag input is rendered as literal text, not executed</td><td>AC5</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>55</td><td><code>TC-ERROR-009-SQLInjection</code></td><td>SQL-injection-style input is treated as literal text</td><td>AC5</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>56</td><td><code>TC-ERROR-010-UnicodeEmoji</code></td><td>Unicode/emoji characters in Last Name are accepted without crashing</td><td>AC5</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>57</td><td><code>TC-ERROR-011-FixOneFieldAtATime</code></td><td>Correcting fields one at a time surfaces the correct next error with no stale message</td><td>AC5</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>58</td><td><code>TC-ERROR-012-RefreshMidEntry</code></td><td>Refreshing the Checkout Information page mid-entry clears typed values</td><td>AC5</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>59</td><td><code>TC-NAV-001-HappyPathE2E</code></td><td>Full end-to-end checkout smoke path</td><td>NAV</td><td>BR1-BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>60</td><td><code>TC-NAV-002-CancelFromInfoToCart</code></td><td>Cancel on Checkout Information returns to Cart with items intact</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>61</td><td><code>TC-NAV-003-CancelFromOverviewToProducts</code></td><td>Cancel on Overview returns to Products page, cart intact</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-005</span></td></tr>
+        <tr><td>62</td><td><code>TC-NAV-004-BrowserBackAfterCompletion</code></td><td>Browser Back after order completion shows a stale, empty Overview page</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-006</span></td></tr>
+        <tr><td>63</td><td><code>TC-NAV-005-ReFinishStaleOverview</code></td><td>Clicking Finish again from the stale post-completion Overview page still submits</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-006</span></td></tr>
+        <tr><td>64</td><td><code>TC-NAV-006-BrowserBackFromCheckoutInfo</code></td><td>Browser Back from Checkout Information returns to Cart page</td><td>NAV</td><td>BR5</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>65</td><td><code>TC-NAV-007-DirectSkipToOverview</code></td><td>User can skip the mandatory Checkout Information step via direct URL</td><td>NAV</td><td>BR1</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span> <span class="gap-tag">BUG-003</span></td></tr>
+        <tr><td>66</td><td><code>TC-NAV-008-LogoutMidCheckout</code></td><td>Logging out mid-checkout redirects to Login and blocks further checkout access</td><td>NAV</td><td>BR2</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>67</td><td><code>TC-NAV-009-RefreshOverviewPage</code></td><td>Refreshing the Overview page (before completion) preserves order summary data</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td>68</td><td><code>TC-NAV-010-ResetAppState</code></td><td>\</td><td>NAV</td><td>—</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td class="pass-cell">✅</td><td><span class="badge-pass">Pass</span></td></tr>
+        <tr><td colspan="5">Total</td><td class="num-col">68/68</td><td class="num-col">68/68</td><td class="num-col">68/68</td><td class="num-col">204/204</td></tr>
       </table>
     </div>
   </section>
@@ -138,13 +174,13 @@
     <div class="table-scroll">
       <table>
         <tr><th>Business Use Case</th><th>Test Cases</th><th>Count</th><th>Executions (×3)</th><th>Result</th></tr>
-        <tr><td>AC1 — Cart Review</td><td><code>TC-CART-001…006</code></td><td>6</td><td>18</td><td class="pass-cell">✅ 18/18</td></tr>
-        <tr><td>AC2 — Checkout Information Entry</td><td><code>TC-CHECKOUT-INFO-001…008</code></td><td>8</td><td>24</td><td class="pass-cell">✅ 24/24</td></tr>
-        <tr><td>AC3 — Order Overview</td><td><code>TC-CHECKOUT-OVERVIEW-001…004</code></td><td>4</td><td>12</td><td class="pass-cell">✅ 12/12</td></tr>
-        <tr><td>AC4 — Order Completion</td><td><code>TC-CHECKOUT-COMPLETE-001…004</code></td><td>4</td><td>12</td><td class="pass-cell">✅ 12/12</td></tr>
-        <tr><td>AC5 — Error Handling</td><td><code>TC-CHECKOUT-INFO-009…013</code></td><td>5</td><td>15</td><td class="pass-cell">✅ 15/15</td></tr>
-        <tr><td>NAV — Navigation Flow (cross-cutting)</td><td><code>TC-CHECKOUT-NAV-001…005</code></td><td>5</td><td>15</td><td class="pass-cell">✅ 15/15</td></tr>
-        <tr><td>Total</td><td></td><td>32</td><td>96</td><td class="pass-cell">✅ 96/96</td></tr>
+        <tr><td>AC1 — Cart Review</td><td><code>TC-CART-001…TC-CART-011-NoTotalOnCartPage</code></td><td>11</td><td>33</td><td class="pass-cell">✅ 33/33</td></tr>
+        <tr><td>AC2 — Checkout Information Entry</td><td><code>TC-CHECKOUT-001…TC-CHECKOUT-016-EmptyCartAccess</code></td><td>16</td><td>48</td><td class="pass-cell">✅ 48/48</td></tr>
+        <tr><td>AC3 — Order Overview</td><td><code>TC-OVERVIEW-001…TC-OVERVIEW-011-SkipInformationPage</code></td><td>11</td><td>33</td><td class="pass-cell">✅ 33/33</td></tr>
+        <tr><td>AC4 — Order Completion</td><td><code>TC-COMPLETE-001…TC-COMPLETE-008</code></td><td>8</td><td>24</td><td class="pass-cell">✅ 24/24</td></tr>
+        <tr><td>AC5 — Error Handling / Boundary</td><td><code>TC-ERROR-001-UnauthCart…TC-ERROR-012-RefreshMidEntry</code></td><td>12</td><td>36</td><td class="pass-cell">✅ 36/36</td></tr>
+        <tr><td>NAV — Navigation Flow / Cross-Cutting</td><td><code>TC-NAV-001-HappyPathE2E…TC-NAV-010-ResetAppState</code></td><td>10</td><td>30</td><td class="pass-cell">✅ 30/30</td></tr>
+        <tr><td>Total</td><td></td><td>68</td><td>204</td><td class="pass-cell">✅ 204/204</td></tr>
       </table>
     </div>
   </section>
@@ -154,14 +190,34 @@
     <div class="table-scroll">
       <table>
         <tr><th>Business Rule</th><th>Test Cases Exercising It</th><th>Result</th></tr>
-        <tr><td>BR1 — All checkout fields mandatory</td><td>9 cases (<code>TC-CHECKOUT-INFO-001…006</code>, <code>009…013</code>)</td><td class="pass-cell">✅ Passes; format/whitespace gaps logged as <span class="gap-tag">BUG-003</span> <span class="gap-tag">BUG-004</span></td></tr>
-        <tr><td>BR2 — Login required for checkout</td><td><code>TC-CHECKOUT-INFO-007</code></td><td class="pass-cell">✅ Passes as expected</td></tr>
-        <tr><td>BR3 — Cart cannot be empty at checkout</td><td><code>TC-CART-006-EmptyCart</code>, <code>TC-CHECKOUT-INFO-008-EmptyCart</code>, <code>TC-CHECKOUT-OVERVIEW-004-EmptyCart</code></td><td>Tests pass (assert real behavior); rule itself violated by the app — <span class="gap-tag">BUG-001</span></td></tr>
-        <tr><td>BR4 — Order confirmation clears the cart</td><td><code>TC-CHECKOUT-COMPLETE-002</code>, <code>TC-CHECKOUT-COMPLETE-004</code></td><td class="pass-cell">✅ Passes as expected</td></tr>
-        <tr><td>BR5 — Cancel at any step returns to cart</td><td><code>TC-CHECKOUT-NAV-001</code>, <code>TC-CHECKOUT-NAV-002</code>, <code>TC-CHECKOUT-OVERVIEW-003</code></td><td>Tests pass (assert real behavior); Overview Cancel goes to Products, not Cart — <span class="gap-tag">BUG-002</span></td></tr>
+        <tr><td>BR1 — All checkout form fields are mandatory</td><td><code>TC-CHECKOUT-001</code>, <code>TC-CHECKOUT-002</code>, <code>TC-CHECKOUT-003-EmptyFirstName</code>, <code>TC-CHECKOUT-004-EmptyLastName</code>, <code>TC-CHECKOUT-005-EmptyZip</code>, <code>TC-CHECKOUT-006-AllFieldsEmpty</code>, …</td><td class="">Tests pass (assert real behavior); gap logged — <span class="gap-tag">BUG-003</span> <span class="gap-tag">BUG-004</span></td></tr>
+        <tr><td>BR2 — Users must be logged in to access checkout</td><td><code>TC-ERROR-001-UnauthCart</code>, <code>TC-ERROR-002-UnauthCheckoutInfo</code>, <code>TC-ERROR-003-UnauthOverview</code>, <code>TC-ERROR-004-UnauthComplete</code>, <code>TC-ERROR-005-InvalidLogin</code>, <code>TC-NAV-008-LogoutMidCheckout</code></td><td class="pass-cell">✅ Passes as expected</td></tr>
+        <tr><td>BR3 — Cart cannot be empty when proceeding to checkout</td><td><code>TC-CART-006-EmptyCart</code>, <code>TC-CHECKOUT-016-EmptyCartAccess</code>, <code>TC-ERROR-007-EmptyCartCheckoutButtonEnabled</code></td><td class="">Tests pass (assert real behavior); gap logged — <span class="gap-tag">BUG-002</span></td></tr>
+        <tr><td>BR4 — Order confirmation should clear the cart</td><td><code>TC-COMPLETE-004</code>, <code>TC-COMPLETE-005</code>, <code>TC-COMPLETE-008</code></td><td class="pass-cell">✅ Passes as expected</td></tr>
+        <tr><td>BR5 — Users can cancel checkout at any step and return to cart</td><td><code>TC-CHECKOUT-013</code>, <code>TC-OVERVIEW-007</code>, <code>TC-NAV-002-CancelFromInfoToCart</code>, <code>TC-NAV-003-CancelFromOverviewToProducts</code>, <code>TC-NAV-006-BrowserBackFromCheckoutInfo</code></td><td class="">Tests pass (assert real behavior); gap logged — <span class="gap-tag">BUG-005</span></td></tr>
       </table>
     </div>
     <p class="sub">Every row is a passing automation result — assertions match the application's real, observed behavior. Rows tagged with a BUG-xxx reference indicate the <em>application</em> deviates from the business rule as stated in the user story, not that the test failed. Full details in the <a href="SCRUM-101-checkout-test-report.html#defects">summary report's Defects Log</a>.</p>
+  </section>
+
+  <section>
+    <h2>Business Use Case &amp; Rule Legend</h2>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Code</th><th>Description</th></tr>
+        <tr><td>AC1</td><td>Cart Review — user reviews cart contents and totals before checkout</td></tr>
+        <tr><td>AC2</td><td>Checkout Information Entry — user provides shipping/contact info</td></tr>
+        <tr><td>AC3</td><td>Order Overview — user reviews order summary, payment/shipping, and totals before confirming</td></tr>
+        <tr><td>AC4</td><td>Order Completion — user confirms the order and receives confirmation</td></tr>
+        <tr><td>AC5</td><td>Error Handling — invalid/incomplete input is rejected with clear feedback</td></tr>
+        <tr><td>NAV</td><td>Navigation Flow — cancel/back-button behavior and cross-cutting session/state handling</td></tr>
+        <tr><td>BR1</td><td>All checkout form fields are mandatory</td></tr>
+        <tr><td>BR2</td><td>Users must be logged in to access checkout</td></tr>
+        <tr><td>BR3</td><td>Cart cannot be empty when proceeding to checkout</td></tr>
+        <tr><td>BR4</td><td>Order confirmation should clear the cart</td></tr>
+        <tr><td>BR5</td><td>Users can cancel checkout at any step and return to cart</td></tr>
+      </table>
+    </div>
   </section>
 
   <section>
@@ -169,11 +225,11 @@
     <div class="table-scroll">
       <table>
         <tr><th>Item</th><th>Value</th></tr>
-        <tr><td>Test runner</td><td>Playwright 1.61.1</td></tr>
+        <tr><td>Test runner</td><td>Playwright</td></tr>
         <tr><td>Browsers</td><td>Chromium (Desktop Chrome), Firefox (Desktop Firefox), WebKit (Desktop Safari)</td></tr>
         <tr><td>Workers</td><td>1 (sequential)</td></tr>
         <tr><td>Retries</td><td>0 (local run)</td></tr>
-        <tr><td>Run duration</td><td>20.8 minutes</td></tr>
+        <tr><td>Run duration</td><td>30.8 minutes</td></tr>
         <tr><td>Application URL</td><td>https://www.saucedemo.com</td></tr>
         <tr><td>Test account</td><td><code>standard_user</code> / <code>secret_sauce</code></td></tr>
       </table>

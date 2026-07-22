@@ -2,20 +2,24 @@
   "meta": {
     "app_under_test": "SauceDemo Checkout",
     "app_url": "https://www.saucedemo.com",
-    "report_date": "2026-07-21",
+    "report_date": "2026-07-22",
     "test_account": "standard_user / secret_sauce",
-    "browsers": ["Chromium (Desktop Chrome)", "Firefox (Desktop Firefox)", "WebKit (Desktop Safari)"],
+    "browsers": [
+      "Chromium (Desktop Chrome)",
+      "Firefox (Desktop Firefox)",
+      "WebKit (Desktop Safari)"
+    ],
     "run_command": "npx playwright test tests/saucedemo-checkout --project=chromium --project=firefox --project=webkit",
-    "duration_minutes": 20.8,
+    "duration_minutes": 30.8,
     "test_plan_path": "specs/saucedemo-checkout-test-plan.md",
     "suite_path": "tests/saucedemo-checkout/",
     "story": "SCRUM-101"
   },
   "summary": {
-    "test_cases": 32,
+    "test_cases": 68,
     "browsers": 3,
-    "executions": 96,
-    "passed": 96,
+    "executions": 204,
+    "passed": 204,
     "failed": 0,
     "skipped": 0,
     "success_rate": 100,
@@ -23,12 +27,42 @@
     "status": "PASS"
   },
   "suites": [
-    {"name": "Cart Review", "use_case": "AC1", "file": "cart-review.spec.ts", "tests": 6},
-    {"name": "Checkout Information Entry", "use_case": "AC2", "file": "checkout-information.spec.ts", "tests": 8},
-    {"name": "Order Overview", "use_case": "AC3", "file": "checkout-overview.spec.ts", "tests": 4},
-    {"name": "Order Completion", "use_case": "AC4", "file": "checkout-complete.spec.ts", "tests": 4},
-    {"name": "Error Handling / Boundary", "use_case": "AC5", "file": "checkout-error-handling.spec.ts", "tests": 5},
-    {"name": "Navigation Flow / Cross-Cutting", "use_case": "NAV", "file": "checkout-navigation.spec.ts", "tests": 5}
+    {
+      "name": "Cart Review",
+      "use_case": "AC1",
+      "file": "cart-review.spec.ts",
+      "tests": 11
+    },
+    {
+      "name": "Checkout Information Entry",
+      "use_case": "AC2",
+      "file": "checkout-information.spec.ts",
+      "tests": 16
+    },
+    {
+      "name": "Order Overview",
+      "use_case": "AC3",
+      "file": "checkout-overview.spec.ts",
+      "tests": 11
+    },
+    {
+      "name": "Order Completion",
+      "use_case": "AC4",
+      "file": "checkout-complete.spec.ts",
+      "tests": 8
+    },
+    {
+      "name": "Error Handling / Boundary",
+      "use_case": "AC5",
+      "file": "checkout-error-handling.spec.ts",
+      "tests": 12
+    },
+    {
+      "name": "Navigation Flow / Cross-Cutting",
+      "use_case": "NAV",
+      "file": "checkout-navigation.spec.ts",
+      "tests": 10
+    }
   ],
   "use_cases": {
     "AC1": "Cart Review — user reviews cart contents and totals before checkout",
@@ -36,7 +70,7 @@
     "AC3": "Order Overview — user reviews order summary, payment/shipping, and totals before confirming",
     "AC4": "Order Completion — user confirms the order and receives confirmation",
     "AC5": "Error Handling — invalid/incomplete input is rejected with clear feedback",
-    "NAV": "Navigation Flow — cancel/back-button behavior across the checkout flow (cross-cutting)"
+    "NAV": "Navigation Flow — cancel/back-button behavior and cross-cutting session/state handling"
   },
   "business_rules": {
     "BR1": "All checkout form fields are mandatory",
@@ -46,44 +80,750 @@
     "BR5": "Users can cancel checkout at any step and return to cart"
   },
   "tests": [
-    {"id": "TC-CART-001", "title": "Cart displays single added item with correct name, description, price, and quantity", "use_case": "AC1", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CART-002", "title": "Cart displays multiple items with correct per-item details", "use_case": "AC1", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CART-003", "title": "Removing an item from the cart updates the list and badge count", "use_case": "AC1", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CART-004", "title": "Continue Shopping returns to Products page without altering cart contents", "use_case": "AC1", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CART-005", "title": "Checkout button from cart navigates to Checkout Information page", "use_case": "AC1", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CART-006-EmptyCart", "title": "Cart page with zero items shows no line items and no totals", "use_case": "AC1", "business_rule": "BR3", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-001", "title": "Checkout Information page displays all mandatory fields", "use_case": "AC2", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-002", "title": "Valid First Name, Last Name, and Zip proceeds to Overview page", "use_case": "AC2", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-003-EmptyFirstName", "title": "Leaving First Name empty blocks progression and shows required-field error", "use_case": "AC2", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-004-EmptyLastName", "title": "Leaving Last Name empty blocks progression and shows required-field error", "use_case": "AC2", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-005-EmptyZip", "title": "Leaving Zip/Postal Code empty blocks progression and shows required-field error", "use_case": "AC2", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-006-AllFieldsEmpty", "title": "Submitting a completely blank form shows the First Name error first", "use_case": "AC2", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-007", "title": "Checkout Information page requires an active login session", "use_case": "AC2", "business_rule": "BR2", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-008-EmptyCart", "title": "Reaching Checkout Information with an empty cart does not block the form", "use_case": "AC2", "business_rule": "BR3", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": "BUG-001"},
-    {"id": "TC-CHECKOUT-OVERVIEW-001", "title": "Overview page shows correct item summary for a single-item cart", "use_case": "AC3", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-OVERVIEW-002", "title": "Overview page totals recalculate correctly for a multi-item cart", "use_case": "AC3", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-OVERVIEW-003", "title": "Cancel on Overview page returns to Products page (not Cart)", "use_case": "AC3", "business_rule": "BR5", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": "BUG-002"},
-    {"id": "TC-CHECKOUT-OVERVIEW-004-EmptyCart", "title": "Overview page with an empty cart shows zeroed totals and an empty item table", "use_case": "AC3", "business_rule": "BR3", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": "BUG-001"},
-    {"id": "TC-CHECKOUT-COMPLETE-001", "title": "Clicking Finish completes the order and shows the confirmation page", "use_case": "AC4", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-COMPLETE-002", "title": "Order completion clears the cart", "use_case": "AC4", "business_rule": "BR4", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-COMPLETE-003", "title": "Back Home returns to the Products page", "use_case": "AC4", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-COMPLETE-004", "title": "Browser Back button after order completion does not restore the purchased cart", "use_case": "AC4", "business_rule": "BR4", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-009-SpecialCharacters", "title": "Special characters and markup in Name fields are accepted (no format validation)", "use_case": "AC5", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": "BUG-004"},
-    {"id": "TC-CHECKOUT-INFO-010-WhitespaceOnly", "title": "Whitespace-only input in a required field is treated as non-empty (accepted)", "use_case": "AC5", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": "BUG-003"},
-    {"id": "TC-CHECKOUT-INFO-011-LongInput", "title": "Very long input values are accepted in all three fields", "use_case": "AC5", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-012-SingleCharacter", "title": "Minimum boundary — single-character values in each field are accepted", "use_case": "AC5", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-INFO-013-ReSubmitAfterError", "title": "Correcting a flagged field and resubmitting clears the error and proceeds", "use_case": "AC5", "business_rule": "BR1", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-NAV-001", "title": "Cancel on Checkout Information returns to the Cart page with cart intact", "use_case": "NAV", "business_rule": "BR5", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-NAV-002", "title": "End-to-end cancel-and-resume: cancelling at Overview and re-entering checkout preserves cart and requires re-entry of info", "use_case": "NAV", "business_rule": "BR5", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-NAV-003", "title": "Browser Back button from Checkout Information returns to Cart without data loss", "use_case": "NAV", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""},
-    {"id": "TC-CHECKOUT-NAV-004", "title": "Browser Back button from Checkout Overview returns to Checkout Information with fields cleared", "use_case": "NAV", "business_rule": "", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": "BUG-005"},
-    {"id": "TC-CHECKOUT-NAV-005", "title": "Full guest-to-confirmation happy path in a single continuous run", "use_case": "AC1-AC4", "business_rule": "BR1-BR5", "chromium": "Pass", "firefox": "Pass", "webkit": "Pass", "note": ""}
+    {
+      "id": "TC-CART-001",
+      "title": "Cart displays all added items with name, description, and price",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-002",
+      "title": "Cart shows correct quantity per line item",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-003",
+      "title": "\\",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-004",
+      "title": "\\",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-005",
+      "title": "Removing an item from the cart updates the list and badge count",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-006-EmptyCart",
+      "title": "Cart page renders correctly with zero items",
+      "use_case": "AC1",
+      "business_rule": "BR3",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-002"
+    },
+    {
+      "id": "TC-CART-007",
+      "title": "Cart persists across navigation to a product detail page and back",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-008",
+      "title": "Cart contents persist after a full page refresh",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-009-AllProducts",
+      "title": "Adding all six catalog products displays each correctly in cart",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-010",
+      "title": "Cart item name is a clickable link to its Product Detail page",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CART-011-NoTotalOnCartPage",
+      "title": "Cart page does not display a subtotal/total price (AC1 discrepancy)",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-CHECKOUT-001",
+      "title": "Checkout button redirects to Checkout Information page with required fields",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-002",
+      "title": "Valid data in all fields and Continue proceeds to Overview page",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-003-EmptyFirstName",
+      "title": "Error shown when First Name is empty",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-004-EmptyLastName",
+      "title": "Error shown when Last Name is empty",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-005-EmptyZip",
+      "title": "Error shown when Postal Code is empty",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-006-AllFieldsEmpty",
+      "title": "Only the first missing-field error is shown when all fields are empty",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-007",
+      "title": "Error banner dismiss (X) control clears the message",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-008",
+      "title": "Invalid field is visually highlighted with an error icon",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-009-WhitespaceOnly",
+      "title": "Whitespace-only values are accepted (validation gap)",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-004"
+    },
+    {
+      "id": "TC-CHECKOUT-010-SpecialCharacters",
+      "title": "Special characters in Zip are accepted (AC5 gap)",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-004"
+    },
+    {
+      "id": "TC-CHECKOUT-011-LongInput",
+      "title": "Very long input string in First Name is accepted",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-004"
+    },
+    {
+      "id": "TC-CHECKOUT-012-NumericAndAlphaZip",
+      "title": "Zip field accepts both numeric and alphanumeric postal codes",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-013",
+      "title": "Cancel button on Checkout Information page returns to Cart with items intact",
+      "use_case": "AC2",
+      "business_rule": "BR5",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-014",
+      "title": "Cart badge count persists on the Checkout Information page header",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-015-DirectURLWithItems",
+      "title": "Direct URL navigation to checkout-step-one.html works when logged in with items in cart",
+      "use_case": "AC2",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CHECKOUT-016-EmptyCartAccess",
+      "title": "Checkout Information page is reachable even with an empty cart (business rule 3 gap)",
+      "use_case": "AC2",
+      "business_rule": "BR3",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-002"
+    },
+    {
+      "id": "TC-OVERVIEW-001",
+      "title": "Overview page lists all cart items with qty, name, description, price",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-002",
+      "title": "Payment Information section is displayed",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-003",
+      "title": "Shipping Information section is displayed",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-004",
+      "title": "Item Total equals the sum of individual item prices",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-005",
+      "title": "Tax and Total amounts are displayed and Total = Item Total + Tax",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-006",
+      "title": "Cancel and Finish buttons are both present and enabled",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-007",
+      "title": "Cancel button on Overview redirects to Products page (actual behavior)",
+      "use_case": "AC3",
+      "business_rule": "BR5",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-005"
+    },
+    {
+      "id": "TC-OVERVIEW-008",
+      "title": "Finish button navigates to the Order Confirmation page",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-009-MultipleItems",
+      "title": "Totals recalculate correctly with 3+ differently priced items",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-010-SingleItem",
+      "title": "Totals are correct with exactly one item in cart",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-OVERVIEW-011-SkipInformationPage",
+      "title": "Overview page is directly reachable, bypassing Checkout Information entirely",
+      "use_case": "AC3",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-003"
+    },
+    {
+      "id": "TC-COMPLETE-001",
+      "title": "Finish displays the order confirmation success message",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-COMPLETE-002",
+      "title": "Pony Express confirmation image is displayed",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-COMPLETE-003",
+      "title": "\\",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-COMPLETE-004",
+      "title": "Cart is cleared immediately after order completion (business rule 4)",
+      "use_case": "AC4",
+      "business_rule": "BR4",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-COMPLETE-005",
+      "title": "Cart remains empty after returning to Products page post-completion",
+      "use_case": "AC4",
+      "business_rule": "BR4",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-COMPLETE-006",
+      "title": "\\",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-007"
+    },
+    {
+      "id": "TC-COMPLETE-007-RefreshConfirmation",
+      "title": "Refreshing the confirmation page preserves the completion state",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-COMPLETE-008",
+      "title": "Header shows no cart badge on the confirmation page",
+      "use_case": "AC4",
+      "business_rule": "BR4",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-001-UnauthCart",
+      "title": "Unauthenticated direct access to Cart page is blocked",
+      "use_case": "AC5",
+      "business_rule": "BR2",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-002-UnauthCheckoutInfo",
+      "title": "Unauthenticated direct access to Checkout Information page is blocked",
+      "use_case": "AC5",
+      "business_rule": "BR2",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-003-UnauthOverview",
+      "title": "Unauthenticated direct access to Order Overview page is blocked",
+      "use_case": "AC5",
+      "business_rule": "BR2",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-004-UnauthComplete",
+      "title": "Unauthenticated direct access to Order Confirmation page is blocked",
+      "use_case": "AC5",
+      "business_rule": "BR2",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-005-InvalidLogin",
+      "title": "Invalid login credentials block all checkout access",
+      "use_case": "AC5",
+      "business_rule": "BR2",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-006-SequentialValidation",
+      "title": "Field validation errors surface one at a time in a fixed order",
+      "use_case": "AC5",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-007-EmptyCartCheckoutButtonEnabled",
+      "title": "Checkout button remains active on an empty cart (business rule 3 gap)",
+      "use_case": "AC5",
+      "business_rule": "BR3",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-002"
+    },
+    {
+      "id": "TC-ERROR-008-ScriptInjection",
+      "title": "Script-tag input is rendered as literal text, not executed",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-009-SQLInjection",
+      "title": "SQL-injection-style input is treated as literal text",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-010-UnicodeEmoji",
+      "title": "Unicode/emoji characters in Last Name are accepted without crashing",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-011-FixOneFieldAtATime",
+      "title": "Correcting fields one at a time surfaces the correct next error with no stale message",
+      "use_case": "AC5",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ERROR-012-RefreshMidEntry",
+      "title": "Refreshing the Checkout Information page mid-entry clears typed values",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-NAV-001-HappyPathE2E",
+      "title": "Full end-to-end checkout smoke path",
+      "use_case": "NAV",
+      "business_rule": "BR1-BR5",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-NAV-002-CancelFromInfoToCart",
+      "title": "Cancel on Checkout Information returns to Cart with items intact",
+      "use_case": "NAV",
+      "business_rule": "BR5",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-NAV-003-CancelFromOverviewToProducts",
+      "title": "Cancel on Overview returns to Products page, cart intact",
+      "use_case": "NAV",
+      "business_rule": "BR5",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-005"
+    },
+    {
+      "id": "TC-NAV-004-BrowserBackAfterCompletion",
+      "title": "Browser Back after order completion shows a stale, empty Overview page",
+      "use_case": "NAV",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-006"
+    },
+    {
+      "id": "TC-NAV-005-ReFinishStaleOverview",
+      "title": "Clicking Finish again from the stale post-completion Overview page still submits",
+      "use_case": "NAV",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-006"
+    },
+    {
+      "id": "TC-NAV-006-BrowserBackFromCheckoutInfo",
+      "title": "Browser Back from Checkout Information returns to Cart page",
+      "use_case": "NAV",
+      "business_rule": "BR5",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-NAV-007-DirectSkipToOverview",
+      "title": "User can skip the mandatory Checkout Information step via direct URL",
+      "use_case": "NAV",
+      "business_rule": "BR1",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": "BUG-003"
+    },
+    {
+      "id": "TC-NAV-008-LogoutMidCheckout",
+      "title": "Logging out mid-checkout redirects to Login and blocks further checkout access",
+      "use_case": "NAV",
+      "business_rule": "BR2",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-NAV-009-RefreshOverviewPage",
+      "title": "Refreshing the Overview page (before completion) preserves order summary data",
+      "use_case": "NAV",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-NAV-010-ResetAppState",
+      "title": "\\",
+      "use_case": "NAV",
+      "business_rule": "",
+      "chromium": "Pass",
+      "firefox": "Pass",
+      "webkit": "Pass",
+      "note": ""
+    }
   ],
   "defects": [
-    {"id": "BUG-001", "severity": "Medium", "title": "Empty cart does not block Checkout Information or Overview", "steps": "Log in with an empty cart, navigate directly to checkout.", "expected": "Business Rule 3: cart cannot be empty when proceeding to checkout.", "actual": "Checkout Information renders and accepts input normally; Overview renders with a zeroed item table and $0.00 totals. Neither page blocks progression.", "test_ref": "TC-CHECKOUT-INFO-008-EmptyCart, TC-CHECKOUT-OVERVIEW-004-EmptyCart"},
-    {"id": "BUG-002", "severity": "Medium", "title": "Overview Cancel returns to Products, not Cart", "steps": "On the Checkout Overview page, click Cancel.", "expected": "Business Rule 5: users can cancel checkout at any step and return to cart.", "actual": "Cancel on Overview navigates to the Products page, not the Cart page. Cancel on Checkout Information does correctly return to Cart.", "test_ref": "TC-CHECKOUT-OVERVIEW-003, TC-CHECKOUT-NAV-001"},
-    {"id": "BUG-003", "severity": "Low", "title": "Whitespace-only input satisfies the required check", "steps": "Enter a single space into a required field, click Continue.", "expected": "Business Rule 1: field should be considered empty/required.", "actual": "The field is treated as non-empty and the user proceeds.", "test_ref": "TC-CHECKOUT-INFO-010-WhitespaceOnly"},
-    {"id": "BUG-004", "severity": "Low", "title": "No format validation on Checkout Information fields", "steps": "Enter special characters/markup into Name fields, click Continue.", "expected": "Business Rule 1 implies meaningful field validation, not just presence.", "actual": "All values accepted as long as the field is non-empty — validation is presence-only, not format-based.", "test_ref": "TC-CHECKOUT-INFO-009-SpecialCharacters"},
-    {"id": "BUG-005", "severity": "Info", "title": "Browser Back from Overview clears Checkout Information fields", "steps": "Fill Checkout Information, continue to Overview, click browser Back.", "expected": "Undefined by user story; noted for awareness.", "actual": "Returns to Checkout Information with all fields cleared, requiring re-entry rather than restoring prior input.", "test_ref": "TC-CHECKOUT-NAV-004"}
+    {
+      "id": "BUG-001",
+      "severity": "Low",
+      "title": "Cart page displays no subtotal/total price",
+      "steps": "Add items to the cart and open the Cart page.",
+      "expected": "AC1: cart review shows the total price calculation.",
+      "actual": "No subtotal/tax/total is rendered anywhere on the Cart page; the total first appears on the Order Overview page.",
+      "test_ref": "TC-CART-011-NoTotalOnCartPage"
+    },
+    {
+      "id": "BUG-002",
+      "severity": "Medium",
+      "title": "Empty cart does not block checkout access",
+      "steps": "Log in with an empty cart, open the Cart page or navigate directly to Checkout Information.",
+      "expected": "Business Rule 3: cart cannot be empty when proceeding to checkout.",
+      "actual": "The Checkout button remains enabled and clickable, and checkout-step-one.html loads normally with zero items in cart.",
+      "test_ref": "TC-CART-006-EmptyCart, TC-CHECKOUT-016-EmptyCartAccess, TC-ERROR-007-EmptyCartCheckoutButtonEnabled"
+    },
+    {
+      "id": "BUG-003",
+      "severity": "Medium",
+      "title": "Checkout Information step can be bypassed via direct URL",
+      "steps": "Log in, add an item to cart, navigate directly to checkout-step-two.html without visiting checkout-step-one.html first.",
+      "expected": "Business Rule 1: all checkout form fields are mandatory before an order can proceed.",
+      "actual": "The Order Overview page renders fully and Finish successfully completes the order, without First Name/Last Name/Zip ever being required.",
+      "test_ref": "TC-OVERVIEW-011-SkipInformationPage, TC-NAV-007-DirectSkipToOverview"
+    },
+    {
+      "id": "BUG-004",
+      "severity": "Low",
+      "title": "No format validation on Checkout Information fields",
+      "steps": "Enter whitespace-only, special-character, or very long values into First Name/Last Name/Zip and click Continue.",
+      "expected": "AC5 implies meaningful validation beyond presence-checking for invalid data.",
+      "actual": "All such values are silently accepted and the user proceeds to the Overview page — validation is presence-only.",
+      "test_ref": "TC-CHECKOUT-009-WhitespaceOnly, TC-CHECKOUT-010-SpecialCharacters, TC-CHECKOUT-011-LongInput"
+    },
+    {
+      "id": "BUG-005",
+      "severity": "Medium",
+      "title": "Overview Cancel returns to Products, not Cart",
+      "steps": "Reach the Order Overview page with items in cart, click Cancel.",
+      "expected": "Business Rule 5: users can cancel checkout at any step and return to cart.",
+      "actual": "Cancel on Overview redirects to the Products (inventory) page, not the Cart page. Cart contents remain intact either way.",
+      "test_ref": "TC-OVERVIEW-007, TC-NAV-003-CancelFromOverviewToProducts"
+    },
+    {
+      "id": "BUG-006",
+      "severity": "Medium",
+      "title": "Stale post-completion Overview page allows re-submitting a cleared order",
+      "steps": "Complete a full checkout, then press the browser Back button and click Finish again.",
+      "expected": "Undefined by user story, but a completed/cleared order should not be re-submittable.",
+      "actual": "Back reveals a stale Overview page with $0 totals and an active Finish button; clicking it re-navigates to the Confirmation page despite the empty cart.",
+      "test_ref": "TC-NAV-004-BrowserBackAfterCompletion, TC-NAV-005-ReFinishStaleOverview"
+    },
+    {
+      "id": "BUG-007",
+      "severity": "Info",
+      "title": "Undocumented 'Generate PDF order' button on confirmation page",
+      "steps": "Reach the Order Confirmation page after completing checkout.",
+      "expected": "Undefined by AC4; noted for product-owner awareness.",
+      "actual": "A 'Generate PDF order' button is present alongside 'Back Home', with static Payment/Shipping info fixed across all orders — not mentioned in the acceptance criteria.",
+      "test_ref": "TC-COMPLETE-006"
+    }
   ]
 }

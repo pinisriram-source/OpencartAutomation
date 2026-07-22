@@ -34,19 +34,31 @@ The app is public by default under Community Cloud's free tier.
 
 The **Submit New Request** tab lets a visitor commit a new file to
 `user-stories/` in this repo (title, application URL, optional demo
-credentials, and pasted/uploaded requirements text). It does **not** run
-any tests automatically — it's a capture form; a human or Claude Code
-picks up the committed file afterward and runs the actual plan → generate
-→ execute workflow.
+credentials, and pasted/uploaded requirements text), then triggers a
+`workflow_dispatch` run of the **existing** `.github/workflows/saucedemo-checkout.yml`
+suite (the already-generated, already-reviewed 68-test SauceDemo checkout
+suite) on GitHub Actions.
 
-This requires a GitHub token with **write access to this repo's
-contents**, provided via Streamlit secrets — never hardcoded in the code.
+It deliberately does **not** run AI-driven test *generation* against the
+submitted URL/requirements text. This form is public and unauthenticated,
+so letting anonymous input drive an autonomous agent that writes and commits
+new code would be a real prompt-injection/abuse risk. Turning a new
+submitted requirement into a new test plan + suite still needs a human (or
+Claude Code, in a reviewed session) to read the request file and run the
+plan → generate → execute workflow manually — the same way SCRUM-101 was
+built.
+
+This requires a GitHub token with **write access to this repo's contents
+AND the ability to trigger workflow runs**, provided via Streamlit secrets
+— never hardcoded in the code.
 
 **Create the token** (fine-grained, scoped to just this repo, is safest):
 1. GitHub → Settings → Developer settings → Personal access tokens →
    Fine-grained tokens → **Generate new token**.
 2. Repository access: **Only select repositories** → this repo.
-3. Permissions: **Contents: Read and write**.
+3. Permissions:
+   - **Contents: Read and write** (to commit the request file)
+   - **Actions: Read and write** (to trigger the `workflow_dispatch` run)
 4. Generate and copy the token.
 
 **Add it as a secret:**

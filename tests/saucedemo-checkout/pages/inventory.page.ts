@@ -10,6 +10,7 @@ export class InventoryPage {
   readonly cartLink: Locator;
   readonly openMenuButton: Locator;
   readonly logoutLink: Locator;
+  readonly resetAppStateLink: Locator;
   readonly inventoryItems: Locator;
 
   constructor(page: Page) {
@@ -21,6 +22,7 @@ export class InventoryPage {
     // events; the real clickable control layered underneath it is #react-burger-menu-btn.
     this.openMenuButton = page.locator('#react-burger-menu-btn');
     this.logoutLink = page.locator('[data-test="logout-sidebar-link"]');
+    this.resetAppStateLink = page.locator('[data-test="reset-sidebar-link"]');
     this.inventoryItems = page.locator('[data-test="inventory-item"]');
   }
 
@@ -48,6 +50,11 @@ export class InventoryPage {
     return this.itemRow(productName).locator('[data-test="inventory-item-price"]');
   }
 
+  /** The clickable product-name link within a listing row; navigates to that product's detail page. */
+  nameLink(productName: string): Locator {
+    return this.itemRow(productName).locator('[data-test$="-title-link"]');
+  }
+
   async addToCart(productName: string): Promise<void> {
     await this.addToCartButton(productName).click();
   }
@@ -56,8 +63,22 @@ export class InventoryPage {
     await this.cartLink.click();
   }
 
-  async logout(): Promise<void> {
+  async openProductDetail(productName: string): Promise<void> {
+    await this.nameLink(productName).click();
+  }
+
+  async openMenu(): Promise<void> {
     await this.openMenuButton.click();
+  }
+
+  async logout(): Promise<void> {
+    await this.openMenu();
     await this.logoutLink.click();
+  }
+
+  /** Opens the side menu and clicks 'Reset App State', which clears the cart. */
+  async resetAppState(): Promise<void> {
+    await this.openMenu();
+    await this.resetAppStateLink.click();
   }
 }

@@ -44,7 +44,6 @@
     --sev-medium:#e8b84b; --sev-medium-bg:#332705; --sev-medium-border:#5a4610;
     --sev-low:#a9b6cf; --sev-low-bg:#1f2530; --sev-low-border:#333c4c;
   }
-
   *{box-sizing:border-box;}
   body{
     margin:0; background:var(--bg); color:var(--text);
@@ -52,7 +51,6 @@
     line-height:1.55;
   }
   .wrap{max-width:980px; margin:0 auto; padding:32px 20px 80px;}
-
   header.report-head{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
     box-shadow:var(--shadow); padding:28px 28px 24px; margin-bottom:24px;
@@ -66,7 +64,6 @@
     margin-top:16px; padding:12px 14px; background:var(--surface-2); border-left:3px solid var(--brand);
     border-radius:6px; font-size:.9rem; color:var(--text-muted);
   }
-
   .stat-grid{
     display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:28px;
   }
@@ -79,7 +76,6 @@
   .stat.pass .num{color:var(--pass);}
   .stat.headline{background:var(--pass-bg); border-color:var(--pass-border);}
   .stat.headline .num{color:var(--pass);}
-
   section{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
     box-shadow:var(--shadow); padding:24px 28px; margin-bottom:20px;
@@ -92,14 +88,12 @@
     background:var(--surface-2); border:1px solid var(--border); border-radius:4px;
     padding:1px 5px; font-size:.85em; font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
   }
-
   .table-scroll{overflow-x:auto; margin:10px 0;}
   table{border-collapse:collapse; width:100%; font-size:.88rem;}
   th,td{border:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top;}
   th{background:var(--surface-2); font-weight:600; white-space:nowrap;}
   tr:last-child td{font-weight:600;}
   td code{white-space:nowrap;}
-
   .badge{
     display:inline-block; padding:2px 9px; border-radius:999px; font-size:.72rem; font-weight:700;
     letter-spacing:.02em; text-transform:uppercase; border:1px solid transparent; white-space:nowrap;
@@ -110,20 +104,16 @@
   .badge-info{background:var(--sev-info-bg); color:var(--sev-info); border-color:var(--sev-info-border);}
   .ok{color:var(--pass); font-weight:700;}
   .gap{color:var(--sev-medium); font-weight:700;}
-
   ul,ol{margin:8px 0 0; padding-left:22px;}
   li{margin-bottom:6px;}
   li:last-child{margin-bottom:0;}
-
   .toc{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px;}
   .toc a{
     font-size:.82rem; color:var(--text-muted); text-decoration:none;
     background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:5px 12px;
   }
   .toc a:hover{color:var(--brand); border-color:var(--brand);}
-
   footer{text-align:center; font-size:.78rem; color:var(--text-muted); margin-top:32px;}
-
   @media print{
     body{background:#fff;}
     .toc{display:none;}
@@ -139,19 +129,19 @@
     <div class="meta">
       <div><b>Application Under Test:</b> SauceDemo (<a href="https://www.saucedemo.com" target="_blank" rel="noopener">saucedemo.com</a>)</div>
       <div><b>Test Credentials:</b> <code>standard_user</code> / <code>secret_sauce</code></div>
-      <div><b>Report Date:</b> 2026-07-21</div>
+      <div><b>Report Date:</b> 2026-07-22</div>
       <div><b>Test Plan:</b> <a href="../specs/saucedemo-checkout-test-plan.md">specs/saucedemo-checkout-test-plan.md</a></div>
       <div><b>Automation Suite:</b> <a href="../tests/saucedemo-checkout/">tests/saucedemo-checkout/</a></div>
     </div>
-    <div class="note">This is the fifth full regeneration of the SCRUM-101 workflow in this session: the test plan and the entire automation suite were rebuilt from scratch again (fresh live exploration, not reused from any prior pass), run uninterrupted end-to-end per explicit request.</div>
+    <div class="note">This regeneration was sourced from a testing request submitted through the deployed Streamlit "Submit New Request" form. The planner agent re-explored the live application and expanded the plan from 32 to 68 test cases based on newly captured findings (see Section 4); the generator agent then rebuilt the full automation suite against the new plan.</div>
   </header>
 
   <div class="stat-grid">
     <div class="stat headline"><div class="num">100%</div><div class="label">Success Rate</div></div>
-    <div class="stat"><div class="num">32</div><div class="label">Test Cases</div></div>
+    <div class="stat"><div class="num">68</div><div class="label">Test Cases</div></div>
     <div class="stat"><div class="num">3</div><div class="label">Browsers</div></div>
-    <div class="stat"><div class="num">96</div><div class="label">Executions</div></div>
-    <div class="stat pass"><div class="num">96</div><div class="label">Passed</div></div>
+    <div class="stat"><div class="num">204</div><div class="label">Executions</div></div>
+    <div class="stat pass"><div class="num">204</div><div class="label">Passed</div></div>
     <div class="stat"><div class="num">0</div><div class="label">Failed</div></div>
   </div>
 
@@ -171,10 +161,10 @@
       <table>
         <tr><th>Metric</th><th>Value</th></tr>
         <tr><td>Application</td><td>SauceDemo Checkout</td></tr>
-        <tr><td>Test Cases Designed</td><td>32 (across 6 suites)</td></tr>
+        <tr><td>Test Cases Designed</td><td>68 (across 6 suites)</td></tr>
         <tr><td>Browsers Tested</td><td>Chromium, Firefox, WebKit</td></tr>
-        <tr><td>Total Test Executions</td><td>96 (32 × 3)</td></tr>
-        <tr><td>Passed</td><td class="ok">96</td></tr>
+        <tr><td>Total Test Executions</td><td>204 (68 × 3)</td></tr>
+        <tr><td>Passed</td><td class="ok">204</td></tr>
         <tr><td>Failed</td><td>0</td></tr>
         <tr><td>Skipped</td><td>0</td></tr>
         <tr><td>Overall Success Rate</td><td class="ok">100%</td></tr>
@@ -189,26 +179,25 @@
     <h2>2. Manual Exploratory Testing</h2>
     <p>Per the workflow template driving this run, the standalone manual-exploration phase (Step 3) was not executed as a separate pass — it is commented out in the prompt-file template. In its place, live-application exploration was performed directly via Playwright MCP browser tools during:</p>
     <ul>
-      <li><b>Test planning</b> (<code>playwright-test-planner</code> agent) — walked the full login → inventory → cart → checkout-step-one → checkout-step-two → checkout-complete flow, confirming exact error text (sequential, one field at a time), cancel-destination asymmetry, and totals math (8% tax) before any test case was written.</li>
-      <li><b>Script generation</b> (<code>playwright-test-generator</code> agent) — independently re-verified every selector and behavior claim against the live app before writing code, additionally confirming that browser Back after order completion does not restore the purchased cart, and that an empty cart both at Checkout Information and at Overview does not block progression.</li>
+      <li><b>Test planning</b> (<code>playwright-test-planner</code> agent) — re-walked the full login → inventory → cart → checkout-step-one → checkout-step-two → checkout-complete flow, confirming exact error text, cancel-destination asymmetry, totals math, and additionally probing empty-cart access, direct-URL step-skipping, and browser back-navigation behavior after order completion.</li>
+      <li><b>Script generation</b> (<code>playwright-test-generator</code> agent) — independently re-verified every selector and behavior claim against the live app before writing code, and fixed a real bug in the existing <code>productSlug()</code> utility (it stripped punctuation, producing the wrong <code>data-test</code> selector for products with periods/parens in their name).</li>
     </ul>
     <p>Observations from this exploration are folded into Section 4 below rather than reported separately, since no dedicated manual pass with independent screenshots was run.</p>
   </section>
 
   <section id="automated">
     <h2>3. Automated Test Results</h2>
-
     <h3>3.1 Suite Summary</h3>
     <div class="table-scroll">
       <table>
         <tr><th>Suite</th><th>File</th><th>Tests</th></tr>
-        <tr><td>Cart Review (AC1)</td><td><code>cart-review.spec.ts</code></td><td>6</td></tr>
-        <tr><td>Checkout Information Entry (AC2)</td><td><code>checkout-information.spec.ts</code></td><td>8</td></tr>
-        <tr><td>Order Overview (AC3)</td><td><code>checkout-overview.spec.ts</code></td><td>4</td></tr>
-        <tr><td>Order Completion (AC4)</td><td><code>checkout-complete.spec.ts</code></td><td>4</td></tr>
-        <tr><td>Error Handling / Boundary (AC5)</td><td><code>checkout-error-handling.spec.ts</code></td><td>5</td></tr>
-        <tr><td>Navigation Flow and Cross-Cutting</td><td><code>checkout-navigation.spec.ts</code></td><td>5</td></tr>
-        <tr><td>Total</td><td></td><td>32</td></tr>
+        <tr><td>Cart Review (AC1)</td><td><code>cart-review.spec.ts</code></td><td>11</td></tr>
+        <tr><td>Checkout Information Entry (AC2)</td><td><code>checkout-information.spec.ts</code></td><td>16</td></tr>
+        <tr><td>Order Overview (AC3)</td><td><code>checkout-overview.spec.ts</code></td><td>11</td></tr>
+        <tr><td>Order Completion (AC4)</td><td><code>checkout-complete.spec.ts</code></td><td>8</td></tr>
+        <tr><td>Error Handling / Boundary (AC5)</td><td><code>checkout-error-handling.spec.ts</code></td><td>12</td></tr>
+        <tr><td>Navigation Flow / Cross-Cutting (NAV)</td><td><code>checkout-navigation.spec.ts</code></td><td>10</td></tr>
+        <tr><td>Total</td><td></td><td>68</td></tr>
       </table>
     </div>
     <p>Run command: <code>npx playwright test tests/saucedemo-checkout --project=chromium --project=firefox --project=webkit --reporter=list</code><br>
@@ -218,75 +207,93 @@
     <div class="table-scroll">
       <table>
         <tr><th>Browser</th><th>Executions</th><th>Passed</th><th>Failed</th></tr>
-        <tr><td>Chromium (Desktop Chrome)</td><td>32</td><td class="ok">32</td><td>0</td></tr>
-        <tr><td>Firefox (Desktop Firefox)</td><td>32</td><td class="ok">32</td><td>0</td></tr>
-        <tr><td>WebKit (Desktop Safari)</td><td>32</td><td class="ok">32</td><td>0</td></tr>
-        <tr><td>Total</td><td>96</td><td class="ok">96</td><td>0</td></tr>
+        <tr><td>Chromium (Desktop Chrome)</td><td>68</td><td class="ok">68</td><td>0</td></tr>
+        <tr><td>Firefox (Desktop Firefox)</td><td>68</td><td class="ok">68</td><td>0</td></tr>
+        <tr><td>WebKit (Desktop Safari)</td><td>68</td><td class="ok">68</td><td>0</td></tr>
+        <tr><td>Total</td><td>204</td><td class="ok">204</td><td>0</td></tr>
       </table>
     </div>
-    <p>Total duration: 20.8 minutes. No browser-specific selector, timing, or assertion failures across any of the 32 test cases.</p>
+    <p>Total duration: 30.8 minutes (full 3-browser run); a Chromium-only smoke pass beforehand also passed 68/68 in 15.5 minutes.</p>
 
     <h3>3.3 Healing Activities Performed</h3>
-    <p>None required. The <code>playwright-test-healer</code> agent was not invoked because there were no failures to diagnose. All selectors and assertions were derived directly from live exploration during both planning and generation.</p>
+    <p>None required. The <code>playwright-test-healer</code> agent was not invoked because there were no failures to diagnose.</p>
 
     <h3>3.4 Final Execution Results</h3>
-    <p>Unchanged from Section 3.2 — <b class="ok">96/96 passing</b>.</p>
+    <p>Unchanged from Section 3.2 — <b class="ok">204/204 passing</b>.</p>
   </section>
 
   <section id="defects">
     <h2>4. Defects / Behavior Findings Log</h2>
-    <p>These are <b>application behavior findings</b>, not automation defects — the suite passes because it asserts the application's actual behavior. They are logged here because several diverge from the business rules stated in the user story and warrant a product-owner decision on whether they are acceptable or should be tightened.</p>
+    <p>These are <b>application behavior findings</b>, not automation defects — the suite passes because it asserts the application's actual behavior.</p>
     <div class="table-scroll">
       <table>
         <tr><th>ID</th><th>Severity</th><th>Title</th><th>Steps to Reproduce</th><th>Expected (per Business Rules)</th><th>Actual</th><th>Test Reference</th></tr>
         <tr>
           <td>BUG-001</td>
-          <td><span class="badge badge-medium">Medium</span></td>
-          <td>Empty cart does not block Checkout Information or Overview</td>
-          <td>Log in with an empty cart, navigate directly to checkout.</td>
-          <td>Business Rule 3: "Cart cannot be empty when proceeding to checkout."</td>
-          <td>Checkout Information renders and accepts input normally; Overview renders with a zeroed item table and $0.00 totals. Neither page blocks progression.</td>
-          <td><code>TC-CHECKOUT-INFO-008-EmptyCart</code>, <code>TC-CHECKOUT-OVERVIEW-004-EmptyCart</code></td>
+          <td><span class="badge badge-low">Low</span></td>
+          <td>Cart page displays no subtotal/total price</td>
+          <td>Add items to the cart and open the Cart page.</td>
+          <td>AC1: cart review shows the total price calculation.</td>
+          <td>No subtotal/tax/total is rendered anywhere on the Cart page; the total first appears on the Order Overview page.</td>
+          <td><code>TC-CART-011-NoTotalOnCartPage</code></td>
         </tr>
         <tr>
           <td>BUG-002</td>
           <td><span class="badge badge-medium">Medium</span></td>
-          <td>Overview Cancel returns to Products, not Cart</td>
-          <td>On the Checkout Overview page, click Cancel.</td>
-          <td>Business Rule 5: "Users can cancel checkout at any step and return to cart."</td>
-          <td>Cancel on Overview navigates to the Products page, not the Cart page. Cancel on Checkout Information does correctly return to Cart.</td>
-          <td><code>TC-CHECKOUT-OVERVIEW-003</code>, <code>TC-CHECKOUT-NAV-001</code></td>
+          <td>Empty cart does not block checkout access</td>
+          <td>Log in with an empty cart, open the Cart page or navigate directly to Checkout Information.</td>
+          <td>Business Rule 3: cart cannot be empty when proceeding to checkout.</td>
+          <td>The Checkout button remains enabled and clickable, and checkout-step-one.html loads normally with zero items in cart.</td>
+          <td><code>TC-CART-006-EmptyCart</code>, <code>TC-CHECKOUT-016-EmptyCartAccess</code>, <code>TC-ERROR-007-EmptyCartCheckoutButtonEnabled</code></td>
         </tr>
         <tr>
           <td>BUG-003</td>
-          <td><span class="badge badge-low">Low</span></td>
-          <td>Whitespace-only input satisfies the "required" check</td>
-          <td>Enter a single space into a required field, click Continue.</td>
-          <td>Business Rule 1: field should be considered empty/required.</td>
-          <td>The field is treated as non-empty and the user proceeds.</td>
-          <td><code>TC-CHECKOUT-INFO-010-WhitespaceOnly</code></td>
+          <td><span class="badge badge-medium">Medium</span></td>
+          <td>Checkout Information step can be bypassed via direct URL</td>
+          <td>Log in, add an item to cart, navigate directly to checkout-step-two.html without visiting checkout-step-one.html first.</td>
+          <td>Business Rule 1: all checkout form fields are mandatory before an order can proceed.</td>
+          <td>The Order Overview page renders fully and Finish successfully completes the order, without First Name/Last Name/Zip ever being required.</td>
+          <td><code>TC-OVERVIEW-011-SkipInformationPage</code>, <code>TC-NAV-007-DirectSkipToOverview</code></td>
         </tr>
         <tr>
           <td>BUG-004</td>
           <td><span class="badge badge-low">Low</span></td>
           <td>No format validation on Checkout Information fields</td>
-          <td>Enter special characters/markup into Name fields, click Continue.</td>
-          <td>Business Rule 1 implies meaningful field validation, not just presence.</td>
-          <td>All values are accepted as long as the field is non-empty — validation is presence-only, not format-based.</td>
-          <td><code>TC-CHECKOUT-INFO-009-SpecialCharacters</code></td>
+          <td>Enter whitespace-only, special-character, or very long values into First Name/Last Name/Zip and click Continue.</td>
+          <td>AC5 implies meaningful validation beyond presence-checking for invalid data.</td>
+          <td>All such values are silently accepted and the user proceeds to the Overview page — validation is presence-only.</td>
+          <td><code>TC-CHECKOUT-009-WhitespaceOnly</code>, <code>TC-CHECKOUT-010-SpecialCharacters</code>, <code>TC-CHECKOUT-011-LongInput</code></td>
         </tr>
         <tr>
           <td>BUG-005</td>
+          <td><span class="badge badge-medium">Medium</span></td>
+          <td>Overview Cancel returns to Products, not Cart</td>
+          <td>Reach the Order Overview page with items in cart, click Cancel.</td>
+          <td>Business Rule 5: users can cancel checkout at any step and return to cart.</td>
+          <td>Cancel on Overview redirects to the Products (inventory) page, not the Cart page. Cart contents remain intact either way.</td>
+          <td><code>TC-OVERVIEW-007</code>, <code>TC-NAV-003-CancelFromOverviewToProducts</code></td>
+        </tr>
+        <tr>
+          <td>BUG-006</td>
+          <td><span class="badge badge-medium">Medium</span></td>
+          <td>Stale post-completion Overview page allows re-submitting a cleared order</td>
+          <td>Complete a full checkout, then press the browser Back button and click Finish again.</td>
+          <td>Undefined by user story, but a completed/cleared order should not be re-submittable.</td>
+          <td>Back reveals a stale Overview page with $0 totals and an active Finish button; clicking it re-navigates to the Confirmation page despite the empty cart.</td>
+          <td><code>TC-NAV-004-BrowserBackAfterCompletion</code>, <code>TC-NAV-005-ReFinishStaleOverview</code></td>
+        </tr>
+        <tr>
+          <td>BUG-007</td>
           <td><span class="badge badge-info">Info</span></td>
-          <td>Browser Back from Overview clears Checkout Information fields</td>
-          <td>Fill Checkout Information, continue to Overview, click browser Back.</td>
-          <td>Undefined by user story; noted for awareness.</td>
-          <td>Returns to Checkout Information with all fields cleared, requiring re-entry rather than restoring prior input.</td>
-          <td><code>TC-CHECKOUT-NAV-004</code></td>
+          <td>Undocumented 'Generate PDF order' button on confirmation page</td>
+          <td>Reach the Order Confirmation page after completing checkout.</td>
+          <td>Undefined by AC4; noted for product-owner awareness.</td>
+          <td>A 'Generate PDF order' button is present alongside 'Back Home', with static Payment/Shipping info fixed across all orders — not mentioned in the acceptance criteria.</td>
+          <td><code>TC-COMPLETE-006</code></td>
         </tr>
       </table>
     </div>
-    <p>No Critical or High severity defects were found; core happy-path and validation-error flows (AC1–AC4, and the "leave a field empty" case in AC2/AC5) all behave exactly as specified.</p>
+    <p>No Critical or High severity defects were found; core happy-path flows (AC1–AC4) all behave exactly as specified.</p>
   </section>
 
   <section id="coverage">
@@ -294,47 +301,48 @@
     <div class="table-scroll">
       <table>
         <tr><th>Acceptance Criteria</th><th>Covered By</th><th>Manual</th><th>Automated</th></tr>
-        <tr><td>AC1 – Cart Review</td><td><code>cart-review.spec.ts</code> (TC-CART-001…006)</td><td>Exploration only</td><td class="ok">✅</td></tr>
-        <tr><td>AC2 – Checkout Information Entry</td><td><code>checkout-information.spec.ts</code> (TC-CHECKOUT-INFO-001…008)</td><td>Exploration only</td><td class="ok">✅</td></tr>
-        <tr><td>AC3 – Order Overview</td><td><code>checkout-overview.spec.ts</code> (TC-CHECKOUT-OVERVIEW-001…004)</td><td>Exploration only</td><td class="ok">✅</td></tr>
-        <tr><td>AC4 – Order Completion</td><td><code>checkout-complete.spec.ts</code> (TC-CHECKOUT-COMPLETE-001…004)</td><td>Exploration only</td><td class="ok">✅</td></tr>
-        <tr><td>AC5 – Error Handling</td><td><code>checkout-error-handling.spec.ts</code> (TC-CHECKOUT-INFO-009…013)</td><td>Exploration only</td><td class="ok">✅</td></tr>
-        <tr><td>Business Rule 1 (mandatory fields)</td><td>TC-CHECKOUT-INFO-003…006, 010</td><td>—</td><td class="ok">✅ <span class="gap">(gap: BUG-003/004)</span></td></tr>
-        <tr><td>Business Rule 2 (login required)</td><td><code>TC-CHECKOUT-INFO-007</code></td><td>—</td><td class="ok">✅</td></tr>
-        <tr><td>Business Rule 3 (cart not empty at checkout)</td><td><code>TC-CHECKOUT-INFO-008-EmptyCart</code>, <code>TC-CHECKOUT-OVERVIEW-004-EmptyCart</code></td><td>—</td><td class="ok">✅ <span class="gap">(gap: BUG-001)</span></td></tr>
-        <tr><td>Business Rule 4 (order clears cart)</td><td><code>TC-CHECKOUT-COMPLETE-002</code></td><td>—</td><td class="ok">✅</td></tr>
-        <tr><td>Business Rule 5 (cancel at any step, return to cart)</td><td><code>TC-CHECKOUT-NAV-001</code>, <code>TC-CHECKOUT-OVERVIEW-003</code></td><td>—</td><td class="ok">✅ <span class="gap">(gap: BUG-002)</span></td></tr>
-        <tr><td>Navigation / browser back</td><td><code>checkout-navigation.spec.ts</code> (TC-CHECKOUT-NAV-001…005)</td><td>—</td><td class="ok">✅</td></tr>
-        <tr><td>Cross-browser (Chrome/Firefox/Safari)</td><td><code>firefox</code>/<code>webkit</code> projects in <code>playwright.config.ts</code></td><td>—</td><td class="ok">✅ (96/96)</td></tr>
-        <tr><td>Mobile responsiveness</td><td>—</td><td>—</td><td>❌ Gap</td></tr>
+        <tr><td>AC1 – Cart Review</td><td><code>cart-review.spec.ts</code> (TC-CART-001 … TC-CART-011-NoTotalOnCartPage)</td><td>Exploration only</td><td class="ok">✅</td></tr>
+        <tr><td>AC2 – Checkout Information Entry</td><td><code>checkout-information.spec.ts</code> (TC-CHECKOUT-001 … TC-CHECKOUT-016-EmptyCartAccess)</td><td>Exploration only</td><td class="ok">✅</td></tr>
+        <tr><td>AC3 – Order Overview</td><td><code>checkout-overview.spec.ts</code> (TC-OVERVIEW-001 … TC-OVERVIEW-011-SkipInformationPage)</td><td>Exploration only</td><td class="ok">✅</td></tr>
+        <tr><td>AC4 – Order Completion</td><td><code>checkout-complete.spec.ts</code> (TC-COMPLETE-001 … TC-COMPLETE-008)</td><td>Exploration only</td><td class="ok">✅</td></tr>
+        <tr><td>AC5 – Error Handling / Boundary</td><td><code>checkout-error-handling.spec.ts</code> (TC-ERROR-001-UnauthCart … TC-ERROR-012-RefreshMidEntry)</td><td>Exploration only</td><td class="ok">✅</td></tr>
+        <tr><td>NAV – Navigation Flow / Cross-Cutting</td><td><code>checkout-navigation.spec.ts</code> (TC-NAV-001-HappyPathE2E … TC-NAV-010-ResetAppState)</td><td>Exploration only</td><td class="ok">✅</td></tr>
+      </table>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Business Rule</th><th>Test Cases</th><th>Automated</th></tr>
+        <tr><td>BR1 (All checkout form fields are mandatory)</td><td>18 cases</td><td class="ok">✅ <span class="gap">(gap: BUG-003, BUG-004)</span></td></tr>
+        <tr><td>BR2 (Users must be logged in to access checkout)</td><td>6 cases</td><td class="ok">✅</td></tr>
+        <tr><td>BR3 (Cart cannot be empty when proceeding to checkout)</td><td>3 cases</td><td class="ok">✅ <span class="gap">(gap: BUG-002)</span></td></tr>
+        <tr><td>BR4 (Order confirmation should clear the cart)</td><td>3 cases</td><td class="ok">✅</td></tr>
+        <tr><td>BR5 (Users can cancel checkout at any step and return to cart)</td><td>5 cases</td><td class="ok">✅ <span class="gap">(gap: BUG-005)</span></td></tr>
       </table>
     </div>
     <h3>Coverage gaps / recommendations</h3>
     <ol>
-      <li><b>Mobile responsiveness</b> — not covered by the current suite (no mobile viewport/device project configured). Recommend a follow-up pass with a mobile emulation project if this is a hard requirement rather than a nice-to-have.</li>
-      <li><b>Alternate user personas</b> (<code>locked_out_user</code>, <code>problem_user</code>, <code>performance_glitch_user</code>, <code>error_user</code>, <code>visual_user</code>) were explicitly scoped out of this pass; consider a follow-up suite if these are in-scope for the broader story.</li>
-      <li>Business-rule deviations (BUG-001, BUG-002, BUG-003, BUG-004) should go back to the product owner to confirm whether they are accepted SauceDemo demo-app behavior (likely, since SauceDemo is a fixed public demo target) or represent real validation/navigation fixes to make.</li>
+      <li><b>Mobile responsiveness</b> — not covered by the current suite (no mobile viewport/device project configured).</li>
+      <li><b>Alternate user personas</b> (<code>locked_out_user</code>, <code>problem_user</code>, <code>performance_glitch_user</code>, <code>error_user</code>, <code>visual_user</code>) were explicitly scoped out of this pass.</li>
+      <li>Business-rule deviations should go back to the product owner to confirm whether they are accepted SauceDemo demo-app behavior or represent real fixes to make.</li>
     </ol>
   </section>
 
   <section id="recommendations">
     <h2>6. Summary and Recommendations</h2>
     <h3>Overall quality assessment</h3>
-    <p>The checkout flow is stable and functionally correct against all five acceptance criteria — cart review, information entry, overview totals, order completion, and cancel/navigation behavior all pass. The suite required zero healing on this fifth from-scratch regeneration, reinforcing that the plan → explore → generate pipeline reliably produces accurate selectors and expectations across repeated independent runs.</p>
-
+    <p>The checkout flow is stable and functionally correct against all five acceptance criteria. The suite required zero healing on this regeneration (32 → 68 test cases from a re-explored, expanded plan).</p>
     <h3>Risk areas</h3>
     <ul>
-      <li>BUG-001 (empty cart not blocked at either Checkout Information or Overview) is the most consistently-reproduced finding across every regeneration this session — it directly contradicts Business Rule 3.</li>
-      <li>BUG-002 (Overview Cancel → Products instead of Cart) is a direct, specific contradiction of Business Rule 5's "return to cart" wording.</li>
-      <li>BUG-003/BUG-004 (no format validation, whitespace bypass) are consistent with SauceDemo being a fixed public demo app; unlikely to change, but worth confirming expectations aren't drifting for a real target.</li>
+      <li>BUG-002 (empty cart not blocked) is the most consistently-reproduced finding across every regeneration this session — it directly contradicts Business Rule 3.</li>
+      <li>BUG-003 (Checkout Information step bypassable via direct URL) is a new finding this pass.</li>
+      <li>BUG-005 (Overview Cancel → Products instead of Cart) contradicts Business Rule 5's "return to cart" wording.</li>
+      <li>BUG-006 (stale post-completion Overview page allows re-clicking Finish) is a new finding this pass.</li>
     </ul>
-
     <h3>Next steps</h3>
     <ol>
-      <li>Decide on BUG-001 through BUG-005 with the product owner; if accepted as-is, keep framing these as documented behavior.</li>
+      <li>Decide on BUG-001 through BUG-007 with the product owner.</li>
       <li>Consider a lightweight mobile-viewport pass if mobile responsiveness is a hard release gate.</li>
-      <li>CI is already wired up — see <code>.github/workflows/saucedemo-checkout.yml</code> (push/PR path-filtered, daily schedule, manual <code>workflow_dispatch</code>), running all 3 browsers.</li>
-      <li><b>Process note:</b> this regeneration ran end-to-end without interruption per explicit request, using the same explicit prompt-level scope restrictions plus the <code>PreToolUse</code> guardrail hook (<code>.claude/hooks/guard-mcp-file-writes.js</code>) established earlier in this session. This run completed with zero files touched outside <code>specs/saucedemo-checkout-test-plan.md</code> and <code>tests/saucedemo-checkout/</code>.</li>
+      <li>CI is already wired up — see <code>.github/workflows/saucedemo-checkout.yml</code> (push/PR path-filtered, daily schedule, manual <code>workflow_dispatch</code>).</li>
     </ol>
   </section>
 
