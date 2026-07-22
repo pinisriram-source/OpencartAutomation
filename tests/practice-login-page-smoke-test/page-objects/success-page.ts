@@ -42,4 +42,8 @@ export class SuccessPage {
   async verifyLogoutLinkVisible() {
     await expect(this.logoutLink).toBeVisible();
   }
+
+  async clickLogout() {
+    await this.logoutLink.click();
+  }
 }

@@ -19,6 +19,14 @@ export class LoginPage {
     await this.page.goto('https://practicetestautomation.com/practice-test-login/');
   }
 
+  async navigateTo() {
+    await this.navigate();
+  }
+
+  getErrorMessage(): Locator {
+    return this.errorMessage;
+  }
+
   async verifyPageLoaded() {
     await expect(this.page).toHaveTitle('Test Login | Practice Test Automation');
     await expect(this.usernameInput).toBeVisible();

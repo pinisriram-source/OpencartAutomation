@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../page-objects/login-page';
+import { LoginPage } from '../page-objects/login-page';
 
 test.describe('Login Functionality - Negative Tests', () => {
   test('TC-LOGIN-005 Empty username with valid password shows error', async ({ page }) => {
