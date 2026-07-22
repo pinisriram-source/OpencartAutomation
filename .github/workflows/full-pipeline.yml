@@ -147,11 +147,20 @@ jobs:
           npx playwright test "tests/${SLUG}" --project=chromium --reporter=list,html 2>&1 | tee test-output.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
+      - name: Claude Code -- generate dashboard data
+        continue-on-error: true
+        run: |
+          npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md and the raw Playwright output at test-output.log (this run used only the chromium browser project). Produce a JSON file at streamlit_app/data/${SLUG}-test-results.json that matches EXACTLY the schema of streamlit_app/data/saucedemo-checkout-test-results.json -- read that file first as the schema reference (keys: meta, summary, suites, use_cases, business_rules, tests, defects). Populate every test's real pass/fail status from test-output.log using only a chromium key (no firefox/webkit keys). If the test plan doesn't define explicit business-rule labels, leave business_rule as an empty string on every test and business_rules as an empty object -- do not invent business rules that aren't in the source material. Only write this one file -- do not modify specs/, tests/, or any .claude/ file." \
+            --dangerously-skip-permissions
+
       - name: Set final status
         run: |
           RESULT_LINE=$(grep -E "[0-9]+ (passed|failed|skipped)" test-output.log | tail -3 | tr '\n' ' ')
           if [ -z "$RESULT_LINE" ]; then
             RESULT_LINE="unknown result -- see Actions run log"
+          fi
+          if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
+            git add "streamlit_app/data/${SLUG}-test-results.json"
           fi
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "Completed -- ${RESULT_LINE}. See Actions run and playwright-report artifact for details."
           git add "$REQUEST_FILE"

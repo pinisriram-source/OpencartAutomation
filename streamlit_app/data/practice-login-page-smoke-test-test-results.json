@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "app_under_test": "Practice Login Page",
+    "app_url": "https://practicetestautomation.com/practice-test-login/",
+    "report_date": "2026-07-22",
+    "test_account": "student / Password123",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/practice-login-page-smoke-test --project=chromium",
+    "duration_minutes": 0.5,
+    "test_plan_path": "specs/practice-login-page-smoke-test-test-plan.md",
+    "suite_path": "tests/practice-login-page-smoke-test/",
+    "story": "PRACTICE-LOGIN-SMOKE-TEST"
+  },
+  "summary": {
+    "test_cases": 12,
+    "browsers": 1,
+    "executions": 12,
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "healing_actions": 0,
+    "status": "PASS"
+  },
+  "suites": [
+    {
+      "name": "Core Tests",
+      "use_case": "UC1",
+      "file": "-",
+      "tests": 2
+    },
+    {
+      "name": "Negative Tests",
+      "use_case": "UC2",
+      "file": "-",
+      "tests": 4
+    },
+    {
+      "name": "UI Verification",
+      "use_case": "UC3",
+      "file": "-",
+      "tests": 1
+    },
+    {
+      "name": "Navigation Tests",
+      "use_case": "UC4",
+      "file": "-",
+      "tests": 2
+    },
+    {
+      "name": "Boundary and Edge Cases",
+      "use_case": "UC5",
+      "file": "-",
+      "tests": 3
+    }
+  ],
+  "use_cases": {
+    "UC1": "Core Tests",
+    "UC2": "Negative Tests",
+    "UC3": "UI Verification",
+    "UC4": "Navigation Tests",
+    "UC5": "Boundary and Edge Cases"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-LOGIN-001",
+      "title": "Successful login with valid credentials",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "title": "Invalid password displays error message",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "title": "Empty username and password shows error",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "title": "Empty username with valid password shows error",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-006",
+      "title": "Valid username with empty password shows error",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-007",
+      "title": "Both invalid username and password shows username error",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-008",
+      "title": "Login page loads with all required elements",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-010",
+      "title": "Logout link navigates back to login page",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-011",
+      "title": "Success page displays all required elements",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-014",
+      "title": "Username and password with leading and trailing spaces",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-015",
+      "title": "Very long username input",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-016",
+      "title": "Special characters in username and password",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": []
+}
