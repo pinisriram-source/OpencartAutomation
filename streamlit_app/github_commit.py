@@ -112,7 +112,8 @@ def trigger_workflow(
         return CommitResult(
             False,
             "GitHub token lacks permission to trigger workflows (403 Forbidden). "
-            "The token needs 'Actions: Read and write' permission on this repo.",
+            "The token needs 'Actions: Read and write' permission on this repo. "
+            f"GitHub's response: {resp.text[:300]}",
         )
     if resp.status_code == 404:
         return CommitResult(
