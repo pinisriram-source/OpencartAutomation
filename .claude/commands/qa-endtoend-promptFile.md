@@ -1,3 +1,5 @@
+End-to-end QA workflow: read a user story/request, generate a test plan, generate Playwright automation, execute it, and commit results to GitHub.
+
 > **Usage:** Before running these prompts, substitute the placeholders below
 > for the specific request being processed (e.g. a file submitted through the
 > Streamlit "Submit New Request" form):
