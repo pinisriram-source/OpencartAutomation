@@ -131,12 +131,15 @@ jobs:
         id: run_tests
         continue-on-error: true
         run: |
-          npx playwright test "tests/${SLUG}" --project=chromium --project=firefox --project=webkit --reporter=list 2>&1 | tee test-output.log
+          npx playwright test "tests/${SLUG}" --project=chromium --project=firefox --project=webkit --reporter=list,html 2>&1 | tee test-output.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Set final status
         run: |
-          RESULT_LINE=$(grep -E "^\s*[0-9]+ (passed|failed)" test-output.log | tail -1 || echo "unknown result")
+          RESULT_LINE=$(grep -E "[0-9]+ (passed|failed|skipped)" test-output.log | tail -3 | tr '\n' ' ')
+          if [ -z "$RESULT_LINE" ]; then
+            RESULT_LINE="unknown result -- see Actions run log"
+          fi
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "Completed -- ${RESULT_LINE}. See Actions run and playwright-report artifact for details."
           git add "$REQUEST_FILE"
           git commit -m "chore(pipeline): mark $SLUG complete -- ${RESULT_LINE}"
@@ -147,6 +150,13 @@ jobs:
         with:
           name: ${{ inputs.slug }}-playwright-report
           path: playwright-report/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ${{ inputs.slug }}-test-output-log
+          path: test-output.log
           retention-days: 30
 
       - name: Fail the job if tests failed
