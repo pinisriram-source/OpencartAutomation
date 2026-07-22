@@ -16,7 +16,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from github_commit import create_file, trigger_workflow
+from github_commit import create_file, get_file, trigger_workflow
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -32,6 +32,14 @@ GITHUB_OWNER = "pinisriram-source"
 GITHUB_REPO = "OpencartAutomation"
 GITHUB_BRANCH = "main"
 GITHUB_WORKFLOW_FILE = "saucedemo-checkout.yml"
+GITHUB_FULL_PIPELINE_WORKFLOW_FILE = "full-pipeline.yml"
+
+
+def get_pipeline_passphrase() -> str:
+    try:
+        return st.secrets.get("PIPELINE_PASSPHRASE", "")
+    except Exception:
+        return ""
 
 
 def get_github_token() -> str:
@@ -302,15 +310,15 @@ with tab_defects:
 with tab_submit:
     st.subheader("Submit New Testing Request")
     st.caption(
-        "Submitting this form (1) commits a new request file to `user-stories/` in "
-        f"`{GITHUB_OWNER}/{GITHUB_REPO}`, and (2) triggers the **existing** SauceDemo "
-        "checkout automation suite (68 test cases, already generated and reviewed) to "
-        "re-run on GitHub Actions. It does **not** run AI-driven test generation against "
-        "your submitted URL/requirements — that step still needs a human (or Claude Code, "
-        "in a future session) to review the request and run the plan → generate → execute "
-        "workflow manually. This boundary is intentional: this form is public and "
-        "unauthenticated, so auto-generating and committing new code from anonymous input "
-        "would be a real abuse risk."
+        "Submitting this form commits a new request file to `user-stories/` in "
+        f"`{GITHUB_OWNER}/{GITHUB_REPO}`, then triggers a GitHub Actions run. By default "
+        "(no pipeline passphrase, or a wrong one) it re-runs the **existing**, already-reviewed "
+        "SauceDemo checkout suite only — it does **not** run AI-driven test generation against "
+        "your submitted URL/requirements, since this form is public and unauthenticated and "
+        "auto-generating/committing new code from anonymous input would be a real abuse risk. "
+        "With the correct pipeline passphrase, it instead triggers the full "
+        "plan → generate → execute → commit pipeline against your submitted request "
+        "(experimental; can take 1–2+ hours)."
     )
     st.warning(
         "⚠️ This app and its GitHub repo are **public**. Anything submitted here becomes "
@@ -345,6 +353,16 @@ with tab_submit:
             placeholder="Paste the user story, acceptance criteria, or requirements doc text here...",
         )
         req_file = st.file_uploader("...or upload a requirements file instead", type=["md", "txt"])
+
+        pipeline_passphrase = st.text_input(
+            "Pipeline passphrase (optional — leave blank unless you know it)",
+            type="password",
+            help=(
+                "Enter the correct passphrase to trigger full AI-driven plan → generate → "
+                "execute automation against this request. Leave blank (or enter it wrong) to "
+                "just re-run the existing reviewed suite instead."
+            ),
+        )
 
         submitted = st.form_submit_button("Submit Request")
 
@@ -403,28 +421,88 @@ and automation suite.*
                 st.success(f"Request submitted and committed to `{path}`.")
                 if result.html_url:
                     st.markdown(f"[View the committed file on GitHub]({result.html_url})")
+                st.session_state["last_request_path"] = path
 
-                run_result = trigger_workflow(
-                    owner=GITHUB_OWNER,
-                    repo=GITHUB_REPO,
-                    workflow_file=GITHUB_WORKFLOW_FILE,
-                    ref=GITHUB_BRANCH,
-                    token=get_github_token(),
+                expected_passphrase = get_pipeline_passphrase()
+                full_pipeline_requested = bool(
+                    pipeline_passphrase and expected_passphrase and pipeline_passphrase == expected_passphrase
                 )
-                if run_result.success:
-                    st.success(
-                        "Test run triggered on GitHub Actions (existing 68-test SauceDemo "
-                        "checkout suite, Chromium/Firefox/WebKit)."
+
+                if full_pipeline_requested:
+                    run_result = trigger_workflow(
+                        owner=GITHUB_OWNER,
+                        repo=GITHUB_REPO,
+                        workflow_file=GITHUB_FULL_PIPELINE_WORKFLOW_FILE,
+                        ref=GITHUB_BRANCH,
+                        token=get_github_token(),
+                        inputs={"request_file": path, "slug": slug},
                     )
-                    st.markdown(
-                        f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_WORKFLOW_FILE})"
-                    )
+                    if run_result.success:
+                        st.success(
+                            "Full pipeline triggered: plan → generate → execute → commit "
+                            f"against your request (slug `{slug}`). This can take 1–2+ hours. "
+                            "Use the status checker below (with the path above) to check progress."
+                        )
+                        st.markdown(
+                            f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_FULL_PIPELINE_WORKFLOW_FILE})"
+                        )
+                    else:
+                        st.warning(
+                            f"Request was committed, but the full pipeline could not be triggered: {run_result.message}"
+                        )
                 else:
-                    st.warning(
-                        f"Request was committed, but the test run could not be triggered: {run_result.message}"
+                    run_result = trigger_workflow(
+                        owner=GITHUB_OWNER,
+                        repo=GITHUB_REPO,
+                        workflow_file=GITHUB_WORKFLOW_FILE,
+                        ref=GITHUB_BRANCH,
+                        token=get_github_token(),
                     )
+                    if run_result.success:
+                        st.success(
+                            "Test run triggered on GitHub Actions (existing 68-test SauceDemo "
+                            "checkout suite, Chromium/Firefox/WebKit)."
+                        )
+                        st.markdown(
+                            f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_WORKFLOW_FILE})"
+                        )
+                    else:
+                        st.warning(
+                            f"Request was committed, but the test run could not be triggered: {run_result.message}"
+                        )
             else:
                 st.error(f"Could not submit request: {result.message}")
+
+    st.divider()
+    st.markdown("#### Check request status")
+    st.caption(
+        "Re-fetches the request file's `Status` line from GitHub — works for any request, "
+        "whether it triggered the full pipeline or just the existing suite."
+    )
+    status_path = st.text_input(
+        "Request file path",
+        value=st.session_state.get("last_request_path", ""),
+        placeholder="user-stories/request-my-title-20260722-060822.md",
+    )
+    if st.button("Check Status"):
+        if not status_path.strip():
+            st.error("Enter a request file path first.")
+        else:
+            file_result = get_file(
+                owner=GITHUB_OWNER,
+                repo=GITHUB_REPO,
+                path=status_path.strip(),
+                ref=GITHUB_BRANCH,
+                token=get_github_token(),
+            )
+            if file_result.success:
+                status_match = re.search(r"^\*\*Status:\*\*\s*(.*)$", file_result.content, re.MULTILINE)
+                status_text = status_match.group(1) if status_match else "(no Status line found)"
+                st.info(status_text)
+                if file_result.html_url:
+                    st.markdown(f"[View the full request file on GitHub]({file_result.html_url})")
+            else:
+                st.error(file_result.message)
 
 st.divider()
 st.caption(

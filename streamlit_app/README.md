@@ -77,3 +77,51 @@ on submit rather than failing silently.
 ⚠️ **This app and repo are public.** Anything submitted through this form
 becomes visible in public commit history. The form itself warns
 submitters not to paste real secrets or confidential requirements.
+
+## Full AI pipeline (passphrase-gated) — `.github/workflows/full-pipeline.yml`
+
+The form also has an optional **pipeline passphrase** field. If it matches
+the `PIPELINE_PASSPHRASE` Streamlit secret, submitting the form triggers
+`full-pipeline.yml` instead of the default `saucedemo-checkout.yml` re-run:
+a GitHub Actions job that runs Claude Code **non-interactively** to read the
+submitted request and drive plan → generate → execute → commit against it,
+using a deterministic `slug` derived from the title so output paths
+(`specs/<slug>-test-plan.md`, `tests/<slug>/`) don't depend on the model
+guessing a name.
+
+This is deliberately **not** exposed to anonymous visitors — only to whoever
+knows the passphrase (you). It exists so that a genuinely new/different
+testing request can be run end-to-end from the deployed app instead of
+requiring a manual Claude Code session, while keeping the public form itself
+safe by default (see the abuse-risk discussion above — that risk doesn't go
+away just because *you* trust yourself with it; the gate keeps it from being
+triggerable by anyone else).
+
+**Setup required (two separate secrets, in two different places):**
+
+1. **Streamlit secret** `PIPELINE_PASSPHRASE` — any passphrase you choose,
+   added the same way as `GITHUB_TOKEN` above (Streamlit Cloud → Manage app
+   → Settings → Secrets, or local `.streamlit/secrets.toml`). Leaving it
+   unset disables the full-pipeline trigger entirely (every submission falls
+   back to the default safe behavior).
+2. **GitHub Actions repo secret** `ANTHROPIC_API_KEY` — added at
+   **GitHub → repo → Settings → Secrets and variables → Actions → New
+   repository secret**. This is *not* the same as the Streamlit secrets
+   above; it authenticates the Claude Code CLI running inside the CI
+   container, which starts with no credentials of its own (a fresh CI
+   runner has no access to any locally-logged-in Claude Code session).
+
+**Status:** each pipeline stage (planning, generation, execution, completion
+or failure) commits an update to the `**Status:**` line in the request file
+itself, so the app's "Check request status" box can show progress by
+re-fetching that one file — no need to inspect the Actions run directly,
+though the workflow run link is also shown after triggering.
+
+**Known limitation:** this is the first version of this workflow. Running
+Claude Code non-interactively with the `playwright-test` MCP server in a
+fresh Ubuntu CI container (as opposed to this interactive session) had not
+been verified end-to-end before it was written — the first real trigger is
+the real test, and the workflow may need iteration (permission flags, MCP
+server startup timing, etc.) if it doesn't behave as expected on the first
+run. A run typically takes **1–2+ hours** and consumes real Anthropic API
+usage.
