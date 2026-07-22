@@ -36,6 +36,12 @@ GITHUB_WORKFLOW_FILE = "saucedemo-checkout.yml"
 GITHUB_FULL_PIPELINE_WORKFLOW_FILE = "full-pipeline.yml"
 
 
+def github_url(repo_path: str) -> str:
+    """Link to a path inside the tracked GitHub repo (cloud), not a local filesystem path."""
+    kind = "tree" if repo_path.endswith("/") else "blob"
+    return f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/{kind}/{GITHUB_BRANCH}/{repo_path.rstrip('/')}"
+
+
 def get_pipeline_passphrase() -> str:
     try:
         return st.secrets.get("PIPELINE_PASSPHRASE", "")
@@ -182,8 +188,8 @@ with tab_overview:
                 }
             ).set_index("Item")
         )
-        st.markdown(f"**Test plan:** `{meta['test_plan_path']}`")
-        st.markdown(f"**Automation suite:** `{meta['suite_path']}`")
+        st.markdown(f"**Test plan:** [{meta['test_plan_path']}]({github_url(meta['test_plan_path'])})")
+        st.markdown(f"**Automation suite:** [{meta['suite_path']}]({github_url(meta['suite_path'])})")
 
     st.subheader("Business Use Cases")
     st.table(pd.DataFrame(use_cases.items(), columns=["Code", "Description"]).set_index("Code"))
@@ -542,5 +548,5 @@ and automation suite.*
 st.divider()
 st.caption(
     "Generated from the Playwright automation suite in "
-    f"`{meta['suite_path']}` for user story {meta['story']}."
+    f"[{meta['suite_path']}]({github_url(meta['suite_path'])}) for user story {meta['story']}."
 )
