@@ -35,6 +35,8 @@ jobs:
       CLAUDE_CODE_USE_BEDROCK: "1"
       AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
       AWS_REGION: eu-north-1
+      REQUEST_FILE: ${{ inputs.request_file }}
+      SLUG: ${{ inputs.slug }}
     steps:
       - uses: actions/checkout@v4
 
@@ -66,6 +68,13 @@ jobs:
           }
           EOF
 
+      - name: Debug workflow inputs
+        run: |
+          echo "REQUEST_FILE='$REQUEST_FILE'"
+          echo "SLUG='$SLUG'"
+          pwd
+          ls -R
+
       - name: Verify request file exists
         run: test -f "$REQUEST_FILE"
 
@@ -80,10 +89,7 @@ jobs:
         run: |
           npx claude -p "Read the testing request at \$REQUEST_FILE (application URL, requirements/acceptance criteria, optional test credentials). Use the playwright-test-planner subagent to explore the live application at that URL and produce a comprehensive test plan covering happy paths, negative/boundary cases, and navigation flows, following this project's TC-<MODULE>-<NNN> convention (see CLAUDE.md). Save the plan to specs/${SLUG}-test-plan.md exactly -- no other path. Do not modify any file outside specs/${SLUG}-test-plan.md." \
             --dangerously-skip-permissions
-        env:
-          REQUEST_FILE: ${{ inputs.request_file }}
-          SLUG: ${{ inputs.slug }}
-
+       
       - name: Verify plan was created
         run: |
           test -f "specs/${SLUG}-test-plan.md" || (node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- see Actions run" && git add "$REQUEST_FILE" && git commit -m "chore(pipeline): planning failed for $SLUG" && git push && exit 1)
