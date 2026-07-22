@@ -23,7 +23,7 @@ test.describe('Login Functionality - Navigation Tests', () => {
     await loginPage.clickSubmit();
 
     // Verify user is successfully logged in
-    await expect(successPage.successHeading).toBeVisible();
+    await expect(successPage.heading).toBeVisible();
     await expect(successPage.logoutLink).toBeVisible();
 
     // 5. Click the 'Log out' link
@@ -40,6 +40,6 @@ test.describe('Login Functionality - Navigation Tests', () => {
     await expect(loginPage.passwordInput).toHaveValue('');
     
     // Verify no success message is displayed
-    await expect(successPage.successHeading).not.toBeVisible();
+    await expect(successPage.heading).not.toBeVisible();
   });
 });

@@ -45,7 +45,7 @@ test.describe('Login Functionality - Boundary and Edge Cases', () => {
     await page.getByRole('button', { name: 'Submit' }).click();
     
     // Verify error message is displayed (spaces are not trimmed, so credentials don't match)
-    await expect(page.getByText('Your username is invalid!')).toBeVisible();
+    await expect(page.locator('#error')).toHaveText('Your username is invalid!');
     
     // Verify user remains on the login page
     await expect(page.getByRole('heading', { name: 'Test login' })).toBeVisible();

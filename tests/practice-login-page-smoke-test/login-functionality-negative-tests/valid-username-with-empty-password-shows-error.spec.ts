@@ -28,7 +28,7 @@ test.describe('Login Functionality - Negative Tests', () => {
     await expect(page).toHaveURL('https://practicetestautomation.com/practice-test-login/');
 
     // Verify error message 'Your password is invalid!' is displayed
-    await expect(page.getByText('Your password is invalid!')).toBeVisible();
+    await expect(page.locator('#error')).toHaveText('Your password is invalid!');
 
     // Verify user remains on the login page
     await expect(page.getByRole('heading', { name: 'Test login' })).toBeVisible();

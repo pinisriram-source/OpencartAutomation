@@ -27,7 +27,7 @@ test.describe('Login Functionality - Boundary and Edge Cases', () => {
     await loginPage.submitButton.click();
     
     // Verify error message 'Your username is invalid!' is displayed
-    await expect(page.getByText('Your username is invalid!')).toBeVisible();
+    await expect(page.locator('#error')).toHaveText('Your username is invalid!');
     
     // Verify page handles long input gracefully without crashing
     await expect(page.getByRole('heading', { name: 'Test login' })).toBeVisible();

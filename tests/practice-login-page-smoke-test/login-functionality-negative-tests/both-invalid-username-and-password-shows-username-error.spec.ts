@@ -28,8 +28,7 @@ test.describe('Login Functionality - Negative Tests', () => {
     await expect(page).toHaveURL('https://practicetestautomation.com/practice-test-login/');
 
     // Verify error message 'Your username is invalid!' is displayed (username is validated first)
-    await expect(page.locator('#error')).toBeVisible();
-    await expect(page.getByText('Your username is invalid!')).toBeVisible();
+    await expect(page.locator('#error')).toHaveText('Your username is invalid!');
 
     // Verify user remains on the login page
     await expect(page.getByRole('heading', { name: 'Test login' })).toBeVisible();
