@@ -427,6 +427,13 @@ and automation suite.*
                 full_pipeline_requested = bool(
                     pipeline_passphrase and expected_passphrase and pipeline_passphrase == expected_passphrase
                 )
+                if pipeline_passphrase and not full_pipeline_requested:
+                    st.warning(
+                        "A pipeline passphrase was entered but did not match — falling back to "
+                        "the default behavior (rerun existing suite only), NOT the full pipeline. "
+                        "If you meant to trigger the full pipeline, re-submit and re-type the "
+                        "passphrase (this field clears after every submit attempt, including failed ones)."
+                    )
 
                 if full_pipeline_requested:
                     run_result = trigger_workflow(
