@@ -43,12 +43,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      # Only chromium is installed: playwright.config.ts scopes the firefox/webkit
+      # projects to tests/saucedemo-checkout only, so any newly generated suite
+      # (everything this workflow produces) only ever runs under chromium --
+      # installing firefox/webkit here would be pure wasted time.
+      - name: Install Playwright browser (chromium)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
 
       - name: Configure git identity for automated commits
         run: |
@@ -122,7 +135,7 @@ jobs:
       - name: Commit automation suite, set status -- executing
         run: |
           git add "tests/${SLUG}/"
-          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- automation generated, executing tests (Chromium/Firefox/WebKit)"
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- automation generated, executing tests (Chromium)"
           git add "$REQUEST_FILE"
           git commit -m "feat(pipeline): add automation suite for $SLUG"
           git push
@@ -131,7 +144,7 @@ jobs:
         id: run_tests
         continue-on-error: true
         run: |
-          npx playwright test "tests/${SLUG}" --project=chromium --project=firefox --project=webkit --reporter=list,html 2>&1 | tee test-output.log
+          npx playwright test "tests/${SLUG}" --project=chromium --reporter=list,html 2>&1 | tee test-output.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Set final status
