@@ -1,0 +1,277 @@
+{
+  "meta": {
+    "app_under_test": "Dynamic Controls",
+    "app_url": "https://the-internet.herokuapp.com/dynamic_controls",
+    "report_date": "2026-07-23",
+    "test_account": "N/A",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/testing-request-dynamic-controls --project=chromium",
+    "duration_minutes": 3.0,
+    "test_plan_path": "specs/testing-request-dynamic-controls-test-plan.md",
+    "suite_path": "tests/testing-request-dynamic-controls/",
+    "story": "testing-request-dynamic-controls"
+  },
+  "summary": {
+    "test_cases": 25,
+    "browsers": 1,
+    "executions": 25,
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "healing_actions": 0,
+    "status": "PASS"
+  },
+  "suites": [
+    {
+      "name": "Initial State",
+      "use_case": "S1",
+      "file": "initial-state.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Checkbox Widget Functionality",
+      "use_case": "S2",
+      "file": "checkbox-widget.spec.ts",
+      "tests": 5
+    },
+    {
+      "name": "Text Input Widget Functionality",
+      "use_case": "S3",
+      "file": "text-input-widget.spec.ts",
+      "tests": 5
+    },
+    {
+      "name": "Widget Independence",
+      "use_case": "S4",
+      "file": "widget-independence.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Loading Indicators",
+      "use_case": "S5",
+      "file": "loading-indicators.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Boundary and Edge Cases",
+      "use_case": "S6",
+      "file": "boundary-cases.spec.ts",
+      "tests": 6
+    }
+  ],
+  "use_cases": {
+    "S1": "Initial State — verify default page state with checkbox unchecked, text input disabled, and no loading indicators",
+    "S2": "Checkbox Widget Functionality — remove/add checkbox with async operations and state transitions",
+    "S3": "Text Input Widget Functionality — enable/disable text input with async operations and content persistence",
+    "S4": "Widget Independence — verify checkbox and text input widgets operate independently without affecting each other",
+    "S5": "Loading Indicators — verify loading spinners and messages appear during async operations",
+    "S6": "Boundary and Edge Cases — rapid clicking, interactions during transitions, page refresh, and JS error monitoring"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-DYNCTRL-001",
+      "title": "Verify checkbox widget initial state",
+      "use_case": "S1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-002",
+      "title": "Verify text input widget initial state",
+      "use_case": "S1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-003",
+      "title": "Remove checkbox successfully",
+      "use_case": "S2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-004",
+      "title": "Add checkbox back successfully",
+      "use_case": "S2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-005",
+      "title": "Checkbox toggling when present",
+      "use_case": "S2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-006",
+      "title": "Remove/Add cycle multiple times",
+      "use_case": "S2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-007",
+      "title": "Checkbox state does not persist after remove/add",
+      "use_case": "S2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-008",
+      "title": "Enable text input successfully",
+      "use_case": "S3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-009",
+      "title": "Disable text input successfully",
+      "use_case": "S3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-010",
+      "title": "Enable/Disable cycle multiple times",
+      "use_case": "S3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-011",
+      "title": "Text input content persists across enable/disable",
+      "use_case": "S3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-012",
+      "title": "Cannot type when disabled",
+      "use_case": "S3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-013",
+      "title": "Checkbox widget does not affect text input",
+      "use_case": "S4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-014",
+      "title": "Text input widget does not affect checkbox",
+      "use_case": "S4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-015",
+      "title": "Simultaneous operations on both widgets",
+      "use_case": "S4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-016",
+      "title": "Loading spinner appears on checkbox remove",
+      "use_case": "S5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-017",
+      "title": "Loading spinner appears on checkbox add",
+      "use_case": "S5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-018",
+      "title": "Loading spinner appears on text input enable",
+      "use_case": "S5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-019",
+      "title": "Loading spinner appears on text input disable",
+      "use_case": "S5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-020",
+      "title": "Rapid clicking remove button",
+      "use_case": "S6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-021",
+      "title": "Rapid clicking enable button",
+      "use_case": "S6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-022",
+      "title": "Checkbox interaction during removal",
+      "use_case": "S6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-023",
+      "title": "Type in text input during disable",
+      "use_case": "S6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-024",
+      "title": "Page refresh preserves no state",
+      "use_case": "S6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNCTRL-025",
+      "title": "Verify no JavaScript errors",
+      "use_case": "S6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": []
+}

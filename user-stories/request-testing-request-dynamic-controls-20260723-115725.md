@@ -2,7 +2,7 @@
 
 **Submitted via:** Streamlit dashboard
 **Submitted date (UTC):** 2026-07-23 11:57:25
-**Status:** In progress -- automation generated, executing tests (Chromium)
+**Status:** Completed --   25 passed (3.0m) . See Actions run and playwright-report artifact for details.
 
 ## Application URL
 https://the-internet.herokuapp.com/dynamic_controls
