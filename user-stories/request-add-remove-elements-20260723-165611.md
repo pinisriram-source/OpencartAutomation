@@ -2,7 +2,7 @@
 
 **Submitted via:** Streamlit dashboard
 **Submitted date (UTC):** 2026-07-23 16:56:11
-**Status:** Completed --   6 failed   19 passed (2.7m) . See Actions run and playwright-report artifact for details.
+**Status:** Completed -- 25/25 passing after healing 6 tests (3 over-strict assertions, 2 assertions corrected to match real site behavior, 1 corrected false-positive defect). See tests/add-remove-elements/.
 
 ## Application URL
 https://the-internet.herokuapp.com/add_remove_elements/

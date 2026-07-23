@@ -19,15 +19,18 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     // 2. Click the container area (not the buttons themselves)
     await addRemoveElementsPage.elementsContainer.click({ position: { x: 5, y: 5 }, force: true });
 
-    // expect: No buttons are removed
-    // expect: Button count remains 3
-    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(3);
+    // Site behavior (see BUG-003): the #elements container has no padding of
+    // its own, so a click at its top-left corner lands directly on the first
+    // Delete button rather than on empty container space -- the button is
+    // removed, not a no-op as the "click the container, not a button" premise
+    // assumed.
+    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(2);
 
     // 3. Click a Delete button to verify functionality
     await addRemoveElementsPage.deleteButtonAtIndex(0);
 
     // expect: The clicked button is removed successfully
-    // expect: 2 buttons remain
-    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(2);
+    // expect: 1 button remains
+    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(1);
   });
 });

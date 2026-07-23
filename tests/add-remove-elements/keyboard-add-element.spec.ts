@@ -13,8 +13,14 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     await expect(addRemoveElementsPage.pageHeading).toBeVisible();
 
     // 2. Tab to focus on the 'Add Element' button
+    // The page's actual first Tab stop is the "Fork me on GitHub" ribbon
+    // link -- a fixed decoration present on every the-internet.herokuapp.com
+    // page, before the page's own content. It takes two Tab presses to
+    // reach 'Add Element' (confirmed a real <button> via the accessibility
+    // tree, not the anchor originally assumed here).
     await page.keyboard.press('Tab');
-    
+    await page.keyboard.press('Tab');
+
     // Verify the 'Add Element' button receives keyboard focus
     const focusedElement = await page.evaluate(() => {
       const activeElement = document.activeElement;

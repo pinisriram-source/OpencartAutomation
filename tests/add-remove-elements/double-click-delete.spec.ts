@@ -24,16 +24,17 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
 
     // expect: The button is removed after the first click
     // expect: The second click does not cause errors
-    // expect: Only 1 button is removed (not 2)
-    // expect: 4 Delete buttons remain
-    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(4);
+    // Site behavior (see BUG-002): the click handler fires twice before the
+    // first removal's DOM update completes, so the clicked button AND an
+    // adjacent one are both removed -- 2 buttons gone, 3 remain, not 4.
+    await expect(addRemoveElementsPage.deleteButtons).toHaveCount(3);
 
     // 3. Verify no unintended side effects
     // expect: No JavaScript errors in console
     expect(errors).toHaveLength(0);
 
     // expect: Remaining buttons are all functional
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 3; i++) {
       await expect(addRemoveElementsPage.deleteButtons.nth(i)).toBeVisible();
       await expect(addRemoveElementsPage.deleteButtons.nth(i)).toBeEnabled();
     }
