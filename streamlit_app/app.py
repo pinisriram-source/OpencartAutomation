@@ -343,17 +343,7 @@ with tab_defects:
 # --- Submit New Request tab ------------------------------------------------------
 with tab_submit:
     st.subheader("Submit New Testing Request")
-    st.caption(
-        "Submitting this form commits a new request file to `user-stories/` in "
-        f"`{GITHUB_OWNER}/{GITHUB_REPO}`, then triggers a GitHub Actions run. By default "
-        "(no pipeline passphrase, or a wrong one) it re-runs the **existing**, already-reviewed "
-        "SauceDemo checkout suite only — it does **not** run AI-driven test generation against "
-        "your submitted URL/requirements, since this form is public and unauthenticated and "
-        "auto-generating/committing new code from anonymous input would be a real abuse risk. "
-        "With the correct pipeline passphrase, it instead triggers the full "
-        "plan → generate → execute → commit pipeline against your submitted request "
-        "(experimental; can take 1–2+ hours)."
-    )
+    st.caption("Without the correct pipeline passphrase, this re-runs the existing SauceDemo suite only.")
     st.warning(
         "⚠️ This app and its GitHub repo are **public**. Anything submitted here becomes "
         "visible in public commit history. Do not paste real credentials, secrets, or "
