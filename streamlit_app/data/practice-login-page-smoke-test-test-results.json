@@ -8,7 +8,7 @@
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/practice-login-page-smoke-test --project=chromium",
-    "duration_minutes": 0.4,
+    "duration_minutes": 0.35,
     "test_plan_path": "specs/practice-login-page-smoke-test-test-plan.md",
     "suite_path": "tests/practice-login-page-smoke-test/",
     "story": ""
