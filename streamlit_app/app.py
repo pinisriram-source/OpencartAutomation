@@ -480,8 +480,9 @@ and automation suite.*
                     if run_result.success:
                         st.success(
                             "Full pipeline triggered: plan → generate → execute → commit "
-                            f"against your request (slug `{slug}`). This can take 1–2+ hours. "
-                            "Use the status checker below (with the path above) to check progress."
+                            f"against your request (slug `{slug}`). Typically takes 10-30 minutes "
+                            "for a new suite. Use the status checker below (with the path above) "
+                            "to check progress."
                         )
                         st.markdown(
                             f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_FULL_PIPELINE_WORKFLOW_FILE})"
