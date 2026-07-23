@@ -27,6 +27,12 @@ MUTED_BG = "#e1e0d9"
 SECONDARY_INK = "#52514e"
 
 DATA_DIR = Path(__file__).parent / "data"
+REPO_ROOT = Path(__file__).parent.parent
+
+LOCATOR_METHOD_RE = re.compile(
+    r"\.(getByRole|getByLabel|getByTestId|getByText|getByPlaceholder|getByAltText|getByTitle|locator)\("
+)
+ASSERTION_LINE_RE = re.compile(r"expect\(")
 
 # --- Target repo for the "Submit New Request" form ---
 GITHUB_OWNER = "pinisriram-source"
@@ -91,6 +97,54 @@ def load_data(path_str: str) -> dict:
         return json.load(f)
 
 
+@st.cache_data
+def find_test_block(suite_dir_str: str, test_id: str) -> tuple[str, str] | tuple[None, None]:
+    """Locate the *.spec.ts file containing `test_id` and extract just that test()'s body.
+
+    Reads the real generated spec files checked out alongside the app (this
+    deployment is a full clone of the repo, so tests/<slug>/ sits right next
+    to streamlit_app/) -- not a copy or a summary, the actual script that ran.
+    """
+    suite_dir = Path(suite_dir_str)
+    if not suite_dir.exists():
+        return None, None
+
+    for spec_file in sorted(suite_dir.rglob("*.spec.ts")):
+        try:
+            text = spec_file.read_text(encoding="utf-8")
+        except Exception:
+            continue
+
+        for m in re.finditer(r"test\(\s*(['\"])(.*?)\1", text):
+            if test_id not in m.group(2):
+                continue
+            # Body starts after `=>`, not the first `{` after the test title -- the
+            # callback's own parameter list (e.g. `async ({ page }) => {`) can contain
+            # a destructuring brace that closes before the real body ever begins.
+            arrow_idx = text.find("=>", m.end())
+            if arrow_idx == -1:
+                continue
+            brace_start = text.find("{", arrow_idx)
+            if brace_start == -1:
+                continue
+            depth = 0
+            i = brace_start
+            while i < len(text):
+                if text[i] == "{":
+                    depth += 1
+                elif text[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            end = text.find(");", i)
+            end = end + 2 if end != -1 else i + 1
+            block = text[m.start() : end].strip()
+            return str(spec_file.relative_to(REPO_ROOT).as_posix()), block
+
+    return None, None
+
+
 suite_files = discover_suites()
 if not suite_files:
     st.error(f"No test result files found in {DATA_DIR}/ (expected *-test-results.json).")
@@ -143,12 +197,13 @@ k6.metric("Failed", summary["failed"], delta=None)
 
 st.divider()
 
-tab_overview, tab_matrix, tab_usecase, tab_rules, tab_defects, tab_submit = st.tabs(
+tab_overview, tab_matrix, tab_usecase, tab_rules, tab_details, tab_defects, tab_submit = st.tabs(
     [
         "Overview",
         "Test Execution Matrix",
         "Coverage by Use Case",
         "Coverage by Business Rule",
+        "Test Case Detail",
         "Defects Log",
         "Submit New Request",
     ]
@@ -324,6 +379,87 @@ with tab_rules:
         st.dataframe(pd.DataFrame(rule_rows), use_container_width=True, hide_index=True)
     else:
         st.info("This suite's data doesn't include business rule mappings.")
+
+# --- Test Case Detail tab ---------------------------------------------------------
+with tab_details:
+    st.subheader("Test Case Detail — Script, Locators & Validation")
+    st.caption(
+        "The real Playwright script for the selected test case, as generated and executed by "
+        "the pipeline -- not a summary. Locators and assertions below are extracted directly "
+        "from that script's source."
+    )
+
+    if tests.empty:
+        st.info("This suite has no test cases recorded.")
+    else:
+        detail_options = [f"{row['id']} — {row['title']}" for _, row in tests.iterrows()]
+        picked = st.selectbox("Test case", detail_options)
+        picked_id = picked.split(" — ", 1)[0]
+        row = tests[tests["id"] == picked_id].iloc[0]
+
+        result_col, id_col = st.columns([1, 3])
+        with id_col:
+            st.markdown(f"**{row['id']} — {row['title']}**")
+            sub_bits = [f"Use Case: `{row['use_case']}`"]
+            if row.get("business_rule"):
+                sub_bits.append(f"Business Rule: `{row['business_rule']}`")
+            st.caption(" | ".join(sub_bits))
+        with result_col:
+            outcome = str(row.get("chromium", "")).strip().lower()
+            if outcome == "pass":
+                st.success("PASS")
+            elif outcome == "fail":
+                st.error("FAIL")
+            else:
+                st.info(row.get("chromium", "n/a"))
+
+        suite_dir = REPO_ROOT / meta["suite_path"]
+        spec_path, block = find_test_block(str(suite_dir), picked_id)
+
+        if block is None:
+            st.warning(
+                "Couldn't find this test's spec file in the app's current checkout. "
+                "This can happen right after a new pipeline run if the app hasn't "
+                "redeployed/rebooted yet -- try rebooting the app."
+            )
+        else:
+            st.caption(f"Source: [{spec_path}]({github_url(spec_path)})")
+
+            locator_lines = [
+                line.strip() for line in block.splitlines() if LOCATOR_METHOD_RE.search(line)
+            ]
+            if locator_lines:
+                st.markdown("**Locators used**")
+                st.code("\n".join(dict.fromkeys(locator_lines)), language="typescript")
+
+            st.markdown("**Automation script (as executed)**")
+            st.code(block, language="typescript")
+
+            assertion_lines = [
+                line.strip() for line in block.splitlines() if ASSERTION_LINE_RE.search(line)
+            ]
+            st.markdown("**Validations performed (assertions)**")
+            if assertion_lines:
+                st.code("\n".join(assertion_lines), language="typescript")
+            else:
+                st.caption("No explicit `expect(...)` assertions found in this test block.")
+
+            st.markdown("**Expected vs. Actual**")
+            matching_defect = next(
+                (d for d in data.get("defects", []) if d.get("test_ref") == picked_id), None
+            )
+            if matching_defect:
+                st.error(
+                    f"**Expected:** {matching_defect['expected']}\n\n"
+                    f"**Actual:** {matching_defect['actual']}"
+                )
+            elif outcome == "pass":
+                st.success(
+                    "Every assertion above passed -- the application's actual behavior matched "
+                    "the expected value asserted at each `expect(...)` call in the script."
+                )
+            else:
+                st.caption("No further expected-vs-actual detail recorded for this result.")
 
 # --- Defects Log tab -------------------------------------------------------------
 with tab_defects:
