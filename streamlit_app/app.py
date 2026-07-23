@@ -63,14 +63,20 @@ st.set_page_config(
 
 
 def discover_suites() -> list[Path]:
-    """Every *-test-results.json in data/, most recently modified first.
+    """Every *-test-results.json in data/, most recently reported first.
 
-    The SauceDemo suite's file is committed once and rarely changes; files
-    matching this pattern from the full-pipeline (data/<slug>-test-results.json)
-    are written fresh after every pipeline run, so sorting by mtime naturally
-    surfaces the most recently executed suite first.
+    Sorted by each file's meta.report_date, not filesystem mtime -- a fresh
+    git checkout/clone on redeploy (Streamlit Cloud) resets file mtimes
+    together, so mtime order does not reliably reflect which suite actually
+    ran most recently. report_date is written by the suite data itself.
     """
-    return sorted(DATA_DIR.glob("*-test-results.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    def report_date(p: Path) -> str:
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))["meta"].get("report_date", "")
+        except Exception:
+            return ""
+
+    return sorted(DATA_DIR.glob("*-test-results.json"), key=report_date, reverse=True)
 
 
 @st.cache_data
