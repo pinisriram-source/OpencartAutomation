@@ -255,12 +255,17 @@ with tab_matrix:
 # --- Coverage by Use Case tab ---------------------------------------------------
 with tab_usecase:
     st.subheader("Coverage by Business Use Case")
-    cov = (
-        tests.groupby("use_case")
-        .agg(test_cases=("id", "count"))
-        .reset_index()
-        .rename(columns={"use_case": "Use Case", "test_cases": "Test Cases"})
-    )
+    cov_rows = []
+    for code, grp in tests.groupby("use_case"):
+        desc = use_cases.get(code, "")
+        cov_rows.append(
+            {
+                "Use Case": f"{code} — {desc}" if desc else code,
+                "Test Case IDs": ", ".join(grp["id"].tolist()),
+                "Test Cases": len(grp),
+            }
+        )
+    cov = pd.DataFrame(cov_rows)
     n_browsers = summary["browsers"]
     exec_col = f"Executions (×{n_browsers} browser{'s' if n_browsers != 1 else ''})"
     cov[exec_col] = cov["Test Cases"] * n_browsers
