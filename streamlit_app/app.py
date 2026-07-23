@@ -517,6 +517,19 @@ with tab_submit:
             icon="ℹ️",
         )
 
+    st.text_input(
+        "Pipeline passphrase (optional — leave blank unless you know it)",
+        type="password",
+        key="pipeline_passphrase_input",
+        help=(
+            "Enter the correct passphrase to trigger full AI-driven plan → generate → "
+            "execute automation against this request. Leave blank (or enter it wrong) to "
+            "just re-run the existing reviewed suite instead. Unlike the fields below, this "
+            "one is NOT cleared after submitting -- you don't need to retype it if you "
+            "resubmit after a failure."
+        ),
+    )
+
     with st.form("new_request_form", clear_on_submit=True):
         title = st.text_input("Short title", placeholder="e.g. Guest checkout regression for MyStore")
         app_url = st.text_input("Application URL", placeholder="https://example.com")
@@ -533,16 +546,6 @@ with tab_submit:
             placeholder="Paste the user story, acceptance criteria, or requirements doc text here...",
         )
         req_file = st.file_uploader("...or upload a requirements file instead", type=["md", "txt"])
-
-        pipeline_passphrase = st.text_input(
-            "Pipeline passphrase (optional — leave blank unless you know it)",
-            type="password",
-            help=(
-                "Enter the correct passphrase to trigger full AI-driven plan → generate → "
-                "execute automation against this request. Leave blank (or enter it wrong) to "
-                "just re-run the existing reviewed suite instead."
-            ),
-        )
 
         submitted = st.form_submit_button("Submit Request")
 
@@ -603,16 +606,21 @@ and automation suite.*
                     st.markdown(f"[View the committed file on GitHub]({result.html_url})")
                 st.session_state["last_request_path"] = path
 
+                pipeline_passphrase = st.session_state.get("pipeline_passphrase_input", "")
                 expected_passphrase = get_pipeline_passphrase()
                 full_pipeline_requested = bool(
                     pipeline_passphrase and expected_passphrase and pipeline_passphrase == expected_passphrase
                 )
-                if pipeline_passphrase and not full_pipeline_requested:
+                if not pipeline_passphrase:
+                    st.info(
+                        "No pipeline passphrase entered -- this triggered the default behavior "
+                        "(re-running the existing reviewed suite), not the full AI pipeline against "
+                        "your new request."
+                    )
+                elif not full_pipeline_requested:
                     st.warning(
                         "A pipeline passphrase was entered but did not match — falling back to "
-                        "the default behavior (rerun existing suite only), NOT the full pipeline. "
-                        "If you meant to trigger the full pipeline, re-submit and re-type the "
-                        "passphrase (this field clears after every submit attempt, including failed ones)."
+                        "the default behavior (rerun existing suite only), NOT the full pipeline."
                     )
 
                 if full_pipeline_requested:
