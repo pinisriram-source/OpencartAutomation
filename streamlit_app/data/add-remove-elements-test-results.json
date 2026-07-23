@@ -1,0 +1,303 @@
+{
+  "meta": {
+    "app_under_test": "Add/Remove Elements",
+    "app_url": "https://the-internet.herokuapp.com/add_remove_elements/",
+    "report_date": "2026-07-23",
+    "test_account": "",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/add-remove-elements --project=chromium",
+    "duration_minutes": 2.8,
+    "test_plan_path": "specs/add-remove-elements-test-plan.md",
+    "suite_path": "tests/add-remove-elements/",
+    "story": "",
+    "report_generated_at": "2026-07-23T16:38:38.087Z"
+  },
+  "summary": {
+    "test_cases": 25,
+    "browsers": 1,
+    "executions": 25,
+    "passed": 18,
+    "failed": 7,
+    "skipped": 0,
+    "success_rate": 72,
+    "healing_actions": 0,
+    "status": "FAIL"
+  },
+  "suites": [
+    {
+      "name": "Core Functionality",
+      "use_case": "CORE",
+      "file": "initial-page-load.spec.ts, add-single-element.spec.ts, add-multiple-elements.spec.ts, delete-single-element.spec.ts, delete-all-elements.spec.ts, url-stability.spec.ts",
+      "tests": 6
+    },
+    {
+      "name": "Edge Cases and Boundary Conditions",
+      "use_case": "EDGE",
+      "file": "rapid-click-add.spec.ts, rapid-click-delete.spec.ts, add-large-number.spec.ts, delete-non-sequential.spec.ts, add-after-delete.spec.ts, delete-first-repeatedly.spec.ts, delete-last-repeatedly.spec.ts, alternating-add-delete.spec.ts, delete-all-clean-state.spec.ts",
+      "tests": 9
+    },
+    {
+      "name": "Negative and Validation Tests",
+      "use_case": "NEG",
+      "file": "double-click-delete.spec.ts, click-container.spec.ts, no-add-then-delete.spec.ts, no-maximum-limit.spec.ts, browser-back-button.spec.ts, page-refresh-reset.spec.ts, no-console-errors.spec.ts, button-rendering.spec.ts, keyboard-add-element.spec.ts, keyboard-delete-button.spec.ts",
+      "tests": 10
+    }
+  ],
+  "use_cases": {
+    "CORE": "Core Functionality — verifies basic add/remove element operations, page load state, and URL stability",
+    "EDGE": "Edge Cases and Boundary Conditions — tests rapid clicking, large numbers of elements, non-sequential deletion, and mixed add/delete patterns",
+    "NEG": "Negative and Validation Tests — verifies double-click behavior, container clicks, state persistence, console errors, rendering, and keyboard accessibility"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-ADDREMOVE-001",
+      "title": "Initial Page Load State",
+      "use_case": "CORE",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-ADDREMOVE-002",
+      "title": "Add Single Element",
+      "use_case": "CORE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-003",
+      "title": "Add Multiple Elements Sequentially",
+      "use_case": "CORE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-004",
+      "title": "Delete Single Element from Middle Position",
+      "use_case": "CORE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-005",
+      "title": "Delete All Elements Sequentially",
+      "use_case": "CORE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-006",
+      "title": "URL Stability During All Operations",
+      "use_case": "CORE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-007",
+      "title": "Rapid Clicking Add Element Button",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-008",
+      "title": "Rapid Clicking Delete Buttons",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-009",
+      "title": "Add Large Number of Elements",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-010",
+      "title": "Delete in Non-Sequential Order",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-011",
+      "title": "Add After Delete Operations",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-012",
+      "title": "Delete First Button Multiple Times",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-013",
+      "title": "Delete Last Button Multiple Times",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-014",
+      "title": "Alternating Add and Delete Operations",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-015",
+      "title": "Delete All Then Verify Clean State",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-ADDREMOVE-016",
+      "title": "Double-Click Delete Button",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-002"
+    },
+    {
+      "id": "TC-ADDREMOVE-017",
+      "title": "Click Delete Button Container Instead of Button",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-003"
+    },
+    {
+      "id": "TC-ADDREMOVE-018",
+      "title": "Add Zero Elements Then Delete",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-019",
+      "title": "Verify No Maximum Limit on Add Operations",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-020",
+      "title": "Browser Back Button Does Not Affect State",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-021",
+      "title": "Page Refresh Resets State",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-ADDREMOVE-022",
+      "title": "No JavaScript Errors in Console",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-004"
+    },
+    {
+      "id": "TC-ADDREMOVE-023",
+      "title": "Verify Button Rendering and CSS",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-ADDREMOVE-024",
+      "title": "Keyboard Accessibility for Add Element Button",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-005"
+    },
+    {
+      "id": "TC-ADDREMOVE-025",
+      "title": "Keyboard Accessibility for Delete Buttons",
+      "use_case": "NEG",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": [
+    {
+      "id": "BUG-001",
+      "severity": "Low",
+      "title": "Empty #elements container is hidden (not visible) when it contains no buttons",
+      "steps": "Navigate to the page (or delete all buttons). Inspect the #elements container.",
+      "expected": "The Delete button container element exists and is visible (even if empty).",
+      "actual": "The #elements div resolves in the DOM but Playwright reports it as hidden because it has no rendered height when empty.",
+      "test_ref": "TC-ADDREMOVE-001, TC-ADDREMOVE-015, TC-ADDREMOVE-021"
+    },
+    {
+      "id": "BUG-002",
+      "severity": "Medium",
+      "title": "Double-clicking a Delete button removes two buttons instead of one",
+      "steps": "Add 5 Delete buttons. Double-click the 3rd Delete button rapidly.",
+      "expected": "Only the clicked button is removed; 4 buttons remain.",
+      "actual": "Two buttons are removed (the clicked button and an adjacent one); only 3 buttons remain. The click handler fires twice before the first removal completes DOM updates.",
+      "test_ref": "TC-ADDREMOVE-016"
+    },
+    {
+      "id": "BUG-003",
+      "severity": "Medium",
+      "title": "Clicking the container area between Delete buttons removes a button",
+      "steps": "Add 3 Delete buttons. Click the container area between or around the buttons (not a button itself).",
+      "expected": "No buttons are removed; button count remains 3.",
+      "actual": "A button is removed; button count drops to 2. The click event propagates from the container to a child button.",
+      "test_ref": "TC-ADDREMOVE-017"
+    },
+    {
+      "id": "BUG-004",
+      "severity": "Low",
+      "title": "Page loads external resources that fail with ERR_NAME_NOT_RESOLVED",
+      "steps": "Navigate to the page and monitor console/network errors during add/delete operations.",
+      "expected": "No critical errors in the browser console.",
+      "actual": "Two 'Failed to load resource: net::ERR_NAME_NOT_RESOLVED' errors appear in the console from external resource references.",
+      "test_ref": "TC-ADDREMOVE-022"
+    },
+    {
+      "id": "BUG-005",
+      "severity": "Medium",
+      "title": "Add Element control is an anchor tag, not a button — first Tab focus lands on wrong element",
+      "steps": "Navigate to the page. Press Tab to focus the 'Add Element' control.",
+      "expected": "The focused element is a BUTTON with text 'Add Element'.",
+      "actual": "The focused element is an A (anchor) tag. The 'Add Element' control is implemented as a link, not a semantic button, so Tab order and element type assertions expecting BUTTON fail.",
+      "test_ref": "TC-ADDREMOVE-024"
+    }
+  ]
+}
