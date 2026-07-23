@@ -344,6 +344,10 @@ with tab_defects:
 with tab_submit:
     st.subheader("Submit New Testing Request")
     st.caption("Without the correct pipeline passphrase, this re-runs the existing SauceDemo suite only.")
+    st.caption(
+        "Submit the request for the current automation suite run: "
+        f"[{meta['suite_path']}]({github_url(meta['suite_path'])})  —  user story {meta['story']}."
+    )
     st.warning(
         "⚠️ This app and its GitHub repo are **public**. Anything submitted here becomes "
         "visible in public commit history. Do not paste real credentials, secrets, or "
@@ -534,9 +538,3 @@ and automation suite.*
                     st.markdown(f"[View the full request file on GitHub]({file_result.html_url})")
             else:
                 st.error(file_result.message)
-
-st.divider()
-st.caption(
-    "Submit the request for the current automation suite run: "
-    f"[{meta['suite_path']}]({github_url(meta['suite_path'])})  —  user story {meta['story']}."
-)
