@@ -96,7 +96,7 @@ jobs:
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- generating test plan"
           git add "$REQUEST_FILE"
           git commit -m "chore(pipeline): start test plan generation for $SLUG" || true
-          git push
+          bash .github/scripts/git-push-retry.sh
 
       - name: Claude Code -- generate test plan
         run: |
@@ -109,7 +109,7 @@ jobs:
 
       - name: Verify plan was created
         run: |
-          test -f "specs/${SLUG}-test-plan.md" || (node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- see Actions run" && git add "$REQUEST_FILE" && git commit -m "chore(pipeline): planning failed for $SLUG" && git push && exit 1)
+          test -f "specs/${SLUG}-test-plan.md" || (node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- see Actions run" && git add "$REQUEST_FILE" && git commit -m "chore(pipeline): planning failed for $SLUG" && bash .github/scripts/git-push-retry.sh && exit 1)
 
       - name: Commit test plan, set status -- generating automation
         run: |
@@ -117,7 +117,7 @@ jobs:
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- test plan generated, generating automation suite"
           git add "$REQUEST_FILE"
           git commit -m "feat(pipeline): add test plan for $SLUG"
-          git push
+          bash .github/scripts/git-push-retry.sh
 
       - name: Claude Code -- generate automation suite
         run: |
@@ -136,7 +136,7 @@ jobs:
             node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at generation stage -- see Actions run"
             git add "$REQUEST_FILE"
             git commit -m "chore(pipeline): generation failed for $SLUG"
-            git push
+            bash .github/scripts/git-push-retry.sh
             exit 1
           fi
 
@@ -146,7 +146,7 @@ jobs:
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- automation generated, executing tests (Chromium)"
           git add "$REQUEST_FILE"
           git commit -m "feat(pipeline): add automation suite for $SLUG"
-          git push
+          bash .github/scripts/git-push-retry.sh
 
       - name: Run the generated suite
         id: run_tests
@@ -173,7 +173,7 @@ jobs:
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "Completed -- ${RESULT_LINE}. See Actions run and playwright-report artifact for details."
           git add "$REQUEST_FILE"
           git commit -m "chore(pipeline): mark $SLUG complete -- ${RESULT_LINE}"
-          git push
+          bash .github/scripts/git-push-retry.sh
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
