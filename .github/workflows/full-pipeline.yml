@@ -100,9 +100,13 @@ jobs:
 
       - name: Claude Code -- generate test plan
         run: |
-          npx claude -p "Read the testing request at \$REQUEST_FILE (application URL, requirements/acceptance criteria, optional test credentials). Use the playwright-test-planner subagent to explore the live application at that URL and produce a comprehensive test plan covering happy paths, negative/boundary cases, and navigation flows, following this project's TC-<MODULE>-<NNN> convention (see CLAUDE.md). Save the plan to specs/${SLUG}-test-plan.md exactly -- no other path. Do not modify any file outside specs/${SLUG}-test-plan.md." \
-            --dangerously-skip-permissions
-       
+          if [ -f "specs/${SLUG}-test-plan.md" ]; then
+            echo "specs/${SLUG}-test-plan.md already exists -- skipping regeneration (idempotent re-run for this slug)."
+          else
+            npx claude -p "Read the testing request at \$REQUEST_FILE (application URL, requirements/acceptance criteria, optional test credentials). Use the playwright-test-planner subagent to explore the live application at that URL and produce a comprehensive test plan covering happy paths, negative/boundary cases, and navigation flows, following this project's TC-<MODULE>-<NNN> convention (see CLAUDE.md). Save the plan to specs/${SLUG}-test-plan.md exactly -- no other path. Do not modify any file outside specs/${SLUG}-test-plan.md." \
+              --dangerously-skip-permissions
+          fi
+
       - name: Verify plan was created
         run: |
           test -f "specs/${SLUG}-test-plan.md" || (node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- see Actions run" && git add "$REQUEST_FILE" && git commit -m "chore(pipeline): planning failed for $SLUG" && git push && exit 1)
@@ -117,8 +121,12 @@ jobs:
 
       - name: Claude Code -- generate automation suite
         run: |
-          npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md. Use the playwright-test-generator subagent to create a Playwright TypeScript automation suite implementing every test case in that plan, using Page Object Model, one test() per test case named with its Test Case ID. Write all files under tests/${SLUG}/ only -- do not write outside that directory, and do not modify your own agent definition or any .claude/ file." \
-            --dangerously-skip-permissions
+          if [ -n "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
+            echo "tests/${SLUG}/ already has spec files -- skipping regeneration (idempotent re-run for this slug)."
+          else
+            npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md. Use the playwright-test-generator subagent to create a Playwright TypeScript automation suite implementing every test case in that plan, using Page Object Model, one test() per test case named with its Test Case ID. Write all files under tests/${SLUG}/ only -- do not write outside that directory, and do not modify your own agent definition or any .claude/ file." \
+              --dangerously-skip-permissions
+          fi
         env:
           SLUG: ${{ inputs.slug }}
 
