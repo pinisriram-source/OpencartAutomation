@@ -8,6 +8,7 @@ secrets (GITHUB_TOKEN) -- never hardcoded, never logged.
 from __future__ import annotations
 
 import base64
+import time
 from dataclasses import dataclass
 
 import requests
@@ -20,6 +21,7 @@ class CommitResult:
     success: bool
     message: str
     html_url: str | None = None
+    commit_sha: str | None = None
 
 
 def create_file(
@@ -58,8 +60,10 @@ def create_file(
         return CommitResult(False, f"Network error contacting GitHub: {exc}")
 
     if resp.status_code in (200, 201):
-        html_url = resp.json().get("content", {}).get("html_url")
-        return CommitResult(True, "Committed successfully.", html_url)
+        body = resp.json()
+        html_url = body.get("content", {}).get("html_url")
+        commit_sha = body.get("commit", {}).get("sha")
+        return CommitResult(True, "Committed successfully.", html_url, commit_sha)
 
     if resp.status_code == 401:
         return CommitResult(False, "GitHub rejected the token (401 Unauthorized). Check GITHUB_TOKEN in secrets.")
@@ -69,6 +73,47 @@ def create_file(
         return CommitResult(False, "A file already exists at that path, or the request was invalid (422).")
 
     return CommitResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")
+
+
+def wait_for_ref(
+    owner: str,
+    repo: str,
+    branch: str,
+    commit_sha: str,
+    token: str,
+    attempts: int = 6,
+    delay_seconds: float = 0.5,
+) -> bool:
+    """Poll until `branch`'s tip is `commit_sha`, before dispatching a workflow against it.
+
+    The Contents API (create_file) and the Actions dispatch API can briefly
+    disagree on where a branch points right after a commit -- a
+    workflow_dispatch fired immediately after a commit can resolve `ref`
+    to the *previous* commit and check out a repo state missing the file
+    that was just committed. Give the dispatch API a moment to catch up.
+    Best-effort: returns False (but doesn't raise) if it never catches up,
+    so the caller can still try dispatching anyway.
+    """
+    if not token:
+        return False
+
+    url = f"{GITHUB_API}/repos/{owner}/{repo}/git/refs/heads/{branch}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    for _ in range(attempts):
+        try:
+            resp = requests.get(url, headers=headers, timeout=10)
+        except requests.RequestException:
+            return False
+        if resp.status_code == 200 and resp.json().get("object", {}).get("sha") == commit_sha:
+            return True
+        time.sleep(delay_seconds)
+
+    return False
 
 
 def trigger_workflow(

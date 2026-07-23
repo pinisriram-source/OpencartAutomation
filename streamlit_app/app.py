@@ -17,7 +17,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from github_commit import create_file, get_file, trigger_workflow
+from github_commit import create_file, get_file, trigger_workflow, wait_for_ref
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -480,6 +480,18 @@ and automation suite.*
                     )
 
                 if full_pipeline_requested:
+                    # The dispatched workflow reads REQUEST_FILE straight out of the repo,
+                    # so make sure `main` actually points at this commit first -- dispatching
+                    # immediately after create_file() can otherwise race GitHub's own
+                    # replication and check out a state missing the file just committed.
+                    if result.commit_sha:
+                        wait_for_ref(
+                            owner=GITHUB_OWNER,
+                            repo=GITHUB_REPO,
+                            branch=GITHUB_BRANCH,
+                            commit_sha=result.commit_sha,
+                            token=get_github_token(),
+                        )
                     run_result = trigger_workflow(
                         owner=GITHUB_OWNER,
                         repo=GITHUB_REPO,

@@ -40,6 +40,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Sync to latest main
+        # workflow_dispatch resolves `ref: main` to a commit SHA at the moment it's
+        # called, which can briefly lag behind a commit made just before dispatching
+        # (e.g. the Streamlit app committing the request file, then immediately
+        # dispatching this workflow) -- checkout can land on a stale commit missing
+        # that file. Resync to whatever main actually points to right now.
+        run: |
+          git fetch origin main --quiet
+          git reset --hard origin/main
+
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
