@@ -27,6 +27,14 @@ on:
 permissions:
   contents: write
 
+# Serialize runs for the same slug -- two runs racing on the exact same
+# specs/tests/data paths (e.g. a double-submit, or resubmitting while a
+# prior run for that slug hasn't finished) would hit real git conflicts
+# that the push-retry script can't rebase past. Queue instead of racing.
+concurrency:
+  group: full-pipeline-${{ inputs.slug }}
+  cancel-in-progress: false
+
 jobs:
   full-pipeline:
     timeout-minutes: 180

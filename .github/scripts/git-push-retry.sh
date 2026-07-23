@@ -12,7 +12,11 @@ for attempt in 1 2 3 4 5; do
   fi
   echo "git push rejected (attempt ${attempt}/5) -- fetching and rebasing onto origin/main..."
   git fetch origin main --quiet
-  git rebase origin/main
+  if ! git rebase origin/main; then
+    echo "git rebase hit a real conflict -- aborting rebase rather than leaving the repo mid-rebase."
+    git rebase --abort
+    exit 1
+  fi
 done
 
 echo "git push failed after 5 attempts"
