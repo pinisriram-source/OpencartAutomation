@@ -2,73 +2,80 @@
   "meta": {
     "app_under_test": "Practice Login Page",
     "app_url": "https://practicetestautomation.com/practice-test-login/",
-    "report_date": "2026-07-22",
+    "report_date": "2026-07-23",
     "test_account": "student / Password123",
     "browsers": [
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/practice-login-page-smoke-test --project=chromium",
-    "duration_minutes": 0.5,
+    "duration_minutes": 0.4,
     "test_plan_path": "specs/practice-login-page-smoke-test-test-plan.md",
     "suite_path": "tests/practice-login-page-smoke-test/",
-    "story": "PRACTICE-LOGIN-SMOKE-TEST"
+    "story": ""
   },
   "summary": {
-    "test_cases": 12,
+    "test_cases": 23,
     "browsers": 1,
-    "executions": 12,
-    "passed": 12,
-    "failed": 0,
+    "executions": 23,
+    "passed": 22,
+    "failed": 1,
     "skipped": 0,
-    "success_rate": 100,
+    "success_rate": 95.65,
     "healing_actions": 0,
-    "status": "PASS"
+    "status": "FAIL"
   },
   "suites": [
     {
-      "name": "Core Tests",
-      "use_case": "UC1",
-      "file": "-",
+      "name": "Login Functionality - Core Tests",
+      "use_case": "CORE",
+      "file": "login-functionality-core-tests/",
       "tests": 2
     },
     {
-      "name": "Negative Tests",
-      "use_case": "UC2",
-      "file": "-",
+      "name": "Login Functionality - Negative Tests",
+      "use_case": "NEG",
+      "file": "login-functionality-negative-tests/",
       "tests": 4
     },
     {
-      "name": "UI Verification",
-      "use_case": "UC3",
-      "file": "-",
+      "name": "Login Functionality - UI Verification",
+      "use_case": "UI",
+      "file": "login-functionality-ui-verification/",
       "tests": 1
     },
     {
-      "name": "Navigation Tests",
-      "use_case": "UC4",
-      "file": "-",
+      "name": "Login Functionality - Navigation Tests",
+      "use_case": "NAV",
+      "file": "login-functionality-navigation-tests/",
       "tests": 2
     },
     {
-      "name": "Boundary and Edge Cases",
-      "use_case": "UC5",
-      "file": "-",
+      "name": "Login Functionality - Boundary and Edge Cases",
+      "use_case": "EDGE",
+      "file": "login-functionality-boundary-and-edge-cases/",
       "tests": 3
+    },
+    {
+      "name": "Practice Login Page Tests",
+      "use_case": "PLAN",
+      "file": "tc-login-*.spec.ts",
+      "tests": 11
     }
   ],
   "use_cases": {
-    "UC1": "Core Tests",
-    "UC2": "Negative Tests",
-    "UC3": "UI Verification",
-    "UC4": "Navigation Tests",
-    "UC5": "Boundary and Edge Cases"
+    "CORE": "Core Tests — valid login and invalid password error display",
+    "NEG": "Negative Tests — empty fields and invalid credential combinations rejected with correct errors",
+    "UI": "UI Verification — login page loads with all required form elements visible",
+    "NAV": "Navigation Tests — logout link and success page element verification",
+    "EDGE": "Boundary and Edge Cases — spaces, long input, and special characters handled correctly",
+    "PLAN": "Practice Login Page Tests — full test plan coverage including happy path, negative, boundary, and navigation scenarios"
   },
   "business_rules": {},
   "tests": [
     {
       "id": "TC-LOGIN-001",
       "title": "Successful login with valid credentials",
-      "use_case": "UC1",
+      "use_case": "CORE",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -76,7 +83,7 @@
     {
       "id": "TC-LOGIN-003",
       "title": "Invalid password displays error message",
-      "use_case": "UC1",
+      "use_case": "CORE",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -84,7 +91,7 @@
     {
       "id": "TC-LOGIN-004",
       "title": "Empty username and password shows error",
-      "use_case": "UC2",
+      "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -92,7 +99,7 @@
     {
       "id": "TC-LOGIN-005",
       "title": "Empty username with valid password shows error",
-      "use_case": "UC2",
+      "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -100,7 +107,7 @@
     {
       "id": "TC-LOGIN-006",
       "title": "Valid username with empty password shows error",
-      "use_case": "UC2",
+      "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -108,7 +115,7 @@
     {
       "id": "TC-LOGIN-007",
       "title": "Both invalid username and password shows username error",
-      "use_case": "UC2",
+      "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -116,7 +123,7 @@
     {
       "id": "TC-LOGIN-008",
       "title": "Login page loads with all required elements",
-      "use_case": "UC3",
+      "use_case": "UI",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -124,7 +131,7 @@
     {
       "id": "TC-LOGIN-010",
       "title": "Logout link navigates back to login page",
-      "use_case": "UC4",
+      "use_case": "NAV",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -132,7 +139,7 @@
     {
       "id": "TC-LOGIN-011",
       "title": "Success page displays all required elements",
-      "use_case": "UC4",
+      "use_case": "NAV",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -140,7 +147,7 @@
     {
       "id": "TC-LOGIN-014",
       "title": "Username and password with leading and trailing spaces",
-      "use_case": "UC5",
+      "use_case": "EDGE",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -148,7 +155,7 @@
     {
       "id": "TC-LOGIN-015",
       "title": "Very long username input",
-      "use_case": "UC5",
+      "use_case": "EDGE",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -156,11 +163,109 @@
     {
       "id": "TC-LOGIN-016",
       "title": "Special characters in username and password",
-      "use_case": "UC5",
+      "use_case": "EDGE",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-001",
+      "title": "Valid Login Redirects To Success Page",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-002",
+      "title": "Invalid Username Shows Error Message",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "title": "Invalid Password Shows Error Message",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "title": "Empty Username And Password Shows Error",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "title": "Empty Username With Valid Password Shows Error",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-006",
+      "title": "Valid Username With Empty Password Shows Error",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-007",
+      "title": "Password Is Case Sensitive",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-008",
+      "title": "Username With Leading And Trailing Spaces Shows Error",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-009",
+      "title": "Login Form Elements Are Visible On Page Load",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-010",
+      "title": "Success Page Has Link Back To Practice Page",
+      "use_case": "PLAN",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-011",
+      "title": "Multiple Failed Login Attempts Are Allowed",
+      "use_case": "PLAN",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
     }
   ],
-  "defects": []
+  "defects": [
+    {
+      "id": "BUG-001",
+      "severity": "Low",
+      "title": "Strict mode violation: getByText matches two elements for password error message",
+      "steps": "Navigate to login page, enter valid username 'student' with invalid password 'wrongpassword', click Submit.",
+      "expected": "Error message 'Your password is invalid!' is displayed and locator resolves to a single visible element.",
+      "actual": "getByText('Your password is invalid!') resolves to 2 elements (div#error and a nested <b> tag), causing a Playwright strict mode violation. The error message IS displayed correctly to the user but the test locator is ambiguous.",
+      "test_ref": "TC-LOGIN-003"
+    }
+  ]
 }
