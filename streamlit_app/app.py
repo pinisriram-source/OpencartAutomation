@@ -65,18 +65,24 @@ st.set_page_config(
 def discover_suites() -> list[Path]:
     """Every *-test-results.json in data/, most recently reported first.
 
-    Sorted by each file's meta.report_date, not filesystem mtime -- a fresh
-    git checkout/clone on redeploy (Streamlit Cloud) resets file mtimes
-    together, so mtime order does not reliably reflect which suite actually
-    ran most recently. report_date is written by the suite data itself.
+    Sorted by each file's meta.report_generated_at (an exact UTC instant
+    stamped deterministically by the pipeline -- see
+    .github/scripts/stamp-report-timestamp.js), falling back to the
+    day-only meta.report_date for older files that predate that field.
+    Not filesystem mtime: a fresh git checkout/clone on redeploy (Streamlit
+    Cloud) resets file mtimes together, so mtime order doesn't reflect
+    which suite actually ran most recently. report_date alone isn't enough
+    either -- two suites run on the same calendar day tie, and the tie
+    silently falls back to alphabetical filename order.
     """
-    def report_date(p: Path) -> str:
+    def sort_key(p: Path) -> str:
         try:
-            return json.loads(p.read_text(encoding="utf-8"))["meta"].get("report_date", "")
+            meta = json.loads(p.read_text(encoding="utf-8"))["meta"]
+            return meta.get("report_generated_at") or meta.get("report_date", "")
         except Exception:
             return ""
 
-    return sorted(DATA_DIR.glob("*-test-results.json"), key=report_date, reverse=True)
+    return sorted(DATA_DIR.glob("*-test-results.json"), key=sort_key, reverse=True)
 
 
 @st.cache_data

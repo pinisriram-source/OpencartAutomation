@@ -13,7 +13,8 @@
     "duration_minutes": 30.8,
     "test_plan_path": "specs/saucedemo-checkout-test-plan.md",
     "suite_path": "tests/saucedemo-checkout/",
-    "story": "SCRUM-101"
+    "story": "SCRUM-101",
+    "report_generated_at": "2026-07-22T00:00:00.000Z"
   },
   "summary": {
     "test_cases": 68,

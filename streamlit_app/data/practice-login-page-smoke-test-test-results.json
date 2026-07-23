@@ -11,7 +11,8 @@
     "duration_minutes": 0.35,
     "test_plan_path": "specs/practice-login-page-smoke-test-test-plan.md",
     "suite_path": "tests/practice-login-page-smoke-test/",
-    "story": ""
+    "story": "",
+    "report_generated_at": "2026-07-23T06:35:09.000Z"
   },
   "summary": {
     "test_cases": 23,

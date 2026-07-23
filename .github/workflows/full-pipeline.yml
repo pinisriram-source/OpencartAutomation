@@ -161,6 +161,13 @@ jobs:
           npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md and the raw Playwright output at test-output.log (this run used only the chromium browser project). Produce a JSON file at streamlit_app/data/${SLUG}-test-results.json that matches EXACTLY the schema of streamlit_app/data/saucedemo-checkout-test-results.json -- read that file first as the schema reference (keys: meta, summary, suites, use_cases, business_rules, tests, defects). Populate every test's real pass/fail status from test-output.log using only a chromium key (no firefox/webkit keys). If the test plan doesn't define explicit business-rule labels, leave business_rule as an empty string on every test and business_rules as an empty object -- do not invent business rules that aren't in the source material. Only write this one file -- do not modify specs/, tests/, or any .claude/ file." \
             --dangerously-skip-permissions
 
+      - name: Stamp dashboard data with exact timestamp
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
+            node .github/scripts/stamp-report-timestamp.js "streamlit_app/data/${SLUG}-test-results.json"
+          fi
+
       - name: Set final status
         run: |
           RESULT_LINE=$(grep -E "[0-9]+ (passed|failed|skipped)" test-output.log | tail -3 | tr '\n' ' ')
