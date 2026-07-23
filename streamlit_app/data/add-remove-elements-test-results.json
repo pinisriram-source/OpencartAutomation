@@ -8,20 +8,20 @@
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/add-remove-elements --project=chromium",
-    "duration_minutes": 2.8,
+    "duration_minutes": 2.7,
     "test_plan_path": "specs/add-remove-elements-test-plan.md",
     "suite_path": "tests/add-remove-elements/",
     "story": "",
-    "report_generated_at": "2026-07-23T16:38:38.087Z"
+    "report_generated_at": "2026-07-23T17:02:46.473Z"
   },
   "summary": {
     "test_cases": 25,
     "browsers": 1,
     "executions": 25,
-    "passed": 18,
-    "failed": 7,
+    "passed": 19,
+    "failed": 6,
     "skipped": 0,
-    "success_rate": 72,
+    "success_rate": 76,
     "healing_actions": 0,
     "status": "FAIL"
   },
@@ -225,8 +225,8 @@
       "title": "No JavaScript Errors in Console",
       "use_case": "NEG",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-004"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-023",
@@ -242,7 +242,7 @@
       "use_case": "NEG",
       "business_rule": "",
       "chromium": "Fail",
-      "note": "BUG-005"
+      "note": "BUG-004"
     },
     {
       "id": "TC-ADDREMOVE-025",
@@ -258,8 +258,8 @@
       "id": "BUG-001",
       "severity": "Low",
       "title": "Empty #elements container is hidden (not visible) when it contains no buttons",
-      "steps": "Navigate to the page (or delete all buttons). Inspect the #elements container.",
-      "expected": "The Delete button container element exists and is visible (even if empty).",
+      "steps": "Navigate to the page (or delete all buttons / refresh the page) so that zero Delete buttons exist.",
+      "expected": "The #elements container div exists in the DOM and is visible (even if empty).",
       "actual": "The #elements div resolves in the DOM but Playwright reports it as hidden because it has no rendered height when empty.",
       "test_ref": "TC-ADDREMOVE-001, TC-ADDREMOVE-015, TC-ADDREMOVE-021"
     },
@@ -278,22 +278,13 @@
       "title": "Clicking the container area between Delete buttons removes a button",
       "steps": "Add 3 Delete buttons. Click the container area between or around the buttons (not a button itself).",
       "expected": "No buttons are removed; button count remains 3.",
-      "actual": "A button is removed; button count drops to 2. The click event propagates from the container to a child button.",
+      "actual": "A button is removed; button count drops to 2. The click event propagates from the container to a child button or the click target resolves to a button.",
       "test_ref": "TC-ADDREMOVE-017"
     },
     {
       "id": "BUG-004",
-      "severity": "Low",
-      "title": "Page loads external resources that fail with ERR_NAME_NOT_RESOLVED",
-      "steps": "Navigate to the page and monitor console/network errors during add/delete operations.",
-      "expected": "No critical errors in the browser console.",
-      "actual": "Two 'Failed to load resource: net::ERR_NAME_NOT_RESOLVED' errors appear in the console from external resource references.",
-      "test_ref": "TC-ADDREMOVE-022"
-    },
-    {
-      "id": "BUG-005",
       "severity": "Medium",
-      "title": "Add Element control is an anchor tag, not a button — first Tab focus lands on wrong element",
+      "title": "Add Element control is an anchor tag, not a button — keyboard Tab focus lands on wrong element type",
       "steps": "Navigate to the page. Press Tab to focus the 'Add Element' control.",
       "expected": "The focused element is a BUTTON with text 'Add Element'.",
       "actual": "The focused element is an A (anchor) tag. The 'Add Element' control is implemented as a link, not a semantic button, so Tab order and element type assertions expecting BUTTON fail.",
