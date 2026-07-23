@@ -537,6 +537,6 @@ and automation suite.*
 
 st.divider()
 st.caption(
-    "Showing results from the current automation suite run: "
+    "Submit the request for the current automation suite run: "
     f"[{meta['suite_path']}]({github_url(meta['suite_path'])})  —  user story {meta['story']}."
 )
