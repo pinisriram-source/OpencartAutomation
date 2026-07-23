@@ -17,12 +17,12 @@
     "test_cases": 23,
     "browsers": 1,
     "executions": 23,
-    "passed": 22,
-    "failed": 1,
+    "passed": 23,
+    "failed": 0,
     "skipped": 0,
-    "success_rate": 95.65,
-    "healing_actions": 0,
-    "status": "FAIL"
+    "success_rate": 100,
+    "healing_actions": 1,
+    "status": "PASS"
   },
   "suites": [
     {
@@ -189,8 +189,8 @@
       "title": "Invalid Password Shows Error Message",
       "use_case": "PLAN",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": "Healed: removed redundant ambiguous getByText assertion, kept page-object locator #error"
     },
     {
       "id": "TC-LOGIN-004",
@@ -257,15 +257,5 @@
       "note": ""
     }
   ],
-  "defects": [
-    {
-      "id": "BUG-001",
-      "severity": "Low",
-      "title": "Strict mode violation: getByText matches two elements for password error message",
-      "steps": "Navigate to login page, enter valid username 'student' with invalid password 'wrongpassword', click Submit.",
-      "expected": "Error message 'Your password is invalid!' is displayed and locator resolves to a single visible element.",
-      "actual": "getByText('Your password is invalid!') resolves to 2 elements (div#error and a nested <b> tag), causing a Playwright strict mode violation. The error message IS displayed correctly to the user but the test locator is ambiguous.",
-      "test_ref": "TC-LOGIN-003"
-    }
-  ]
+  "defects": []
 }

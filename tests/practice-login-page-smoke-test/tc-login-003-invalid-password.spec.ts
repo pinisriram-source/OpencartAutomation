@@ -33,10 +33,7 @@ test.describe('Practice Login Page Tests', () => {
     // expect: Page remains on login page (URL unchanged)
     await expect(page).toHaveURL('https://practicetestautomation.com/practice-test-login/');
     
-    // expect: Error message 'Your password is invalid!' is displayed
-    await expect(page.getByText('Your password is invalid!')).toBeVisible();
-    
-    // expect: Error message is visible to the user
+    // expect: Error message 'Your password is invalid!' is displayed and visible to the user
     await loginPage.verifyErrorMessage('Your password is invalid!');
     
     // expect: Username and password fields are still present

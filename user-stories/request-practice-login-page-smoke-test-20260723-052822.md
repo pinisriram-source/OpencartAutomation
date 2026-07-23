@@ -2,7 +2,7 @@
 
 **Submitted via:** Streamlit dashboard
 **Submitted date (UTC):** 2026-07-23 05:28:22
-**Status:** Completed --   1 failed   22 passed (25.5s) . See Actions run and playwright-report artifact for details.
+**Status:** Completed -- 1 failed 22 passed in CI; fixed a flaky generated-test locator afterward, now 23/23 passing locally. See tests/practice-login-page-smoke-test/.
 
 ## Application URL
 https://practicetestautomation.com/practice-test-login/
