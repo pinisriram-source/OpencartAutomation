@@ -343,7 +343,6 @@ with tab_defects:
 # --- Submit New Request tab ------------------------------------------------------
 with tab_submit:
     st.subheader("Submit New Testing Request")
-    st.caption("Without the correct pipeline passphrase, this re-runs the existing SauceDemo suite only.")
     st.caption(
         "Submit the request for the current automation suite run: "
         f"[{meta['suite_path']}]({github_url(meta['suite_path'])})  —  user story {meta['story']}."
