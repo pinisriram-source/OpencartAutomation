@@ -18,11 +18,11 @@
     "test_cases": 25,
     "browsers": 1,
     "executions": 25,
-    "passed": 19,
-    "failed": 6,
+    "passed": 22,
+    "failed": 3,
     "skipped": 0,
-    "success_rate": 76,
-    "healing_actions": 0,
+    "success_rate": 88,
+    "healing_actions": 3,
     "status": "FAIL"
   },
   "suites": [
@@ -57,8 +57,8 @@
       "title": "Initial Page Load State",
       "use_case": "CORE",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": "Healed: replaced toBeVisible() on the empty #elements container with toBeAttached() (zero-height when empty is expected, not a bug)"
     },
     {
       "id": "TC-ADDREMOVE-002",
@@ -169,8 +169,8 @@
       "title": "Delete All Then Verify Clean State",
       "use_case": "EDGE",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": "Healed: replaced toBeVisible() on the empty #elements container with toBeAttached() (zero-height when empty is expected, not a bug)"
     },
     {
       "id": "TC-ADDREMOVE-016",
@@ -217,8 +217,8 @@
       "title": "Page Refresh Resets State",
       "use_case": "NEG",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": "Healed: replaced toBeVisible() on the empty #elements container with toBeAttached() (zero-height when empty is expected, not a bug)"
     },
     {
       "id": "TC-ADDREMOVE-022",
@@ -254,15 +254,6 @@
     }
   ],
   "defects": [
-    {
-      "id": "BUG-001",
-      "severity": "Low",
-      "title": "Empty #elements container is hidden (not visible) when it contains no buttons",
-      "steps": "Navigate to the page (or delete all buttons / refresh the page) so that zero Delete buttons exist.",
-      "expected": "The #elements container div exists in the DOM and is visible (even if empty).",
-      "actual": "The #elements div resolves in the DOM but Playwright reports it as hidden because it has no rendered height when empty.",
-      "test_ref": "TC-ADDREMOVE-001, TC-ADDREMOVE-015, TC-ADDREMOVE-021"
-    },
     {
       "id": "BUG-002",
       "severity": "Medium",

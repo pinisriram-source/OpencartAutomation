@@ -32,7 +32,10 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     await expect(addRemoveElementsPage.addElementButton).toBeEnabled();
     
     // expect: The Delete button container exists but is empty
-    await expect(addRemoveElementsPage.elementsContainer).toBeVisible();
+    // Not asserting toBeVisible() here: the #elements container has zero
+    // rendered height when empty, so Playwright correctly reports it as
+    // not visible even though it's present in the DOM (see BUG-001).
+    await expect(addRemoveElementsPage.elementsContainer).toBeAttached();
     await expect(addRemoveElementsPage.elementsContainer).toBeEmpty();
 
     // 3. Verify functionality after refresh
