@@ -537,6 +537,6 @@ and automation suite.*
 
 st.divider()
 st.caption(
-    "Generated from the Playwright automation suite in "
-    f"[{meta['suite_path']}]({github_url(meta['suite_path'])}) for user story {meta['story']}."
+    "Showing results from the current automation suite run: "
+    f"[{meta['suite_path']}]({github_url(meta['suite_path'])})  —  user story {meta['story']}."
 )
