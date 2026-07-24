@@ -1,0 +1,388 @@
+{
+  "meta": {
+    "app_under_test": "Key Presses",
+    "app_url": "https://the-internet.herokuapp.com/key_presses",
+    "report_date": "2026-07-24",
+    "test_account": "",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/key-presses --project=chromium",
+    "duration_minutes": 0.8,
+    "test_plan_path": "specs/key-presses-test-plan.md",
+    "suite_path": "tests/key-presses/",
+    "story": "",
+    "report_generated_at": "2026-07-24T08:52:01.278Z"
+  },
+  "summary": {
+    "test_cases": 35,
+    "browsers": 1,
+    "executions": 35,
+    "passed": 35,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "healing_actions": 0,
+    "status": "PASS"
+  },
+  "suites": [
+    {
+      "name": "Initial Page State",
+      "use_case": "UC1",
+      "file": "initial-state.spec.ts",
+      "tests": 1
+    },
+    {
+      "name": "Letter Keys",
+      "use_case": "UC1",
+      "file": "letter-keys.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Number Keys",
+      "use_case": "UC1",
+      "file": "number-keys.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Special Keys",
+      "use_case": "UC2",
+      "file": "special-keys.spec.ts",
+      "tests": 6
+    },
+    {
+      "name": "Arrow Keys",
+      "use_case": "UC2",
+      "file": "arrow-keys.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Navigation Keys",
+      "use_case": "UC2",
+      "file": "navigation-keys.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Modifier Keys",
+      "use_case": "UC3",
+      "file": "modifier-keys.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Function Keys",
+      "use_case": "UC3",
+      "file": "function-keys.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Global Key Detection",
+      "use_case": "UC4",
+      "file": "global-detection.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "URL Stability",
+      "use_case": "UC5",
+      "file": "url-stability.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Edge Cases and Boundary Conditions",
+      "use_case": "UC6",
+      "file": "edge-cases.spec.ts",
+      "tests": 6
+    }
+  ],
+  "use_cases": {
+    "UC1": "Initial Page State and Basic Key Detection — verify page loads correctly, letter and number key presses are detected and displayed",
+    "UC2": "Special Keys and Navigation Keys — verify special keys (Enter, Space, Escape, Tab, Backspace, Delete) and navigation/arrow keys are detected",
+    "UC3": "Modifier Keys and Function Keys — verify modifier keys (Shift, Control, Alt) and function keys (F1-F12) are detected",
+    "UC4": "Global Key Detection and Focus Behavior — verify key presses are detected globally regardless of input focus state",
+    "UC5": "URL Stability and Navigation Safety — verify URL remains stable for most key presses except form submission via Enter",
+    "UC6": "Edge Cases and Boundary Conditions — verify rapid key presses, key holding, mixed case, special characters, and keyboard shortcuts"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-KEYPRESS-001",
+      "title": "Verify initial page state on load",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-002",
+      "title": "Single lowercase letter key press displays uppercase key name",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-003",
+      "title": "Multiple letter key presses show only the latest key",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-004",
+      "title": "Number key press displays the number",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-005",
+      "title": "All number keys are detected correctly",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-006",
+      "title": "Enter key detection displays ENTER",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-007",
+      "title": "Space key detection displays SPACE",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-008",
+      "title": "Escape key detection displays ESCAPE",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-009",
+      "title": "Tab key detection displays TAB and moves focus",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-010",
+      "title": "Backspace key detection displays BACK_SPACE",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-011",
+      "title": "Delete key detection displays DELETE",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-012",
+      "title": "Arrow keys detection - Up arrow displays UP",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-013",
+      "title": "All arrow keys are detected correctly",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-014",
+      "title": "Home key detection displays HOME",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-015",
+      "title": "End key detection displays END",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-016",
+      "title": "Page Down key detection displays PAGE_DOWN",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-017",
+      "title": "Page Up key detection displays PAGE_UP",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-018",
+      "title": "Shift modifier key detection displays SHIFT",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-019",
+      "title": "Control modifier key detection displays CONTROL",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-020",
+      "title": "Alt modifier key detection displays ALT",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-021",
+      "title": "Function key F1 detection displays F1",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-022",
+      "title": "Multiple function keys are detected correctly",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-023",
+      "title": "Key press detected without input focus",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-024",
+      "title": "Special keys detected globally without focus",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-025",
+      "title": "Key detection after focus is moved away from input",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-026",
+      "title": "URL remains stable for most key presses",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-027",
+      "title": "Enter key with focused input submits form and changes URL",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-028",
+      "title": "Enter key without focused input does not change URL",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-029",
+      "title": "Function keys do not trigger browser navigation",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-030",
+      "title": "Rapid successive key presses update message correctly",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-031",
+      "title": "Holding down a key continuously updates the message",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-032",
+      "title": "Mixed case letters all display as uppercase",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-033",
+      "title": "Special characters and symbols detection",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-034",
+      "title": "Empty input field after form submission via Enter",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-KEYPRESS-035",
+      "title": "Keyboard shortcut combinations are detected as individual keys",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": []
+}
