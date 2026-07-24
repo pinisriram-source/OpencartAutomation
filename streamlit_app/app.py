@@ -91,13 +91,15 @@ def discover_suites() -> list[Path]:
     return sorted(DATA_DIR.glob("*-test-results.json"), key=sort_key, reverse=True)
 
 
-@st.cache_data
 def load_data(path_str: str) -> dict:
+    # Deliberately uncached: these files are rewritten by every pipeline run
+    # and the suite picker keys purely on file path, so a cache here would
+    # keep serving whatever snapshot this process first read indefinitely,
+    # even after the underlying file changes. They're small; re-reading is free.
     with open(path_str, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-@st.cache_data
 def find_test_block(suite_dir_str: str, test_id: str) -> tuple[str, str] | tuple[None, None]:
     """Locate the *.spec.ts file containing `test_id` and extract just that test()'s body.
 
