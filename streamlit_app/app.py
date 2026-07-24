@@ -692,22 +692,39 @@ and automation suite.*
         value=st.session_state.get("last_request_path", ""),
         placeholder="user-stories/request-my-title-20260722-060822.md",
     )
-    if st.button("Check Status"):
+    auto_refresh_status = st.checkbox(
+        "Auto-refresh every 10s",
+        value=False,
+        help="Keeps re-checking this path on its own -- handy while a full-pipeline run is in progress, instead of repeatedly clicking Check Status.",
+    )
+    manual_check = st.button("Check Status")
+
+    @st.fragment(run_every=10 if auto_refresh_status else None)
+    def render_status_fragment() -> None:
+        if not (auto_refresh_status or manual_check):
+            return
         if not status_path.strip():
             st.error("Enter a request file path first.")
+            return
+        file_result = get_file(
+            owner=GITHUB_OWNER,
+            repo=GITHUB_REPO,
+            path=status_path.strip(),
+            ref=GITHUB_BRANCH,
+            token=get_github_token(),
+        )
+        if file_result.success:
+            status_match = re.search(r"^\*\*Status:\*\*\s*(.*)$", file_result.content, re.MULTILINE)
+            status_text = status_match.group(1) if status_match else "(no Status line found)"
+            st.info(status_text)
+            if auto_refresh_status:
+                st.caption(
+                    f"Last checked {datetime.now(timezone.utc).strftime('%H:%M:%S')} UTC -- "
+                    "auto-refreshing every 10s."
+                )
+            if file_result.html_url:
+                st.markdown(f"[View the full request file on GitHub]({file_result.html_url})")
         else:
-            file_result = get_file(
-                owner=GITHUB_OWNER,
-                repo=GITHUB_REPO,
-                path=status_path.strip(),
-                ref=GITHUB_BRANCH,
-                token=get_github_token(),
-            )
-            if file_result.success:
-                status_match = re.search(r"^\*\*Status:\*\*\s*(.*)$", file_result.content, re.MULTILINE)
-                status_text = status_match.group(1) if status_match else "(no Status line found)"
-                st.info(status_text)
-                if file_result.html_url:
-                    st.markdown(f"[View the full request file on GitHub]({file_result.html_url})")
-            else:
-                st.error(file_result.message)
+            st.error(file_result.message)
+
+    render_status_fragment()
