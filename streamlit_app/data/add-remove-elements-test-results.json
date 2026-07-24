@@ -2,28 +2,28 @@
   "meta": {
     "app_under_test": "Add/Remove Elements",
     "app_url": "https://the-internet.herokuapp.com/add_remove_elements/",
-    "report_date": "2026-07-23",
+    "report_date": "2026-07-24",
     "test_account": "",
     "browsers": [
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/add-remove-elements --project=chromium",
-    "duration_minutes": 2.7,
+    "duration_minutes": 0.8,
     "test_plan_path": "specs/add-remove-elements-test-plan.md",
     "suite_path": "tests/add-remove-elements/",
     "story": "",
-    "report_generated_at": "2026-07-23T17:02:46.473Z"
+    "report_generated_at": "2026-07-24T05:32:22.276Z"
   },
   "summary": {
     "test_cases": 25,
     "browsers": 1,
     "executions": 25,
-    "passed": 25,
-    "failed": 0,
+    "passed": 24,
+    "failed": 1,
     "skipped": 0,
-    "success_rate": 100,
-    "healing_actions": 6,
-    "status": "PASS"
+    "success_rate": 96,
+    "healing_actions": 0,
+    "status": "FAIL"
   },
   "suites": [
     {
@@ -58,7 +58,7 @@
       "use_case": "CORE",
       "business_rule": "",
       "chromium": "Pass",
-      "note": "Healed: replaced toBeVisible() on the empty #elements container with toBeAttached() (zero-height when empty is expected, not a bug)"
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-002",
@@ -170,7 +170,7 @@
       "use_case": "EDGE",
       "business_rule": "",
       "chromium": "Pass",
-      "note": "Healed: replaced toBeVisible() on the empty #elements container with toBeAttached() (zero-height when empty is expected, not a bug)"
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-016",
@@ -178,7 +178,7 @@
       "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
-      "note": "Healed: expected count corrected to 3 (double-click removes 2 adjacent buttons on this site, confirmed real behavior, see BUG-002)"
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-017",
@@ -186,7 +186,7 @@
       "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
-      "note": "Healed: expected count corrected -- the click position lands on the first button, not empty container space, so a button IS removed (confirmed real behavior, see BUG-003)"
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-018",
@@ -218,15 +218,15 @@
       "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
-      "note": "Healed: replaced toBeVisible() on the empty #elements container with toBeAttached() (zero-height when empty is expected, not a bug)"
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-022",
       "title": "No JavaScript Errors in Console",
       "use_case": "NEG",
       "business_rule": "",
-      "chromium": "Pass",
-      "note": ""
+      "chromium": "Fail",
+      "note": "BUG-001"
     },
     {
       "id": "TC-ADDREMOVE-023",
@@ -242,7 +242,7 @@
       "use_case": "NEG",
       "business_rule": "",
       "chromium": "Pass",
-      "note": "Healed: BUG-004 was a false finding, not a real site defect -- Add Element genuinely is a <button> (confirmed via accessibility snapshot); the first Tab stop is actually the page's \"Fork me on GitHub\" ribbon link, so the test needed two Tab presses, not one"
+      "note": ""
     },
     {
       "id": "TC-ADDREMOVE-025",
@@ -253,5 +253,15 @@
       "note": ""
     }
   ],
-  "defects": []
+  "defects": [
+    {
+      "id": "BUG-001",
+      "severity": "Low",
+      "title": "Page loads external resources that fail DNS resolution (ERR_NAME_NOT_RESOLVED)",
+      "steps": "Navigate to the Add/Remove Elements page, perform mixed operations (add 10 buttons, delete 5, add 3, delete all), then check the browser console for errors.",
+      "expected": "No critical JavaScript errors are logged during add/delete operations.",
+      "actual": "Two 'Failed to load resource: net::ERR_NAME_NOT_RESOLVED' errors are logged in the console from external resource requests that cannot be resolved.",
+      "test_ref": "TC-ADDREMOVE-022"
+    }
+  ]
 }
