@@ -227,15 +227,15 @@ k6.metric("Failed", summary["failed"], delta=None)
 
 st.divider()
 
-tab_overview, tab_matrix, tab_usecase, tab_rules, tab_details, tab_defects, tab_submit = st.tabs(
+tab_submit, tab_overview, tab_matrix, tab_usecase, tab_rules, tab_details, tab_defects = st.tabs(
     [
+        "Submit New Request",
         "Overview",
         "Test Execution Matrix",
         "Coverage by Use Case",
         "Coverage by Business Rule",
         "Test Case Detail",
         "Defects Log",
-        "Submit New Request",
     ]
 )
 
