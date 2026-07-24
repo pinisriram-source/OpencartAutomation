@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "app_under_test": "Context Menu",
+    "app_url": "https://the-internet.herokuapp.com/context_menu",
+    "report_date": "2026-07-24",
+    "test_account": "",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/context-menu --project=chromium",
+    "duration_minutes": 0.3,
+    "test_plan_path": "specs/context-menu-test-plan.md",
+    "suite_path": "tests/context-menu/",
+    "story": "",
+    "report_generated_at": "2026-07-24T13:26:06.748Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30095494181"
+  },
+  "summary": {
+    "test_cases": 10,
+    "browsers": 1,
+    "executions": 10,
+    "passed": 7,
+    "failed": 1,
+    "skipped": 2,
+    "success_rate": 70,
+    "healing_actions": 0,
+    "status": "FAIL"
+  },
+  "suites": [
+    {
+      "name": "Initial Page State",
+      "use_case": "AC1",
+      "file": "page-load-hot-spot-visible.spec.ts",
+      "tests": 1
+    },
+    {
+      "name": "Right-Click Alert Behavior - Happy Path",
+      "use_case": "AC2",
+      "file": "right-click-triggers-alert.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Negative Cases and Boundary Conditions",
+      "use_case": "AC3",
+      "file": "right-click-outside-no-alert.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Edge Cases and Additional Validation",
+      "use_case": "AC4",
+      "file": "border-click-triggers-alert.spec.ts",
+      "tests": 2
+    }
+  ],
+  "use_cases": {
+    "AC1": "Initial Page State — page loads with correct heading, instructional text, and hot spot element",
+    "AC2": "Right-Click Alert Behavior — right-click inside hot spot triggers JavaScript alert dialog",
+    "AC3": "Negative Cases and Boundary Conditions — verify alert only triggers under correct conditions",
+    "AC4": "Edge Cases and Additional Validation — border clicks and exact message validation"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-CONTEXTMENU-001",
+      "title": "Verify page loads with hot spot box visible and properly styled",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CONTEXTMENU-002",
+      "title": "Right-click inside hot spot triggers alert with exact message",
+      "use_case": "AC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CONTEXTMENU-003",
+      "title": "Dismissing the alert leaves page in normal state with no navigation",
+      "use_case": "AC2",
+      "business_rule": "",
+      "chromium": "Skip",
+      "note": "Spec file not generated"
+    },
+    {
+      "id": "TC-CONTEXTMENU-004",
+      "title": "Right-clicking hot spot repeatedly triggers alert each time (repeatable behavior)",
+      "use_case": "AC2",
+      "business_rule": "",
+      "chromium": "Skip",
+      "note": "Spec file not generated"
+    },
+    {
+      "id": "TC-CONTEXTMENU-005",
+      "title": "Right-clicking outside the hot spot does NOT trigger the alert",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CONTEXTMENU-006",
+      "title": "URL remains unchanged throughout all interactions",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CONTEXTMENU-007",
+      "title": "Left-clicking inside the hot spot does NOT trigger the alert",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CONTEXTMENU-008",
+      "title": "Page content remains intact after multiple alert dismiss cycles",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-CONTEXTMENU-009",
+      "title": "Right-click on the edge/border of the hot spot triggers the alert",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-CONTEXTMENU-010",
+      "title": "Alert message is exact and case-sensitive",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": [
+    {
+      "id": "BUG-001",
+      "severity": "Low",
+      "title": "Dialog handler race condition causes failure on repeated right-click alert cycles",
+      "steps": "Navigate to the context menu page, right-click the hot spot 5 times in succession, dismissing each alert.",
+      "expected": "Each right-click triggers a new alert that can be accepted independently, and page content remains intact after all cycles.",
+      "actual": "Test fails with 'Cannot accept dialog which is already handled!' — the dialog is auto-dismissed before the explicit accept call, causing a race condition in the handler on repeated alert cycles.",
+      "test_ref": "TC-CONTEXTMENU-008"
+    }
+  ]
+}
