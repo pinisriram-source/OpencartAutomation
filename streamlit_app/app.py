@@ -448,9 +448,11 @@ with tab_details:
 
         if block is None:
             st.warning(
-                "Couldn't find this test's spec file in the app's current checkout. "
-                "This can happen right after a new pipeline run if the app hasn't "
-                "redeployed/rebooted yet -- try rebooting the app."
+                "Couldn't find this test's spec file. Either the automation generator didn't "
+                "actually produce it (check the note column in the Test Execution Matrix -- "
+                "e.g. a 'Skip' result with 'spec file not generated' means the test plan called "
+                "for it but the suite doesn't have it), or the app's checkout is behind a very "
+                "recent pipeline run and hasn't picked it up yet -- try rebooting the app."
             )
         else:
             st.caption(f"Source: [{spec_path}]({github_url(spec_path)})")
