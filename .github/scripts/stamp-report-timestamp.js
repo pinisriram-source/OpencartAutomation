@@ -1,8 +1,11 @@
-// Sets meta.report_generated_at on a suite's dashboard-data JSON to the
-// current UTC instant. meta.report_date only has day granularity, so two
-// suites run on the same calendar day tie when the dashboard sorts "most
-// recent first" -- this field gives that sort second-level precision
-// without depending on the LLM-generated JSON to format a timestamp itself.
+// Sets meta.report_generated_at and meta.workflow_run_url on a suite's
+// dashboard-data JSON. report_generated_at gives the "most recent first"
+// sort second-level precision (meta.report_date is day-only, so two suites
+// run on the same calendar day would otherwise tie). workflow_run_url links
+// failed tests back to the Actions run that produced them, where the
+// playwright-report artifact holds each failure's screenshot/trace/video --
+// neither is trusted to the LLM-generated JSON; both are stamped
+// deterministically here from the job's own environment.
 const fs = require("fs");
 
 const filePath = process.argv[2];
@@ -13,5 +16,14 @@ if (!filePath) {
 
 const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
 data.meta.report_generated_at = new Date().toISOString();
+
+const { GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID } = process.env;
+if (GITHUB_SERVER_URL && GITHUB_REPOSITORY && GITHUB_RUN_ID) {
+  data.meta.workflow_run_url = `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
+}
+
 fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
 console.log(`Stamped ${filePath} with report_generated_at=${data.meta.report_generated_at}`);
+if (data.meta.workflow_run_url) {
+  console.log(`Stamped ${filePath} with workflow_run_url=${data.meta.workflow_run_url}`);
+}

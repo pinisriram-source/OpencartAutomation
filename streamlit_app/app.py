@@ -491,6 +491,20 @@ with tab_details:
             else:
                 st.caption("No further expected-vs-actual detail recorded for this result.")
 
+            if outcome == "fail":
+                run_url = meta.get("workflow_run_url")
+                if run_url:
+                    st.markdown(
+                        f"[View failure screenshot, trace & video for this run]({run_url}) "
+                        "-- in the `playwright-report` artifact at the bottom of the run page "
+                        "(Playwright captures a screenshot automatically for every failed test)."
+                    )
+                else:
+                    st.caption(
+                        "No linked Actions run recorded for this suite (generated before this "
+                        "feature was added) -- screenshot unavailable."
+                    )
+
 # --- Defects Log tab -------------------------------------------------------------
 with tab_defects:
     st.subheader("Defects / Behavior Findings Log")
