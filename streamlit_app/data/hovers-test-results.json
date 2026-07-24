@@ -1,0 +1,294 @@
+{
+  "meta": {
+    "app_under_test": "The Internet - Hovers",
+    "app_url": "https://the-internet.herokuapp.com/hovers",
+    "report_date": "2026-07-24",
+    "test_account": "",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/hovers --project=chromium",
+    "duration_minutes": 1.5,
+    "test_plan_path": "specs/hovers-test-plan.md",
+    "suite_path": "tests/hovers/",
+    "story": "",
+    "report_generated_at": "2026-07-24T07:08:36.699Z"
+  },
+  "summary": {
+    "test_cases": 24,
+    "browsers": 1,
+    "executions": 24,
+    "passed": 21,
+    "failed": 3,
+    "skipped": 0,
+    "success_rate": 87.5,
+    "healing_actions": 0,
+    "status": "FAIL"
+  },
+  "suites": [
+    {
+      "name": "Initial Page State",
+      "use_case": "UC1",
+      "file": "initial-page-state.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Single Image Hover - First Avatar",
+      "use_case": "UC2",
+      "file": "first-avatar-hover.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Single Image Hover - Second Avatar",
+      "use_case": "UC3",
+      "file": "second-avatar-hover.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Single Image Hover - Third Avatar",
+      "use_case": "UC4",
+      "file": "third-avatar-hover.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Sequential Hover Behavior",
+      "use_case": "UC5",
+      "file": "sequential-hover-behavior.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Navigation via View Profile Links",
+      "use_case": "UC6",
+      "file": "view-profile-navigation.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Negative and Boundary Tests",
+      "use_case": "UC7",
+      "file": "negative-boundary-tests.spec.ts",
+      "tests": 5
+    },
+    {
+      "name": "Caption Content Verification",
+      "use_case": "UC8",
+      "file": "caption-content-verification.spec.ts",
+      "tests": 4
+    }
+  ],
+  "use_cases": {
+    "UC1": "Initial Page State — page loads with three avatars and no visible captions",
+    "UC2": "Single Image Hover - First Avatar — hovering reveals user1 caption and link",
+    "UC3": "Single Image Hover - Second Avatar — hovering reveals user2 caption and link",
+    "UC4": "Single Image Hover - Third Avatar — hovering reveals user3 caption and link",
+    "UC5": "Sequential Hover Behavior — moving between avatars shows only one caption at a time",
+    "UC6": "Navigation via View Profile Links — clicking profile links navigates to user pages",
+    "UC7": "Negative and Boundary Tests — hovering alone does not navigate, captions hide correctly",
+    "UC8": "Caption Content Verification — caption text and link hrefs are correct"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-HOVERS-001",
+      "title": "Verify page load shows three avatar images with no visible captions",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-002",
+      "title": "Verify all three avatar images are rendered correctly",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-003",
+      "title": "Hovering over first avatar reveals user1 caption and link",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-004",
+      "title": "Moving mouse away from first avatar hides its caption",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-005",
+      "title": "Hovering over second avatar reveals user2 caption and link",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-006",
+      "title": "Moving mouse away from second avatar hides its caption",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-007",
+      "title": "Hovering over third avatar reveals user3 caption and link",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-008",
+      "title": "Moving mouse away from third avatar hides its caption",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-009",
+      "title": "Hovering from first to second avatar hides first caption and shows second",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-010",
+      "title": "Hovering from second to third avatar hides second caption and shows third",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-011",
+      "title": "Hovering from third to first avatar hides third caption and shows first",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-012",
+      "title": "Hovering all three avatars in sequence shows only one caption at a time",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-013",
+      "title": "Clicking View profile link for user1 navigates to /users/1",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-HOVERS-014",
+      "title": "Clicking View profile link for user2 navigates to /users/2",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-HOVERS-015",
+      "title": "Clicking View profile link for user3 navigates to /users/3",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Fail",
+      "note": "BUG-001"
+    },
+    {
+      "id": "TC-HOVERS-016",
+      "title": "Hovering over page does not trigger navigation",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-017",
+      "title": "Caption remains hidden when hovering outside avatar area",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-018",
+      "title": "Rapid hover changes show correct caption without delay",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-019",
+      "title": "Caption hides correctly when mouse leaves page viewport while hovering",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-020",
+      "title": "View profile link is not clickable when caption is hidden",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-021",
+      "title": "First avatar caption displays correct user name format",
+      "use_case": "UC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-022",
+      "title": "Second avatar caption displays correct user name format",
+      "use_case": "UC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-023",
+      "title": "Third avatar caption displays correct user name format",
+      "use_case": "UC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-HOVERS-024",
+      "title": "All View profile links have correct href attributes",
+      "use_case": "UC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": [
+    {
+      "id": "BUG-001",
+      "severity": "Medium",
+      "title": "View profile navigation fails — target page returns empty title",
+      "steps": "Navigate to /hovers, hover over any avatar, click the 'View profile' link.",
+      "expected": "Browser navigates to /users/[1-3] and the page loads with title 'The Internet'.",
+      "actual": "Navigation to /users/[1-3] results in a page with an empty title; toHaveTitle('The Internet') times out after 10 seconds.",
+      "test_ref": "TC-HOVERS-013, TC-HOVERS-014, TC-HOVERS-015"
+    }
+  ]
+}
