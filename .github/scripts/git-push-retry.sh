@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Retries `git push` against a moving main branch. The full-pipeline workflow
-# commits and pushes multiple times over a long-running job, and other
+# Retries `git push` against a moving main branch. The pipeline-plan.yml /
+# pipeline-automation.yml / pipeline-execute.yml workflows each commit and
+# push multiple times over a long-running job, and other
 # commits (manual pushes, concurrent workflow runs) can land on main in
 # between -- a bare `git push` then gets rejected as non-fast-forward and
 # aborts the whole job. Merge in the latest origin/main and retry instead.

@@ -1,0 +1,152 @@
+name: Pipeline Stage 3 - Execute and Report
+
+# Third and final stage of the human-reviewed pipeline (see pipeline-plan.yml
+# and pipeline-automation.yml for the other two stages). Only runs once the
+# automation suite has been approved in the Streamlit dashboard's Review tab
+# -- refuses to run out of order otherwise. Runs the suite, generates the
+# dashboard-data JSON, and commits the final report.
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_file:
+        description: 'Path to the user-stories/request-*.md file to process'
+        required: true
+        type: string
+      slug:
+        description: 'Deterministic slug for output paths (specs/<slug>-test-plan.md, tests/<slug>/)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-pipeline-${{ inputs.slug }}
+  cancel-in-progress: false
+
+jobs:
+  execute-and-report:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_USE_BEDROCK: "1"
+      AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+      AWS_REGION: eu-north-1
+      REQUEST_FILE: ${{ inputs.request_file }}
+      SLUG: ${{ inputs.slug }}
+      REVIEW_FILE: user-stories/${{ inputs.slug }}-review.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin main --quiet
+          git reset --hard origin/main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browser (chromium)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Configure git identity for automated commits
+        run: |
+          git config user.name "qa-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Use a Linux-safe MCP server config for this run
+        run: |
+          cat > .mcp.json <<'EOF'
+          {
+            "mcpServers": {
+              "playwright-test": {
+                "command": "npx",
+                "args": ["playwright", "run-test-mcp-server"]
+              }
+            }
+          }
+          EOF
+
+      - name: Verify automation suite is approved
+        run: |
+          AUTOMATION_STATUS=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" automation status)
+          if [ "$AUTOMATION_STATUS" != "approved" ]; then
+            echo "Automation suite status is '$AUTOMATION_STATUS', not 'approved' -- refusing to execute out of order. Approve the automation suite in the Review tab first."
+            exit 1
+          fi
+
+      - name: Set status -- executing
+        run: |
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage execute --status in_progress
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- automation generated, executing tests (Chromium)"
+          git add "$REVIEW_FILE" "$REQUEST_FILE"
+          git commit -m "chore(pipeline): start execution for $SLUG" || true
+          bash .github/scripts/git-push-retry.sh
+
+      - name: Run the generated suite
+        id: run_tests
+        continue-on-error: true
+        run: |
+          npx playwright test "tests/${SLUG}" --project=chromium --reporter=list,html 2>&1 | tee test-output.log
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Claude Code -- generate dashboard data
+        continue-on-error: true
+        run: |
+          npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md and the raw Playwright output at test-output.log (this run used only the chromium browser project). Produce a JSON file at streamlit_app/data/${SLUG}-test-results.json that matches EXACTLY the schema of streamlit_app/data/saucedemo-checkout-test-results.json -- read that file first as the schema reference (keys: meta, summary, suites, use_cases, business_rules, tests, defects). Populate every test's real pass/fail status from test-output.log using only a chromium key (no firefox/webkit keys). If the test plan doesn't define explicit business-rule labels, leave business_rule as an empty string on every test and business_rules as an empty object -- do not invent business rules that aren't in the source material. Only write this one file -- do not modify specs/, tests/, or any .claude/ file." \
+            --dangerously-skip-permissions
+
+      - name: Stamp dashboard data with exact timestamp
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
+            node .github/scripts/stamp-report-timestamp.js "streamlit_app/data/${SLUG}-test-results.json"
+          fi
+
+      - name: Set final status
+        run: |
+          RESULT_LINE=$(grep -E "[0-9]+ (passed|failed|skipped)" test-output.log | tail -3 | tr '\n' ' ')
+          if [ -z "$RESULT_LINE" ]; then
+            RESULT_LINE="unknown result -- see Actions run log"
+          fi
+          if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
+            git add "streamlit_app/data/${SLUG}-test-results.json"
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage execute --status completed --run-url "$RUN_URL"
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "Completed -- ${RESULT_LINE}. See Actions run and playwright-report artifact for details."
+          git add "$REVIEW_FILE" "$REQUEST_FILE"
+          git commit -m "chore(pipeline): mark $SLUG complete -- ${RESULT_LINE}"
+          bash .github/scripts/git-push-retry.sh
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ${{ inputs.slug }}-playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: ${{ inputs.slug }}-test-output-log
+          path: test-output.log
+          retention-days: 30
+
+      - name: Fail the job if tests failed
+        if: steps.run_tests.outputs.exit_code != '0'
+        run: exit 1

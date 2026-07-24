@@ -75,6 +75,70 @@ def create_file(
     return CommitResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")
 
 
+def upsert_file(
+    owner: str,
+    repo: str,
+    branch: str,
+    path: str,
+    content: str,
+    commit_message: str,
+    token: str,
+) -> CommitResult:
+    """Create or update a file via the GitHub Contents API.
+
+    Unlike create_file (which fails on 422 if the file already exists), this
+    looks up the current blob sha first and includes it in the PUT so it can
+    overwrite an existing file. Used for state this app owns end-to-end and
+    revises repeatedly (the review-status JSON), as opposed to create_file's
+    one-shot request-file submissions.
+    """
+    if not token:
+        return CommitResult(False, "No GitHub token configured (see README for setup).")
+
+    url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/{path}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    sha = None
+    try:
+        existing = requests.get(url, headers=headers, params={"ref": branch}, timeout=20)
+        if existing.status_code == 200:
+            sha = existing.json().get("sha")
+    except requests.RequestException as exc:
+        return CommitResult(False, f"Network error contacting GitHub: {exc}")
+
+    payload = {
+        "message": commit_message,
+        "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+        "branch": branch,
+    }
+    if sha:
+        payload["sha"] = sha
+
+    try:
+        resp = requests.put(url, headers=headers, json=payload, timeout=20)
+    except requests.RequestException as exc:
+        return CommitResult(False, f"Network error contacting GitHub: {exc}")
+
+    if resp.status_code in (200, 201):
+        body = resp.json()
+        html_url = body.get("content", {}).get("html_url")
+        commit_sha = body.get("commit", {}).get("sha")
+        return CommitResult(True, "Committed successfully.", html_url, commit_sha)
+
+    if resp.status_code == 401:
+        return CommitResult(False, "GitHub rejected the token (401 Unauthorized). Check GITHUB_TOKEN in secrets.")
+    if resp.status_code == 403:
+        return CommitResult(False, "GitHub token lacks permission for this repo (403 Forbidden).")
+    if resp.status_code == 409:
+        return CommitResult(False, "Conflict (409) -- the file changed since it was last read. Reload and try again.")
+
+    return CommitResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")
+
+
 def wait_for_ref(
     owner: str,
     repo: str,

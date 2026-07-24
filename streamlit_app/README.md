@@ -78,16 +78,35 @@ on submit rather than failing silently.
 becomes visible in public commit history. The form itself warns
 submitters not to paste real secrets or confidential requirements.
 
-## Full AI pipeline (passphrase-gated) — `.github/workflows/full-pipeline.yml`
+## Full AI pipeline (passphrase-gated, human-reviewed) — `pipeline-plan.yml` / `pipeline-automation.yml` / `pipeline-execute.yml`
 
 The form also has an optional **pipeline passphrase** field. If it matches
 the `PIPELINE_PASSPHRASE` Streamlit secret, submitting the form triggers
-`full-pipeline.yml` instead of the default `saucedemo-checkout.yml` re-run:
-a GitHub Actions job that runs Claude Code **non-interactively** to read the
-submitted request and drive plan → generate → execute → commit against it,
-using a deterministic `slug` derived from the title so output paths
-(`specs/<slug>-test-plan.md`, `tests/<slug>/`) don't depend on the model
-guessing a name.
+`pipeline-plan.yml` instead of the default `saucedemo-checkout.yml` re-run --
+the first of three separate GitHub Actions workflows that run Claude Code
+**non-interactively**, one per pipeline stage, with a human review gate
+between each:
+
+1. **`pipeline-plan.yml`** reads the submitted request and produces a test
+   plan (`specs/<slug>-test-plan.md`), then stops.
+2. A stakeholder reviews the plan in the app's **Review Pipeline Artifacts**
+   tab and either **Approves** it (triggers stage 2) or **Requests Changes**
+   with free-text feedback (re-triggers stage 1, which revises the existing
+   plan to address that feedback rather than starting over).
+3. **`pipeline-automation.yml`** (only runs if the plan is `approved`) reads
+   the plan and generates the Playwright automation suite
+   (`tests/<slug>/`), then stops.
+4. Same review loop: **Approve** triggers stage 3, **Request Changes**
+   re-triggers stage 2 with feedback.
+5. **`pipeline-execute.yml`** (only runs if the suite is `approved`) runs the
+   suite, generates the dashboard-data JSON, and commits the final report.
+
+A deterministic `slug` (derived from the request title) ties all three
+stages together, both for output paths and for the review-status file at
+`user-stories/<slug>-review.json` -- the single source of truth each stage
+reads/writes and the Review tab renders. Each stage workflow refuses to run
+if the prior stage isn't `approved` yet, so a stray/out-of-order dispatch
+can't skip review.
 
 This is deliberately **not** exposed to anonymous visitors — only to whoever
 knows the passphrase (you). It exists so that a genuinely new/different
@@ -102,26 +121,28 @@ triggerable by anyone else).
 1. **Streamlit secret** `PIPELINE_PASSPHRASE` — any passphrase you choose,
    added the same way as `GITHUB_TOKEN` above (Streamlit Cloud → Manage app
    → Settings → Secrets, or local `.streamlit/secrets.toml`). Leaving it
-   unset disables the full-pipeline trigger entirely (every submission falls
+   unset disables the pipeline trigger entirely (every submission falls
    back to the default safe behavior).
-2. **GitHub Actions repo secret** `ANTHROPIC_API_KEY` — added at
+2. **GitHub Actions repo secret** `AWS_BEARER_TOKEN_BEDROCK` — added at
    **GitHub → repo → Settings → Secrets and variables → Actions → New
    repository secret**. This is *not* the same as the Streamlit secrets
-   above; it authenticates the Claude Code CLI running inside the CI
-   container, which starts with no credentials of its own (a fresh CI
-   runner has no access to any locally-logged-in Claude Code session).
+   above; it authenticates the Claude Code CLI (via AWS Bedrock) running
+   inside the CI container, which starts with no credentials of its own (a
+   fresh CI runner has no access to any locally-logged-in Claude Code
+   session).
 
-**Status:** each pipeline stage (planning, generation, execution, completion
-or failure) commits an update to the `**Status:**` line in the request file
-itself, so the app's "Check request status" box can show progress by
-re-fetching that one file — no need to inspect the Actions run directly,
-though the workflow run link is also shown after triggering.
+**Status:** each stage commits an update to the `**Status:**` line in the
+request file itself, so the app's "Check request status" box can show
+progress by re-fetching that one file — no need to inspect the Actions run
+directly, though the workflow run link is also shown after triggering. The
+same stages are also reflected, per-artifact, in `user-stories/<slug>-review.json`
+for the Review tab.
 
-**Known limitation:** this is the first version of this workflow. Running
-Claude Code non-interactively with the `playwright-test` MCP server in a
-fresh Ubuntu CI container (as opposed to this interactive session) had not
-been verified end-to-end before it was written — the first real trigger is
-the real test, and the workflow may need iteration (permission flags, MCP
-server startup timing, etc.) if it doesn't behave as expected on the first
-run. A run typically takes **1–2+ hours** and consumes real Anthropic API
-usage.
+**Known limitation:** running Claude Code non-interactively with the
+`playwright-test` MCP server in a fresh Ubuntu CI container (as opposed to
+an interactive session) is still relatively early -- expect to iterate
+(permission flags, MCP server startup timing, etc.) if a run doesn't behave
+as expected. Each stage typically takes a few minutes to tens of minutes
+depending on suite size; the review pauses in between are unbounded (they
+wait on you), so total wall-clock time for a request depends on how quickly
+it's reviewed.

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Updates the "**Status:** ..." line in a submitted user-stories/request-*.md
-// file in place. Used by .github/workflows/full-pipeline.yml to report
-// progress back to the Streamlit app between pipeline stages.
+// file in place. Used by the pipeline-plan.yml / pipeline-automation.yml /
+// pipeline-execute.yml workflows to report progress back to the Streamlit
+// app between pipeline stages.
 //
 // Usage: node set-request-status.js <path-to-request-file> "<new status text>"
 

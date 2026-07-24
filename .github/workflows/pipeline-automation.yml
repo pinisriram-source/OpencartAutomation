@@ -1,0 +1,134 @@
+name: Pipeline Stage 2 - Generate Automation Suite
+
+# Second stage of the human-reviewed pipeline (see pipeline-plan.yml and
+# pipeline-execute.yml for the other two stages). Only runs once the test
+# plan has been approved in the Streamlit dashboard's Review tab -- refuses
+# to run out of order otherwise. Generates the automation suite, or revises
+# it per reviewer feedback, then stops and marks it "pending_review".
+# Approving there dispatches pipeline-execute.yml; requesting changes
+# re-dispatches this same workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_file:
+        description: 'Path to the user-stories/request-*.md file to process'
+        required: true
+        type: string
+      slug:
+        description: 'Deterministic slug for output paths (specs/<slug>-test-plan.md, tests/<slug>/)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-pipeline-${{ inputs.slug }}
+  cancel-in-progress: false
+
+jobs:
+  generate-automation:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_USE_BEDROCK: "1"
+      AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+      AWS_REGION: eu-north-1
+      REQUEST_FILE: ${{ inputs.request_file }}
+      SLUG: ${{ inputs.slug }}
+      REVIEW_FILE: user-stories/${{ inputs.slug }}-review.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin main --quiet
+          git reset --hard origin/main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browser (chromium)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Configure git identity for automated commits
+        run: |
+          git config user.name "qa-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Use a Linux-safe MCP server config for this run
+        run: |
+          cat > .mcp.json <<'EOF'
+          {
+            "mcpServers": {
+              "playwright-test": {
+                "command": "npx",
+                "args": ["playwright", "run-test-mcp-server"]
+              }
+            }
+          }
+          EOF
+
+      - name: Verify test plan is approved
+        run: |
+          PLAN_STATUS=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" plan status)
+          if [ "$PLAN_STATUS" != "approved" ]; then
+            echo "Test plan status is '$PLAN_STATUS', not 'approved' -- refusing to generate automation out of order. Approve the test plan in the Review tab first."
+            exit 1
+          fi
+
+      - name: Set status -- generating automation
+        run: |
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status in_progress
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- generating automation suite"
+          git add "$REVIEW_FILE" "$REQUEST_FILE"
+          git commit -m "chore(pipeline): start automation generation for $SLUG" || true
+          bash .github/scripts/git-push-retry.sh
+
+      - name: Claude Code -- generate or revise automation suite
+        run: |
+          FEEDBACK=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" automation feedback)
+          if [ -n "$FEEDBACK" ]; then
+            echo "Revising existing automation suite per reviewer feedback."
+            npx claude -p "Read the existing automation suite under tests/${SLUG}/ and the test plan at specs/${SLUG}-test-plan.md for context. A stakeholder reviewed the suite and requested changes: ${FEEDBACK}. Revise the suite under tests/${SLUG}/ to address every point raised, using the playwright-test-generator subagent as needed. Keep the existing Page Object Model structure and TC-ID-named tests where still applicable. Do not modify anything outside tests/${SLUG}/." \
+              --dangerously-skip-permissions
+          elif [ -n "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
+            echo "tests/${SLUG}/ already has spec files and no feedback is pending -- skipping regeneration (idempotent re-run for this slug)."
+          else
+            npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md. Use the playwright-test-generator subagent to create a Playwright TypeScript automation suite implementing every test case in that plan, using Page Object Model, one test() per test case named with its Test Case ID. Write all files under tests/${SLUG}/ only -- do not write outside that directory, and do not modify your own agent definition or any .claude/ file." \
+              --dangerously-skip-permissions
+          fi
+
+      - name: Verify automation suite was created
+        run: |
+          if [ -z "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
+            node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status failed
+            node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at generation stage -- see Actions run"
+            git add "$REVIEW_FILE" "$REQUEST_FILE"
+            git commit -m "chore(pipeline): generation failed for $SLUG"
+            bash .github/scripts/git-push-retry.sh
+            exit 1
+          fi
+
+      - name: Commit automation suite, mark pending review
+        run: |
+          git add "tests/${SLUG}/"
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status pending_review --path "tests/${SLUG}/" --bump-revision --clear-feedback
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- automation suite generated, awaiting stakeholder review"
+          git add "$REVIEW_FILE" "$REQUEST_FILE"
+          git commit -m "feat(pipeline): automation suite ready for review -- $SLUG"
+          bash .github/scripts/git-push-retry.sh

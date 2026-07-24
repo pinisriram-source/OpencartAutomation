@@ -18,7 +18,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from github_commit import create_file, get_file, trigger_workflow, wait_for_ref
+from github_commit import create_file, get_file, trigger_workflow, upsert_file, wait_for_ref
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -40,7 +40,9 @@ GITHUB_OWNER = "pinisriram-source"
 GITHUB_REPO = "OpencartAutomation"
 GITHUB_BRANCH = "main"
 GITHUB_WORKFLOW_FILE = "saucedemo-checkout.yml"
-GITHUB_FULL_PIPELINE_WORKFLOW_FILE = "full-pipeline.yml"
+GITHUB_PIPELINE_PLAN_WORKFLOW_FILE = "pipeline-plan.yml"
+GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE = "pipeline-automation.yml"
+GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE = "pipeline-execute.yml"
 
 
 def github_url(repo_path: str) -> str:
@@ -298,9 +300,10 @@ k6.metric("Failed", summary["failed"], delta=None)
 
 st.divider()
 
-tab_submit, tab_overview, tab_matrix, tab_usecase, tab_rules, tab_details, tab_defects = st.tabs(
+tab_submit, tab_review, tab_overview, tab_matrix, tab_usecase, tab_rules, tab_details, tab_defects = st.tabs(
     [
         "Submit New Request",
+        "Review Pipeline Artifacts",
         "Overview",
         "Test Execution Matrix",
         "Coverage by Use Case",
@@ -745,6 +748,7 @@ and automation suite.*
                 if result.html_url:
                     st.markdown(f"[View the committed file on GitHub]({result.html_url})")
                 st.session_state["last_request_path"] = path
+                st.session_state["last_slug"] = slug
 
                 pipeline_passphrase = st.session_state.get("pipeline_passphrase_input", "")
                 expected_passphrase = get_pipeline_passphrase()
@@ -779,24 +783,26 @@ and automation suite.*
                     run_result = trigger_workflow(
                         owner=GITHUB_OWNER,
                         repo=GITHUB_REPO,
-                        workflow_file=GITHUB_FULL_PIPELINE_WORKFLOW_FILE,
+                        workflow_file=GITHUB_PIPELINE_PLAN_WORKFLOW_FILE,
                         ref=GITHUB_BRANCH,
                         token=get_github_token(),
                         inputs={"request_file": path, "slug": slug},
                     )
                     if run_result.success:
                         st.success(
-                            "Full pipeline triggered: plan → generate → execute → commit "
-                            f"against your request (slug `{slug}`). Typically takes 10-30 minutes "
-                            "for a new suite. Use the status checker below (with the path above) "
-                            "to check progress."
+                            "Pipeline stage 1 triggered: generating the test plan (slug "
+                            f"`{slug}`). This is a human-reviewed pipeline now -- once the plan "
+                            "is ready it stops and waits for you in the **Review Pipeline "
+                            "Artifacts** tab, where you approve it (or request changes) before "
+                            "automation generation and execution proceed. Typically takes a few "
+                            "minutes for this first stage."
                         )
                         st.markdown(
-                            f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_FULL_PIPELINE_WORKFLOW_FILE})"
+                            f"[View the run on GitHub](https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/actions/workflows/{GITHUB_PIPELINE_PLAN_WORKFLOW_FILE})"
                         )
                     else:
                         st.warning(
-                            f"Request was committed, but the full pipeline could not be triggered: {run_result.message}"
+                            f"Request was committed, but the test plan stage could not be triggered: {run_result.message}"
                         )
                 else:
                     run_result = trigger_workflow(
@@ -868,3 +874,203 @@ and automation suite.*
             st.error(file_result.message)
 
     render_status_fragment()
+
+# --- Review Pipeline Artifacts tab ---------------------------------------------
+REVIEW_STATUS_LABELS = {
+    "not_started": "⚪ Not started",
+    "in_progress": "🔄 In progress -- check back shortly",
+    "pending_review": "🟡 Pending your review",
+    "approved": "✅ Approved",
+    "changes_requested": "🔁 Changes requested -- regenerating",
+    "failed": "❌ Failed -- see the Actions run log",
+    "completed": "✅ Completed",
+}
+
+
+def render_review_stage(
+    review_data: dict,
+    review_path: str,
+    review_slug: str,
+    stage_name: str,
+    stage_key: str,
+    artifact_label: str,
+    approve_workflow: str,
+    revise_workflow: str,
+) -> None:
+    """Render one stage's status plus Approve / Request Changes controls.
+
+    Writes decisions straight to the review-status JSON via upsert_file
+    (this app owns that file end-to-end, unlike the request markdown which
+    only the pipeline itself updates) and dispatches the workflow for
+    whichever stage should run next.
+    """
+    stage_data = review_data.get(stage_key, {})
+    status = stage_data.get("status", "not_started")
+    st.markdown(f"##### {stage_name}")
+    st.markdown(REVIEW_STATUS_LABELS.get(status, status))
+    if stage_data.get("revision"):
+        st.caption(f"Revision {stage_data['revision']}")
+    artifact_path = stage_data.get("path", "")
+    if artifact_path:
+        st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
+
+    if status != "pending_review":
+        if status == "changes_requested" and stage_data.get("feedback"):
+            st.caption(f"Feedback sent, awaiting regeneration: {stage_data['feedback']}")
+        return
+
+    approve_col, changes_col = st.columns([1, 1])
+    with approve_col:
+        if st.button(f"✅ Approve", key=f"approve_{stage_key}"):
+            updated = dict(review_data)
+            updated[stage_key] = {**stage_data, "status": "approved"}
+            upsert_result = upsert_file(
+                owner=GITHUB_OWNER,
+                repo=GITHUB_REPO,
+                branch=GITHUB_BRANCH,
+                path=review_path,
+                content=json.dumps(updated, indent=2) + "\n",
+                commit_message=f"chore(review): approve {stage_key} for {review_slug}",
+                token=get_github_token(),
+            )
+            if upsert_result.success:
+                run_result = trigger_workflow(
+                    owner=GITHUB_OWNER,
+                    repo=GITHUB_REPO,
+                    workflow_file=approve_workflow,
+                    ref=GITHUB_BRANCH,
+                    token=get_github_token(),
+                    inputs={"request_file": review_data.get("request_file", ""), "slug": review_slug},
+                )
+                if run_result.success:
+                    st.success("Approved -- next stage triggered.")
+                else:
+                    st.warning(f"Approved, but couldn't trigger the next stage: {run_result.message}")
+            else:
+                st.error(f"Couldn't record approval: {upsert_result.message}")
+            st.rerun()
+
+    with changes_col:
+        with st.expander("🔁 Request changes"):
+            feedback_text = st.text_area(
+                "What's missing or needs fixing?",
+                key=f"feedback_{stage_key}_{review_slug}",
+                height=100,
+            )
+            if st.button("Submit feedback & regenerate", key=f"submit_feedback_{stage_key}"):
+                if not feedback_text.strip():
+                    st.error("Enter feedback describing the gap first.")
+                else:
+                    updated = dict(review_data)
+                    updated[stage_key] = {
+                        **stage_data,
+                        "status": "changes_requested",
+                        "feedback": feedback_text.strip(),
+                    }
+                    upsert_result = upsert_file(
+                        owner=GITHUB_OWNER,
+                        repo=GITHUB_REPO,
+                        branch=GITHUB_BRANCH,
+                        path=review_path,
+                        content=json.dumps(updated, indent=2) + "\n",
+                        commit_message=f"chore(review): request changes on {stage_key} for {review_slug}",
+                        token=get_github_token(),
+                    )
+                    if upsert_result.success:
+                        run_result = trigger_workflow(
+                            owner=GITHUB_OWNER,
+                            repo=GITHUB_REPO,
+                            workflow_file=revise_workflow,
+                            ref=GITHUB_BRANCH,
+                            token=get_github_token(),
+                            inputs={"request_file": review_data.get("request_file", ""), "slug": review_slug},
+                        )
+                        if run_result.success:
+                            st.success("Feedback recorded -- regeneration triggered.")
+                        else:
+                            st.warning(f"Feedback recorded, but couldn't trigger regeneration: {run_result.message}")
+                    else:
+                        st.error(f"Couldn't record feedback: {upsert_result.message}")
+                    st.rerun()
+
+
+with tab_review:
+    st.subheader("Review Pipeline Artifacts")
+    st.caption(
+        "Each stage of the AI pipeline (test plan, then automation suite) stops and waits "
+        "here for a stakeholder to approve it or request changes before the next stage "
+        "runs -- nothing executes against an unreviewed artifact. Enter the slug from your "
+        "submission below (carried over automatically right after you submit)."
+    )
+
+    review_slug_input = st.text_input(
+        "Slug to review",
+        value=st.session_state.get("last_slug", ""),
+        key="review_slug_input",
+        placeholder="e.g. guest-checkout-regression",
+    )
+    review_auto_refresh = st.checkbox(
+        "Auto-refresh every 15s",
+        value=False,
+        key="review_auto_refresh",
+        help="Keeps re-checking this slug's review status on its own -- handy while a stage is generating.",
+    )
+    if review_auto_refresh:
+        @st.fragment(run_every=15)
+        def _tick_review_refresh() -> None:
+            st.rerun()
+
+        _tick_review_refresh()
+
+    review_slug = review_slug_input.strip()
+    if not review_slug:
+        st.info("Enter a slug above to load its review status.")
+    else:
+        review_path = f"user-stories/{review_slug}-review.json"
+        review_result = get_file(
+            owner=GITHUB_OWNER, repo=GITHUB_REPO, path=review_path, ref=GITHUB_BRANCH, token=get_github_token(),
+        )
+        if not review_result.success:
+            st.info(
+                f"No review status found yet for slug `{review_slug}` -- {review_result.message} "
+                "This appears once the test-plan stage has started for this slug (Submit New "
+                "Request tab, with the pipeline passphrase)."
+            )
+        else:
+            try:
+                review_data = json.loads(review_result.content)
+            except (json.JSONDecodeError, TypeError):
+                st.error("Review status file exists but isn't valid JSON yet -- try again shortly.")
+                review_data = None
+
+            if review_data:
+                render_review_stage(
+                    review_data, review_path, review_slug,
+                    stage_name="1. Test Plan", stage_key="plan",
+                    artifact_label="View test plan on GitHub",
+                    approve_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
+                    revise_workflow=GITHUB_PIPELINE_PLAN_WORKFLOW_FILE,
+                )
+                st.divider()
+
+                if review_data.get("plan", {}).get("status") == "approved":
+                    render_review_stage(
+                        review_data, review_path, review_slug,
+                        stage_name="2. Automation Suite", stage_key="automation",
+                        artifact_label="View automation suite on GitHub",
+                        approve_workflow=GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE,
+                        revise_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
+                    )
+                else:
+                    st.markdown("##### 2. Automation Suite")
+                    st.caption("Waiting on test plan approval.")
+                st.divider()
+
+                st.markdown("##### 3. Execution")
+                execute_data = review_data.get("execute", {})
+                execute_status = execute_data.get("status", "not_started")
+                st.markdown(REVIEW_STATUS_LABELS.get(execute_status, execute_status))
+                if execute_data.get("workflow_run_url"):
+                    st.markdown(f"[View the run on GitHub]({execute_data['workflow_run_url']})")
+                if execute_status == "completed":
+                    st.caption("See the Overview tab for the full report.")

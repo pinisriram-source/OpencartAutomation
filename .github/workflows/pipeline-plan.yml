@@ -1,0 +1,127 @@
+name: Pipeline Stage 1 - Generate Test Plan
+
+# First stage of the human-reviewed pipeline (see pipeline-automation.yml and
+# pipeline-execute.yml for the other two stages). Generates the test plan --
+# or, if the reviewer requested changes, revises the existing one -- then
+# stops and marks it "pending_review" in user-stories/<slug>-review.json.
+# The Streamlit dashboard's Review tab reads that file: approving there
+# dispatches pipeline-automation.yml; requesting changes re-dispatches this
+# same workflow with the reviewer's feedback attached to the review-status
+# file for this run to pick up.
+
+on:
+  workflow_dispatch:
+    inputs:
+      request_file:
+        description: 'Path to the user-stories/request-*.md file to process'
+        required: true
+        type: string
+      slug:
+        description: 'Deterministic slug for output paths (specs/<slug>-test-plan.md, tests/<slug>/)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+# Shared with pipeline-automation.yml/pipeline-execute.yml on purpose --
+# concurrency groups are matched repo-wide regardless of workflow file, so
+# this keeps all three stages for a given slug serialized against each other,
+# not just against re-runs of this one stage.
+concurrency:
+  group: full-pipeline-${{ inputs.slug }}
+  cancel-in-progress: false
+
+jobs:
+  generate-plan:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_USE_BEDROCK: "1"
+      AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+      AWS_REGION: eu-north-1
+      REQUEST_FILE: ${{ inputs.request_file }}
+      SLUG: ${{ inputs.slug }}
+      REVIEW_FILE: user-stories/${{ inputs.slug }}-review.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin main --quiet
+          git reset --hard origin/main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browser (chromium)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Configure git identity for automated commits
+        run: |
+          git config user.name "qa-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Use a Linux-safe MCP server config for this run
+        run: |
+          cat > .mcp.json <<'EOF'
+          {
+            "mcpServers": {
+              "playwright-test": {
+                "command": "npx",
+                "args": ["playwright", "run-test-mcp-server"]
+              }
+            }
+          }
+          EOF
+
+      - name: Verify request file exists
+        run: test -f "$REQUEST_FILE"
+
+      - name: Set status -- planning
+        run: |
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --slug "$SLUG" --request-file "$REQUEST_FILE" --stage plan --status in_progress
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- generating test plan"
+          git add "$REVIEW_FILE" "$REQUEST_FILE"
+          git commit -m "chore(pipeline): start test plan generation for $SLUG" || true
+          bash .github/scripts/git-push-retry.sh
+
+      - name: Claude Code -- generate or revise test plan
+        run: |
+          FEEDBACK=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" plan feedback)
+          if [ -n "$FEEDBACK" ]; then
+            echo "Revising existing plan per reviewer feedback."
+            npx claude -p "Read the existing test plan at specs/${SLUG}-test-plan.md and the testing request at \$REQUEST_FILE for context. A stakeholder reviewed the plan and requested changes: ${FEEDBACK}. Revise specs/${SLUG}-test-plan.md to address every point raised, using the playwright-test-planner subagent to re-verify against the live application where needed. Overwrite the file in place -- do not create a second file, and do not modify anything outside specs/${SLUG}-test-plan.md." \
+              --dangerously-skip-permissions
+          elif [ -f "specs/${SLUG}-test-plan.md" ]; then
+            echo "specs/${SLUG}-test-plan.md already exists and no feedback is pending -- skipping regeneration (idempotent re-run for this slug)."
+          else
+            npx claude -p "Read the testing request at \$REQUEST_FILE (application URL, requirements/acceptance criteria, optional test credentials). Use the playwright-test-planner subagent to explore the live application at that URL and produce a comprehensive test plan covering happy paths, negative/boundary cases, and navigation flows, following this project's TC-<MODULE>-<NNN> convention (see CLAUDE.md). Save the plan to specs/${SLUG}-test-plan.md exactly -- no other path. Do not modify any file outside specs/${SLUG}-test-plan.md." \
+              --dangerously-skip-permissions
+          fi
+
+      - name: Verify plan was created
+        run: |
+          test -f "specs/${SLUG}-test-plan.md" || (node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage plan --status failed && node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- see Actions run" && git add "$REVIEW_FILE" "$REQUEST_FILE" && git commit -m "chore(pipeline): planning failed for $SLUG" && bash .github/scripts/git-push-retry.sh && exit 1)
+
+      - name: Commit test plan, mark pending review
+        run: |
+          git add "specs/${SLUG}-test-plan.md"
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage plan --status pending_review --path "specs/${SLUG}-test-plan.md" --bump-revision --clear-feedback
+          node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- test plan generated, awaiting stakeholder review"
+          git add "$REVIEW_FILE" "$REQUEST_FILE"
+          git commit -m "feat(pipeline): test plan ready for review -- $SLUG"
+          bash .github/scripts/git-push-retry.sh
