@@ -1,0 +1,21 @@
+{
+  "slug": "checkboxes",
+  "request_file": "user-stories/request-checkboxes-20260724-165819.md",
+  "plan": {
+    "status": "in_progress",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "not_started",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "not_started",
+    "workflow_run_url": ""
+  },
+  "updated_at": "2026-07-24T16:58:48.663Z"
+}
