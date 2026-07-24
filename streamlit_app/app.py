@@ -8,6 +8,7 @@ matrix, coverage by business use case, coverage by business rule, and the
 defects log. A suite picker lets the viewer switch between suites.
 """
 
+import hashlib
 import json
 import re
 from datetime import datetime, timezone
@@ -147,6 +148,32 @@ def find_test_block(suite_dir_str: str, test_id: str) -> tuple[str, str] | tuple
     return None, None
 
 
+def _results_fingerprint() -> tuple:
+    """Cheap content hash of every suite file, to detect a new/updated result.
+
+    Not file size or mtime -- a healed test can change content without
+    changing byte count, and mtime is meaningless after a git checkout (see
+    discover_suites()). Hashing full content is fine: these files are small.
+    """
+    return tuple(
+        (f.name, hashlib.md5(f.read_bytes()).hexdigest())
+        for f in discover_suites()
+    )
+
+
+@st.fragment(run_every=15)
+def _watch_for_new_results() -> None:
+    fingerprint = _results_fingerprint()
+    seen = st.session_state.get("_results_fingerprint")
+    if seen is None:
+        st.session_state["_results_fingerprint"] = fingerprint
+    elif fingerprint != seen:
+        st.session_state["_results_fingerprint"] = fingerprint
+        st.rerun()
+
+
+_watch_for_new_results()
+
 suite_files = discover_suites()
 if not suite_files:
     st.error(f"No test result files found in {DATA_DIR}/ (expected *-test-results.json).")
@@ -187,6 +214,7 @@ st.caption(
     f"**Application:** {meta['app_under_test']} ([{meta['app_url']}]({meta['app_url']}))  |  "
     f"**Test account:** `{meta['test_account']}`  |  **Report date:** {meta['report_date']}"
 )
+st.caption("🔄 Watching for new pipeline results every 15s -- new suites appear here automatically.")
 
 # --- KPI row ------------------------------------------------------------------
 k1, k2, k3, k4, k5, k6 = st.columns(6)
