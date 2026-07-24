@@ -1006,7 +1006,6 @@ with tab_review:
     review_slug_input = st.text_input(
         "Slug to review",
         value=st.session_state.get("last_slug", ""),
-        key="review_slug_input",
         placeholder="e.g. guest-checkout-regression",
     )
     review_auto_refresh = st.checkbox(
