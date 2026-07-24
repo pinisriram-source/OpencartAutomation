@@ -62,6 +62,77 @@ def get_github_token() -> str:
     except Exception:
         return ""
 
+
+def analyze_acceptance_criteria(text: str) -> list[str]:
+    """Heuristic scan for common gaps in submitted requirements/acceptance criteria.
+
+    Rule-based on purpose (no LLM call from this app) -- catches the gaps that
+    actually bit prior pipeline runs: vague criteria the generator had to guess
+    at, missing expected outcomes, and no negative/edge cases. Returns clarifying
+    questions to surface to the submitter; empty list means nothing obvious was flagged.
+    """
+    stripped = text.strip()
+    if not stripped:
+        return []
+
+    lower = stripped.lower()
+    word_count = len(stripped.split())
+    questions: list[str] = []
+
+    if word_count < 25:
+        questions.append(
+            f"This looks quite short (~{word_count} words). Is there more detail available -- "
+            "specific pages/flows, field names, or expected outcomes?"
+        )
+
+    if not re.search(r"(^|\n)\s*(-|\*|\d+[.)])\s+\S", stripped):
+        questions.append(
+            "No numbered/bulleted list of acceptance criteria detected -- could you break this "
+            "into discrete, testable criteria (one behavior per line)?"
+        )
+
+    outcome_markers = ["should", "must", "expect", "shall", "verify", "displays", "returns", "will show"]
+    if not any(m in lower for m in outcome_markers):
+        questions.append(
+            "No clear expected-outcome language found (e.g. 'should', 'must', 'displays') -- "
+            "what observable result confirms each step passed?"
+        )
+
+    negative_markers = [
+        "invalid", "error", "fail", "negative", "empty", "missing", "incorrect",
+        "reject", "denied", "not allowed", "out of stock", "boundary",
+    ]
+    if not any(m in lower for m in negative_markers):
+        questions.append(
+            "No negative/edge cases mentioned -- are there invalid inputs, error states, or "
+            "boundary conditions (e.g. empty fields, out-of-stock, expired coupon) that should "
+            "also be covered?"
+        )
+
+    if not re.search(r"['\"].+?['\"]|`.+?`|@|\b\d+\b", stripped):
+        questions.append(
+            "No concrete example values (usernames, quantities, sample text, prices, etc.) "
+            "detected -- should specific test data be used, or is any placeholder value fine?"
+        )
+
+    vague_terms = ["appropriate", "as needed", "etc.", "and so on", "various", "several", "properly", "correctly formatted", "some data"]
+    hits = sorted({t for t in vague_terms if t in lower})
+    if hits:
+        questions.append(
+            f"Vague phrasing detected ({', '.join(hits)}) -- can you replace this with a "
+            "specific, checkable condition?"
+        )
+
+    login_markers = ["login", "log in", "sign in", "authenticate"]
+    if any(m in lower for m in login_markers) and not re.search(r"user(name)?[:\s]|password[:\s]|credential|guest", lower):
+        questions.append(
+            "Login/authentication is mentioned but no account state is described -- registered "
+            "user, guest checkout, or a specific test account?"
+        )
+
+    return questions
+
+
 st.set_page_config(
     page_title="QA Test Execution Report",
     page_icon="✅",
@@ -576,6 +647,34 @@ with tab_submit:
         ),
     )
 
+    st.markdown("##### Requirements / Acceptance Criteria")
+    req_text = st.text_area(
+        "Paste text",
+        height=200,
+        key="req_text_input",
+        placeholder="Paste the user story, acceptance criteria, or requirements doc text here...",
+        label_visibility="collapsed",
+    )
+    req_file = st.file_uploader(
+        "...or upload a requirements file instead", type=["md", "txt"], key="req_file_input"
+    )
+    requirements_content = (
+        req_file.getvalue().decode("utf-8") if req_file is not None else req_text
+    )
+
+    if requirements_content.strip():
+        clarifications = analyze_acceptance_criteria(requirements_content)
+        if clarifications:
+            with st.container(border=True):
+                st.warning(
+                    f"⚠️ {len(clarifications)} potential gap(s) in these acceptance criteria -- "
+                    "these are suggestions, not blockers, you can still submit as-is:"
+                )
+                for question in clarifications:
+                    st.markdown(f"- {question}")
+        else:
+            st.success("✅ No obvious gaps detected in the acceptance criteria.")
+
     with st.form("new_request_form", clear_on_submit=True):
         title = st.text_input("Short title", placeholder="e.g. Guest checkout regression for MyStore")
         app_url = st.text_input("Application URL", placeholder="https://example.com")
@@ -586,24 +685,19 @@ with tab_submit:
         with col2:
             test_password = st.text_input("Test password (optional, demo/placeholder only)", type="password")
 
-        req_text = st.text_area(
-            "Requirements / Acceptance Criteria (paste text)",
-            height=200,
-            placeholder="Paste the user story, acceptance criteria, or requirements doc text here...",
+        st.caption(
+            f"Requirements captured above ({len(requirements_content.split())} word(s)) will be "
+            "included with this submission."
         )
-        req_file = st.file_uploader("...or upload a requirements file instead", type=["md", "txt"])
 
         submitted = st.form_submit_button("Submit Request")
 
     if submitted:
         if not title.strip() or not app_url.strip():
             st.error("Short title and Application URL are both required.")
-        elif not req_text.strip() and req_file is None:
+        elif not requirements_content.strip():
             st.error("Provide requirements either as pasted text or an uploaded file.")
         else:
-            requirements_content = (
-                req_file.read().decode("utf-8") if req_file is not None else req_text
-            )
             timestamp = datetime.now(timezone.utc)
             slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:50] or "request"
             filename = f"request-{slug}-{timestamp.strftime('%Y%m%d-%H%M%S')}.md"
