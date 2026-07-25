@@ -142,37 +142,56 @@ for the Review tab.
 
 By default, the Review tab links each artifact straight to its GitHub blob
 view. If you'd rather reviewers see a proper Google Doc (headings, lists,
-tables rendered, commentable), configure two more Streamlit secrets and the
-app will publish/update a Google Doc per stage automatically -- no change
-needed on the pipeline side, this happens lazily in the dashboard the next
-time a stage's Review section is rendered.
+tables rendered, commentable), configure a Google OAuth client and the
+Review tab gets a **"Connect Google Drive"** button -- once a reviewer
+signs in (once per browser session), the tab publishes/updates a Google Doc
+per stage automatically, owned by that reviewer's own Google account.
+
+This intentionally uses **per-user OAuth, not a service account.** A
+service account has zero Drive storage quota of its own, and Google does
+not let it own files against a personal/consumer Gmail account's quota at
+all -- the only workarounds (a Shared Drive, or domain-wide delegation)
+require a paid Google Workspace admin console. Per-user OAuth sidesteps
+this: docs are created under whoever actually clicked "Connect," using
+their own quota, with the narrow `drive.file` scope (this app can only see
+files it itself created, nothing else in the reviewer's Drive).
 
 **One-time Google Cloud setup:**
 1. Create (or reuse) a Google Cloud project, enable the **Google Drive API**.
-2. Create a **service account** (IAM & Admin → Service Accounts), then
-   generate and download a JSON key for it.
-3. In your own Google Drive, create a folder for these docs, then **share
-   that folder with the service account's email address as Editor** --
-   service accounts have no Drive storage quota of their own, so the docs
-   must live in a folder a real account owns and has shared with it.
-4. Copy the folder's ID out of its URL
-   (`https://drive.google.com/drive/folders/<THIS_PART>`).
+2. Configure the **OAuth consent screen** (APIs & Services → OAuth consent
+   screen): External user type is fine for a personal account; "Testing"
+   publishing status is fine too (add yourself/your reviewers as test users)
+   -- no Google verification review needed for the `drive.file` scope at
+   this scale. Note: apps left in "Testing" get a refresh token that expires
+   after 7 days, so reviewers will need to reconnect periodically; publish
+   the app (still free) if you want that to stop.
+3. Create an **OAuth client ID** (APIs & Services → Credentials → Create
+   Credentials → OAuth client ID → **Web application**). Add this exact
+   dashboard URL as an **Authorized redirect URI** (and `http://localhost:8501`
+   too if you also run it locally):
+   ```
+   https://opencartautomation-maev4hqufwiuu3fhv5oghu.streamlit.app/
+   ```
+4. Copy the generated **Client ID** and **Client secret**.
 
 **Add as Streamlit secrets:**
 ```toml
-GOOGLE_SERVICE_ACCOUNT_JSON = '''{"type": "service_account", "project_id": "...", ...}'''
-GOOGLE_DRIVE_FOLDER_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz"
+GOOGLE_OAUTH_CLIENT_ID = "xxxxxxxxxxxx.apps.googleusercontent.com"
+GOOGLE_OAUTH_CLIENT_SECRET = "GOCSPX-..."
+GOOGLE_OAUTH_REDIRECT_URI = "https://opencartautomation-maev4hqufwiuu3fhv5oghu.streamlit.app/"
 ```
-(paste the entire downloaded JSON key file's contents as the first value,
-wrapped in `'''`).
 
 Each stage's doc is created once and then overwritten in place on later
 revisions (tracked via a `doc_revision` field alongside the artifact's own
 `revision` in `user-stories/<slug>-review.json`, so it isn't recreated or
 rewritten on every 15s auto-refresh tick -- only when the artifact actually
 changes). New docs are shared as "anyone with the link can view", matching
-the rest of this project's artifacts (public repo, public dashboard).
-Leaving these two secrets unset keeps the GitHub link as-is -- this
+the rest of this project's artifacts (public repo, public dashboard), so
+other reviewers can read them without connecting their own account.
+"Connect Google Drive" only matters for whoever is publishing/updating a
+doc. The Google sign-in is session-only (stored in `st.session_state`, not
+persisted) -- reconnect after a hard refresh or a new browser session.
+Leaving the three secrets unset keeps the GitHub link as-is -- this
 feature is fully optional.
 
 **Known limitation:** running Claude Code non-interactively with the

@@ -19,7 +19,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from github_commit import create_file, get_file, trigger_workflow, upsert_file, wait_for_ref
-from google_docs import upsert_google_doc
+from google_docs import build_oauth_flow, exchange_code_for_credentials, get_authorization_url, upsert_google_doc
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -66,24 +66,18 @@ def get_github_token() -> str:
         return ""
 
 
-def get_google_service_account_info() -> dict | None:
+def get_google_oauth_config() -> dict | None:
+    """Reads the OAuth client used for the Review tab's "Connect Google Drive"
+    button. All three must be set, or the feature is treated as disabled."""
     try:
-        raw = st.secrets.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+        client_id = st.secrets.get("GOOGLE_OAUTH_CLIENT_ID", "")
+        client_secret = st.secrets.get("GOOGLE_OAUTH_CLIENT_SECRET", "")
+        redirect_uri = st.secrets.get("GOOGLE_OAUTH_REDIRECT_URI", "")
     except Exception:
         return None
-    if not raw:
+    if not (client_id and client_secret and redirect_uri):
         return None
-    try:
-        return json.loads(raw)
-    except (json.JSONDecodeError, TypeError):
-        return None
-
-
-def get_google_drive_folder_id() -> str:
-    try:
-        return st.secrets.get("GOOGLE_DRIVE_FOLDER_ID", "")
-    except Exception:
-        return ""
+    return {"client_id": client_id, "client_secret": client_secret, "redirect_uri": redirect_uri}
 
 
 def analyze_acceptance_criteria(text: str) -> list[str]:
@@ -922,12 +916,11 @@ def _sync_stage_google_doc(
     Cheap no-op on every render once caught up: the doc is only (re)created
     when doc_revision doesn't match the artifact's current revision, so the
     15s auto-refresh tick doesn't hammer the Drive API or spam commits.
-    Falls back silently (caller shows the plain GitHub link) if Google
-    credentials aren't configured, or if the sync itself fails.
+    Falls back silently (caller shows the plain GitHub link) if the reviewer
+    hasn't connected Google Drive this session, or if the sync itself fails.
     """
-    service_account_info = get_google_service_account_info()
-    folder_id = get_google_drive_folder_id()
-    if not service_account_info or not folder_id:
+    google_credentials = st.session_state.get("google_credentials")
+    if not google_credentials:
         return stage_data, review_data
 
     current_revision = stage_data.get("revision", 0)
@@ -941,8 +934,7 @@ def _sync_stage_google_doc(
         return stage_data, review_data
 
     doc_result = upsert_google_doc(
-        service_account_info=service_account_info,
-        folder_id=folder_id,
+        credentials=google_credentials,
         title=f"{review_slug} -- {stage_name}",
         markdown_content=content_result.content,
         existing_doc_id=stage_data.get("doc_id") or None,
@@ -1105,6 +1097,39 @@ with tab_review:
         help="Keeps re-checking this slug's review status on its own -- handy while a stage is generating.",
     )
     review_slug = review_slug_input.strip()
+
+    oauth_config = get_google_oauth_config()
+    if oauth_config:
+        if not st.session_state.get("google_credentials") and "code" in st.query_params:
+            returned_state = st.query_params.get("state")
+            expected_state = st.session_state.get("google_oauth_state")
+            code = st.query_params.get("code")
+            st.query_params.clear()
+            if expected_state and returned_state == expected_state:
+                flow = build_oauth_flow(**oauth_config)
+                try:
+                    st.session_state["google_credentials"] = exchange_code_for_credentials(flow, code)
+                    st.session_state.pop("google_oauth_state", None)
+                except Exception as exc:
+                    st.error(f"Google sign-in failed: {exc}")
+            else:
+                st.error("Google sign-in state mismatch -- please try connecting again.")
+            st.rerun()
+
+        if st.session_state.get("google_credentials"):
+            connect_col, disconnect_col = st.columns([4, 1])
+            with connect_col:
+                st.caption("✅ Connected to Google Drive for this session -- artifacts below sync as Google Docs.")
+            with disconnect_col:
+                if st.button("Disconnect", key="google_disconnect"):
+                    st.session_state.pop("google_credentials", None)
+                    st.rerun()
+        else:
+            flow = build_oauth_flow(**oauth_config)
+            auth_url, state = get_authorization_url(flow)
+            st.session_state["google_oauth_state"] = state
+            st.link_button("🔗 Connect Google Drive", auth_url)
+            st.caption("Sign in once per browser session to publish artifacts below as Google Docs you own.")
 
     @st.fragment(run_every=15 if review_auto_refresh else None)
     def render_review_tab() -> None:
