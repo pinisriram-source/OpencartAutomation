@@ -1,21 +1,21 @@
 {
   "slug": "key-presses",
-  "request_file": "user-stories/request-key-presses-20260725-135529.md",
+  "request_file": "user-stories/request-key-presses-20260725-160754.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/key-presses-test-plan.md",
-    "revision": 2,
+    "revision": 3,
     "feedback": ""
   },
   "automation": {
-    "status": "not_started",
-    "path": "",
-    "revision": 0,
+    "status": "approved",
+    "path": "tests/key-presses/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
-    "status": "not_started",
-    "workflow_run_url": ""
+    "status": "completed",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30165683809"
   },
-  "updated_at": "2026-07-25T13:55:51.918Z"
+  "updated_at": "2026-07-25T16:30:23.449Z"
 }
