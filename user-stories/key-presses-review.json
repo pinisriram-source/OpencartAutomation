@@ -2,7 +2,7 @@
   "slug": "key-presses",
   "request_file": "user-stories/request-key-presses-20260725-160754.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/key-presses-test-plan.md",
     "revision": 3,
     "feedback": ""
