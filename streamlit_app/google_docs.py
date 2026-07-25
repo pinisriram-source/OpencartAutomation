@@ -84,6 +84,7 @@ def upsert_google_doc(
                 fileId=existing_doc_id,
                 media_body=media,
                 fields="id",
+                supportsAllDrives=True,
             ).execute()
             doc_id = file["id"]
         else:
@@ -91,11 +92,13 @@ def upsert_google_doc(
                 body={"name": title, "mimeType": DOC_MIME_TYPE, "parents": [folder_id]},
                 media_body=media,
                 fields="id",
+                supportsAllDrives=True,
             ).execute()
             doc_id = file["id"]
             drive.permissions().create(
                 fileId=doc_id,
                 body={"type": "anyone", "role": "reader"},
+                supportsAllDrives=True,
             ).execute()
     except HttpError as exc:
         return DocResult(False, f"Google Drive API error: {exc}")
