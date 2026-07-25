@@ -1,0 +1,21 @@
+{
+  "slug": "dropdown-selection-behavior",
+  "request_file": "user-stories/request-dropdown-selection-behavior-20260725-064639.md",
+  "plan": {
+    "status": "in_progress",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "not_started",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "not_started",
+    "workflow_run_url": ""
+  },
+  "updated_at": "2026-07-25T06:46:55.328Z"
+}
