@@ -35,6 +35,84 @@ LOCATOR_METHOD_RE = re.compile(
     r"\.(getByRole|getByLabel|getByTestId|getByText|getByPlaceholder|getByAltText|getByTitle|locator)\("
 )
 ASSERTION_LINE_RE = re.compile(r"expect\(")
+STEP_MARKER_RE = re.compile(r"^\s*//\s*(\d+)\.\s*(.+)$")
+EXPECT_MARKER_RE = re.compile(r"^\s*//\s*(?:expect|verify):\s*(.+)$", re.IGNORECASE)
+
+
+def parse_step_markers(block: str) -> list[dict]:
+    """Split a generated test's body into numbered steps.
+
+    Relies on the `// N. <step text>` and `// expect: <validation>` /
+    `// Verify: <validation>` comment markers the pipeline's automation
+    generator emits (the exact keyword has varied across pipeline runs),
+    mirroring the test plan's own Steps/expect structure -- this is what lets
+    the dashboard show which code+assertions implement each *planned* step,
+    rather than just dumping the flat script.
+    """
+    steps: list[dict] = []
+    current: dict | None = None
+    for raw_line in block.splitlines():
+        step_match = STEP_MARKER_RE.match(raw_line)
+        if step_match:
+            if current:
+                steps.append(current)
+            current = {
+                "number": int(step_match.group(1)),
+                "text": step_match.group(2).strip(),
+                "expectations": [],
+                "code_lines": [],
+            }
+            continue
+        expect_match = EXPECT_MARKER_RE.match(raw_line)
+        if expect_match and current is not None:
+            current["expectations"].append(expect_match.group(1).strip())
+            continue
+        if current is not None and raw_line.strip() and not raw_line.strip().startswith("//"):
+            current["code_lines"].append(raw_line.rstrip())
+    if current:
+        steps.append(current)
+    return steps
+
+
+def annotate_step_results(steps: list[dict], outcome: str, defect: dict | None) -> None:
+    """Best-effort attribution of pass/fail to a specific step, in place.
+
+    There's no per-assertion pass/fail signal in the stored test-results JSON
+    (Playwright throws and stops at the first failed expect, and we only
+    persist the overall test outcome plus a hand-written defect
+    expected/actual) -- so a failing test's step is matched by substring
+    overlap between the defect's `expected` text and each step's `expect:`
+    bullets. Steps before the match are "passed" (their assertions ran and
+    didn't throw), the matched step is "failed", steps after are
+    "not_reached" (the throw stopped the test before they ran). If no defect
+    matches confidently, every step is marked "unknown" rather than guessing.
+    """
+    if outcome != "fail" or not defect:
+        status = "passed" if outcome == "pass" else "unknown"
+        for step in steps:
+            step["result"] = status
+        return
+
+    expected_lower = (defect.get("expected") or "").lower()
+    failing_idx = None
+    for i, step in enumerate(steps):
+        for expectation in step["expectations"]:
+            exp_lower = expectation.lower()
+            if exp_lower and (exp_lower in expected_lower or expected_lower in exp_lower):
+                failing_idx = i
+                break
+        if failing_idx is not None:
+            break
+
+    for i, step in enumerate(steps):
+        if failing_idx is None:
+            step["result"] = "unknown"
+        elif i < failing_idx:
+            step["result"] = "passed"
+        elif i == failing_idx:
+            step["result"] = "failed"
+        else:
+            step["result"] = "not_reached"
 
 # --- Target repo for the "Submit New Request" form ---
 GITHUB_OWNER = "pinisriram-source"
@@ -546,6 +624,14 @@ with tab_details:
         else:
             st.caption(f"Source: [{spec_path}]({github_url(spec_path)})")
 
+            matching_defect = next(
+                (
+                    d for d in data.get("defects", [])
+                    if picked_id in [r.strip() for r in str(d.get("test_ref", "")).split(",")]
+                ),
+                None,
+            )
+
             locator_lines = [
                 line.strip() for line in block.splitlines() if LOCATOR_METHOD_RE.search(line)
             ]
@@ -555,6 +641,40 @@ with tab_details:
 
             st.markdown("**Automation script (as executed)**")
             st.code(block, language="typescript")
+
+            st.markdown("**Test case steps coverage**")
+            step_records = parse_step_markers(block)
+            if not step_records:
+                st.caption(
+                    "No numbered step markers (`// N. ...`) found in this script -- coverage "
+                    "view unavailable for this test, see the full script above instead."
+                )
+            else:
+                annotate_step_results(step_records, outcome, matching_defect)
+                result_badges = {
+                    "passed": "✅ Passed",
+                    "failed": "❌ Failed",
+                    "not_reached": "⏭️ Not reached -- the test stopped at an earlier failed assertion",
+                    "unknown": "ℹ️ Result not attributable to a specific step",
+                }
+                for step in step_records:
+                    with st.container(border=True):
+                        st.markdown(f"**Step {step['number']}. {step['text']}**")
+                        st.markdown(result_badges.get(step["result"], step["result"]))
+                        if step["expectations"]:
+                            st.markdown("Validations:\n" + "\n".join(f"- {e}" for e in step["expectations"]))
+                        if step["code_lines"]:
+                            st.code("\n".join(step["code_lines"]), language="typescript")
+                if outcome == "fail" and not matching_defect:
+                    st.caption(
+                        "Test failed but no matching Defects Log entry was found to attribute "
+                        "the failure to a specific step -- see the raw script above."
+                    )
+                elif outcome == "fail" and all(s["result"] == "unknown" for s in step_records):
+                    st.caption(
+                        "Couldn't confidently match the recorded defect to a specific step -- "
+                        "see Expected vs. Actual below for the overall failure."
+                    )
 
             assertion_lines = [
                 line.strip() for line in block.splitlines() if ASSERTION_LINE_RE.search(line)
@@ -566,9 +686,6 @@ with tab_details:
                 st.caption("No explicit `expect(...)` assertions found in this test block.")
 
             st.markdown("**Expected vs. Actual**")
-            matching_defect = next(
-                (d for d in data.get("defects", []) if d.get("test_ref") == picked_id), None
-            )
             if matching_defect:
                 st.error(
                     f"**Expected:** {matching_defect['expected']}\n\n"
