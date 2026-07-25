@@ -1,0 +1,21 @@
+{
+  "slug": "key-presses",
+  "request_file": "user-stories/request-key-presses-20260725-133241.md",
+  "plan": {
+    "status": "in_progress",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "not_started",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "not_started",
+    "workflow_run_url": ""
+  },
+  "updated_at": "2026-07-25T13:33:03.815Z"
+}
