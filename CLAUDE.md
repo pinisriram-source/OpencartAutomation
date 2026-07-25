@@ -255,3 +255,90 @@ Conventions:
   cached values.
 - No public API was detected; do not assume REST endpoints exist beyond
   standard `index.php?route=` form-driven pages.
+
+# Project rules for AI agents
+
+You are working in a Playwright TypeScript automation project.
+Follow these rules for every code change.
+
+## Stack
+
+- Playwright 1.56+ with TypeScript
+- Node 20+
+- Test runner: @playwright/test
+- Reporter: Allure + built-in HTML
+- CI: GitHub Actions, sharded
+
+## Folder structure
+
+- `src/pages/` — Page Object classes (one file per page)
+- `src/fixtures/` — Custom fixtures extending base test
+- `src/utils/` — Pure helpers, no test logic
+- `tests/` — Spec files, mirror app URL structure
+- `tests/data/` — JSON/CSV test data
+- `specs/` — Planner output (Markdown plans)
+
+## Coding conventions
+
+- Import test from `src/fixtures/pages.fixture.ts`, never from `@playwright/test` directly
+- Use `test.describe` per feature area
+- One logical assertion group per test
+- Use `test.step` for readability when a flow has more than 3 actions
+- File names: kebab-case (`add-to-cart.spec.ts`)
+
+## Locator priority (STRICT — do not deviate)
+
+1. `getByRole` with accessible name
+2. `getByLabel` for form fields
+3. `getByTestId` (attribute is `data-test-id`)
+4. `getByText` only for genuinely static UI text
+5. CSS / XPath — forbidden unless approved in PR
+
+## Page Object contract
+
+- One class per page, extends `BasePage` (storefront) or `AdminBasePage` (admin)
+- Constructor takes `page: Page` only, **except** admin page objects, which
+  also take the `user_token` captured at admin login (`AdminBasePage`'s
+  constructor) — every admin route requires it, so this is an accepted,
+  documented exception rather than a gap.
+- Locators are exposed as `get` accessor methods returning a `Locator`
+  (e.g. `get name() { return this.page.locator(...); }`), computed fresh on
+  each access rather than cached as `readonly` properties assigned in the
+  constructor. This is the project's actual convention — it avoids stale
+  locator handles across navigations/reloads within the same page object
+  instance — and is what every existing page object does.
+- Action methods return `Promise<void>` OR the next page object
+- No `expect()` calls inside page objects — assertions belong in tests
+- No business logic in tests — put it in page objects or helpers
+- Tests should call POM methods, not reach into `pageObject.page.locator(...)`
+  directly — if a test needs a locator the page object doesn't expose yet,
+  add it to the page object instead of building it ad hoc in the spec.
+
+## Assertion rules
+
+- Web-first assertions only (`expect(locator).toBeVisible()`)
+- No `page.waitForTimeout` — ever
+- No `waitForSelector` — use locator auto-waiting
+- Custom timeouts only when justified in a code comment
+
+## When adding a new test
+
+- Mirror the app URL structure inside `tests/`
+- Reuse existing page objects — do not create parallel infra
+- Load test data from `tests/data/`, not inline
+- Tag tests with `@smoke`, `@regression`, or `@critical` as appropriate
+
+## Forbidden
+
+- Do not skip or comment out failing tests to make CI green
+- Do not use `page.evaluate` unless there is no MCP tool alternative
+- Do not commit `.env`, credentials, `storage-state.json`, or auth tokens
+- Do not modify `playwright.config.ts` without asking
+- Do not add new npm dependencies without asking
+- Do not use `page.pause()` in committed code
+
+## When you (the agent) are unsure
+
+- Ask a clarifying question before generating code
+- Prefer a smaller, focused change over a big refactor
+- If a required file does not exist, ask before creating it
