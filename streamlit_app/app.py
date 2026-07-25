@@ -1014,17 +1014,14 @@ with tab_review:
         key="review_auto_refresh",
         help="Keeps re-checking this slug's review status on its own -- handy while a stage is generating.",
     )
-    if review_auto_refresh:
-        @st.fragment(run_every=15)
-        def _tick_review_refresh() -> None:
-            st.rerun()
-
-        _tick_review_refresh()
-
     review_slug = review_slug_input.strip()
-    if not review_slug:
-        st.info("Enter a slug above to load its review status.")
-    else:
+
+    @st.fragment(run_every=15 if review_auto_refresh else None)
+    def render_review_tab() -> None:
+        if not review_slug:
+            st.info("Enter a slug above to load its review status.")
+            return
+
         review_path = f"user-stories/{review_slug}-review.json"
         review_result = get_file(
             owner=GITHUB_OWNER, repo=GITHUB_REPO, path=review_path, ref=GITHUB_BRANCH, token=get_github_token(),
@@ -1035,41 +1032,48 @@ with tab_review:
                 "This appears once the test-plan stage has started for this slug (Submit New "
                 "Request tab, with the pipeline passphrase)."
             )
+            return
+
+        try:
+            review_data = json.loads(review_result.content)
+        except (json.JSONDecodeError, TypeError):
+            st.error("Review status file exists but isn't valid JSON yet -- try again shortly.")
+            return
+
+        render_review_stage(
+            review_data, review_path, review_slug,
+            stage_name="1. Test Plan", stage_key="plan",
+            artifact_label="View test plan on GitHub",
+            approve_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
+            revise_workflow=GITHUB_PIPELINE_PLAN_WORKFLOW_FILE,
+        )
+        st.divider()
+
+        if review_data.get("plan", {}).get("status") == "approved":
+            render_review_stage(
+                review_data, review_path, review_slug,
+                stage_name="2. Automation Suite", stage_key="automation",
+                artifact_label="View automation suite on GitHub",
+                approve_workflow=GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE,
+                revise_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
+            )
         else:
-            try:
-                review_data = json.loads(review_result.content)
-            except (json.JSONDecodeError, TypeError):
-                st.error("Review status file exists but isn't valid JSON yet -- try again shortly.")
-                review_data = None
+            st.markdown("##### 2. Automation Suite")
+            st.caption("Waiting on test plan approval.")
+        st.divider()
 
-            if review_data:
-                render_review_stage(
-                    review_data, review_path, review_slug,
-                    stage_name="1. Test Plan", stage_key="plan",
-                    artifact_label="View test plan on GitHub",
-                    approve_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
-                    revise_workflow=GITHUB_PIPELINE_PLAN_WORKFLOW_FILE,
-                )
-                st.divider()
+        st.markdown("##### 3. Execution")
+        execute_data = review_data.get("execute", {})
+        execute_status = execute_data.get("status", "not_started")
+        st.markdown(REVIEW_STATUS_LABELS.get(execute_status, execute_status))
+        if execute_data.get("workflow_run_url"):
+            st.markdown(f"[View the run on GitHub]({execute_data['workflow_run_url']})")
+        if execute_status == "completed":
+            st.caption("See the Overview tab for the full report.")
+        if review_auto_refresh:
+            st.caption(
+                f"Last checked {datetime.now(timezone.utc).strftime('%H:%M:%S')} UTC -- "
+                "auto-refreshing every 15s."
+            )
 
-                if review_data.get("plan", {}).get("status") == "approved":
-                    render_review_stage(
-                        review_data, review_path, review_slug,
-                        stage_name="2. Automation Suite", stage_key="automation",
-                        artifact_label="View automation suite on GitHub",
-                        approve_workflow=GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE,
-                        revise_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
-                    )
-                else:
-                    st.markdown("##### 2. Automation Suite")
-                    st.caption("Waiting on test plan approval.")
-                st.divider()
-
-                st.markdown("##### 3. Execution")
-                execute_data = review_data.get("execute", {})
-                execute_status = execute_data.get("status", "not_started")
-                st.markdown(REVIEW_STATUS_LABELS.get(execute_status, execute_status))
-                if execute_data.get("workflow_run_url"):
-                    st.markdown(f"[View the run on GitHub]({execute_data['workflow_run_url']})")
-                if execute_status == "completed":
-                    st.caption("See the Overview tab for the full report.")
+    render_review_tab()
