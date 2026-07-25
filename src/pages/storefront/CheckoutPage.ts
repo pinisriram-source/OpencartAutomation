@@ -103,7 +103,9 @@ export class CheckoutPage extends BasePage {
       await shippingRadio.check();
     }
     await this.page.locator('#button-shipping-method').click();
-    await this.page.waitForTimeout(800);
+    // No wait here: every caller invokes selectPaymentMethodIfPresent() right
+    // after, which already does its own explicit waitFor() on the payment
+    // panel before proceeding.
   }
 
   async selectPaymentMethodIfPresent(): Promise<void> {

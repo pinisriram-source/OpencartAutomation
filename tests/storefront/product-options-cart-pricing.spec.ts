@@ -32,7 +32,7 @@ test('TC-PDP-003/004/005 all option types on Apple Cinema 30" are captured throu
   await expect(productPage.successAlert).toBeVisible();
 
   await cartPage.open();
-  const cartRow = cartPage.page.locator('tr').filter({ has: cartPage.page.getByRole('link', { name: PRODUCT_NAME, exact: true }) });
+  const cartRow = cartPage.rowByProductName(PRODUCT_NAME);
   await expect(cartRow).toContainText('Text: Engrave: QA Automat');
   await expect(cartRow).toContainText('Select: Red');
   await expect(cartRow).toContainText('Radio:');
@@ -52,7 +52,6 @@ test('TC-PDP-003/004/005 all option types on Apple Cinema 30" are captured throu
   await adminOrderListPage.filterByCustomer(customer.firstName);
   await adminOrderListPage.openOrderByCustomer(customer.firstName);
 
-  const productLines = adminOrderDetailPage.page.locator('#content');
-  await expect(productLines).toContainText('Engrave');
-  await expect(productLines).toContainText('Red');
+  await expect(adminOrderDetailPage.orderContent).toContainText('Engrave');
+  await expect(adminOrderDetailPage.orderContent).toContainText('Red');
 });

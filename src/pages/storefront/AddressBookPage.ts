@@ -14,8 +14,12 @@ export class AddressBookPage extends BasePage {
     await this.page.locator('#input-city').fill(customer.city);
     await this.page.locator('#input-postcode').fill(customer.postcode);
     await this.page.locator('select[name="country_id"]').selectOption({ label: customer.country });
-    await this.page.waitForTimeout(500);
-    await this.page.locator('select[name="zone_id"]').selectOption({ label: customer.zone });
+    const zoneSelect = this.page.locator('select[name="zone_id"]');
+    await this.page.waitForFunction(
+      (el) => (el as HTMLSelectElement).options.length > 1,
+      await zoneSelect.elementHandle(),
+    );
+    await zoneSelect.selectOption({ label: customer.zone });
     if (setDefault) {
       await this.page.locator('input[name="default"][value="1"]').check();
     }

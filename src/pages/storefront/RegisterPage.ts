@@ -21,7 +21,7 @@ export class RegisterPage extends BasePage {
   }
 
   get emailError() {
-    return this.page.locator('#input-email').locator('xpath=following-sibling::div[contains(@class,"text-danger")]');
+    return this.page.getByText(/e-mail address does not appear to be valid/i);
   }
 
   get successHeading() {

@@ -47,6 +47,5 @@ test('TC-CART-004 / TC-ADMIN-MKT-001 admin-created coupon discounts the storefro
   await adminOrderListPage.open();
   await adminOrderListPage.filterByCustomer(customer.firstName);
   await adminOrderListPage.openOrderByCustomer(customer.firstName);
-  const orderContent = adminOrderDetailPage.page.locator('#content');
-  await expect(orderContent).toContainText('Coupon');
+  await expect(adminOrderDetailPage.orderContent).toContainText('Coupon');
 });

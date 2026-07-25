@@ -5,7 +5,7 @@ export class CartPage extends BasePage {
     await this.gotoRoute('checkout/cart');
   }
 
-  private rowByProductName(name: string) {
+  rowByProductName(name: string) {
     return this.page.locator('tr').filter({ has: this.page.getByRole('link', { name, exact: true }) });
   }
 
@@ -36,15 +36,23 @@ export class CartPage extends BasePage {
   async applyCoupon(code: string): Promise<void> {
     await this.page.getByRole('link', { name: /use coupon code/i }).click();
     await this.page.locator('#input-coupon').fill(code);
-    await this.page.locator('#button-coupon').click();
-    await this.page.waitForTimeout(1000);
+    await Promise.all([
+      this.page.waitForResponse((r) => /route=extension\/total\/coupon\/coupon/.test(r.url())),
+      this.page.locator('#button-coupon').click(),
+    ]);
   }
 
   async applyVoucher(code: string): Promise<void> {
-    await this.page.getByRole('link', { name: /gift certificate/i }).click();
+    // "Gift Certificate" also matches the footer's "Gift Certificates" nav
+    // link under a loose /gift certificate/i match -- anchor to the start
+    // of the accordion toggle's accessible name ("Use Gift Certificate ")
+    // to keep this a single, unambiguous match.
+    await this.page.getByRole('link', { name: /^use gift certificate/i }).click();
     await this.page.locator('#input-voucher').fill(code);
-    await this.page.locator('#button-voucher').click();
-    await this.page.waitForTimeout(1000);
+    await Promise.all([
+      this.page.waitForResponse((r) => /route=extension\/total\/voucher\/voucher/.test(r.url())),
+      this.page.locator('#button-voucher').click(),
+    ]);
   }
 
   async proceedToCheckout(): Promise<void> {
