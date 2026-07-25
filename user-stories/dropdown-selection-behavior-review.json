@@ -1,21 +1,21 @@
 {
   "slug": "dropdown-selection-behavior",
-  "request_file": "user-stories/request-dropdown-selection-behavior-20260725-064639.md",
+  "request_file": "user-stories/request-dropdown-selection-behavior-20260725-070936.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/dropdown-selection-behavior-test-plan.md",
-    "revision": 1,
+    "revision": 2,
     "feedback": ""
   },
   "automation": {
-    "status": "not_started",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "tests/dropdown-selection-behavior/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-25T06:49:28.415Z"
+  "updated_at": "2026-07-25T07:29:36.880Z"
 }
