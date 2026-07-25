@@ -2,7 +2,7 @@
   "slug": "dropdown-selection-behavior",
   "request_file": "user-stories/request-dropdown-selection-behavior-20260725-070936.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/dropdown-selection-behavior-test-plan.md",
     "revision": 2,
     "feedback": ""
