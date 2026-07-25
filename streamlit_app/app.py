@@ -87,10 +87,18 @@ def annotate_step_results(steps: list[dict], outcome: str, defect: dict | None) 
     "not_reached" (the throw stopped the test before they ran). If no defect
     matches confidently, every step is marked "unknown" rather than guessing.
     """
-    if outcome != "fail" or not defect:
-        status = "passed" if outcome == "pass" else "unknown"
+    if outcome == "pass":
+        for step in steps:
+            step["result"] = "passed"
+        return
+    if outcome != "fail":
+        status = "skipped" if outcome == "skip" else "unknown"
         for step in steps:
             step["result"] = status
+        return
+    if not defect:
+        for step in steps:
+            step["result"] = "unknown"
         return
 
     expected_lower = (defect.get("expected") or "").lower()
@@ -113,6 +121,30 @@ def annotate_step_results(steps: list[dict], outcome: str, defect: dict | None) 
             step["result"] = "failed"
         else:
             step["result"] = "not_reached"
+
+
+def step_actual_text(step: dict, defect: dict | None) -> tuple[str, str]:
+    """Returns (st-method-name, message) describing what actually happened for this step.
+
+    Only a "failed" step has a genuine recorded actual value (the matched
+    defect's `actual` field) -- everything else is inferred from the overall
+    test outcome, since there's no per-assertion runtime capture to draw on.
+    """
+    result = step.get("result")
+    if result == "passed":
+        return "success", "Matched expected -- the assertion(s) for this step passed as written."
+    if result == "failed":
+        actual = (defect or {}).get("actual") or "Assertion failed (no further detail recorded)."
+        return "error", actual
+    if result == "not_reached":
+        return "info", "Not executed -- the test stopped at an earlier failed assertion before reaching this step."
+    if result == "skipped":
+        return "info", "Not executed -- this test case was skipped in the run."
+    # "unknown": test failed overall but couldn't be confidently attributed to this step
+    note = "Test failed overall, but this step's outcome couldn't be confidently matched to a specific assertion."
+    if defect and defect.get("actual"):
+        note += f" Recorded overall actual behavior: {defect['actual']}"
+    return "warning", note
 
 # --- Target repo for the "Submit New Request" form ---
 GITHUB_OWNER = "pinisriram-source"
@@ -651,19 +683,22 @@ with tab_details:
                 )
             else:
                 annotate_step_results(step_records, outcome, matching_defect)
-                result_badges = {
-                    "passed": "✅ Passed",
-                    "failed": "❌ Failed",
-                    "not_reached": "⏭️ Not reached -- the test stopped at an earlier failed assertion",
-                    "unknown": "ℹ️ Result not attributable to a specific step",
-                }
                 for step in step_records:
                     with st.container(border=True):
                         st.markdown(f"**Step {step['number']}. {step['text']}**")
-                        st.markdown(result_badges.get(step["result"], step["result"]))
+
+                        st.markdown("**Expected:**")
                         if step["expectations"]:
-                            st.markdown("Validations:\n" + "\n".join(f"- {e}" for e in step["expectations"]))
+                            st.markdown("\n".join(f"- {e}" for e in step["expectations"]))
+                        else:
+                            st.caption("No explicit validation comment captured for this step.")
+
+                        st.markdown("**Actual:**")
+                        actual_kind, actual_text = step_actual_text(step, matching_defect)
+                        getattr(st, actual_kind)(actual_text)
+
                         if step["code_lines"]:
+                            st.markdown("Automation code for this step:")
                             st.code("\n".join(step["code_lines"]), language="typescript")
                 if outcome == "fail" and not matching_defect:
                     st.caption(
