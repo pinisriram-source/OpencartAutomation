@@ -2,17 +2,18 @@
   "meta": {
     "app_under_test": "Key Presses",
     "app_url": "https://the-internet.herokuapp.com/key_presses",
-    "report_date": "2026-07-24",
+    "report_date": "2026-07-25",
     "test_account": "",
     "browsers": [
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/key-presses --project=chromium",
-    "duration_minutes": 0.8,
+    "duration_minutes": 0.3,
     "test_plan_path": "specs/key-presses-test-plan.md",
     "suite_path": "tests/key-presses/",
     "story": "",
-    "report_generated_at": "2026-07-24T08:52:01.278Z"
+    "report_generated_at": "2026-07-25T16:30:23.399Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30165683809"
   },
   "summary": {
     "test_cases": 35,
