@@ -2,9 +2,9 @@
   "slug": "key-presses",
   "request_file": "user-stories/request-key-presses-20260725-160754.md",
   "plan": {
-    "status": "in_progress",
+    "status": "pending_review",
     "path": "specs/key-presses-test-plan.md",
-    "revision": 2,
+    "revision": 3,
     "feedback": ""
   },
   "automation": {
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-25T16:08:23.940Z"
+  "updated_at": "2026-07-25T16:08:25.332Z"
 }
