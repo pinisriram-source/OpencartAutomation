@@ -8,14 +8,14 @@
     "feedback": ""
   },
   "automation": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "tests/dropdown-selection-behavior/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-25T07:12:37.265Z"
+  "updated_at": "2026-07-25T07:29:36.880Z"
 }
