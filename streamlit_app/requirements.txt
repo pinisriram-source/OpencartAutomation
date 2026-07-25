@@ -2,3 +2,6 @@ streamlit>=1.38
 pandas>=2.2
 plotly>=5.22
 requests>=2.32
+markdown>=3.6
+google-api-python-client>=2.140
+google-auth>=2.32

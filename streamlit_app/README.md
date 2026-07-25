@@ -138,6 +138,43 @@ directly, though the workflow run link is also shown after triggering. The
 same stages are also reflected, per-artifact, in `user-stories/<slug>-review.json`
 for the Review tab.
 
+## Review tab artifacts as Google Docs (optional)
+
+By default, the Review tab links each artifact straight to its GitHub blob
+view. If you'd rather reviewers see a proper Google Doc (headings, lists,
+tables rendered, commentable), configure two more Streamlit secrets and the
+app will publish/update a Google Doc per stage automatically -- no change
+needed on the pipeline side, this happens lazily in the dashboard the next
+time a stage's Review section is rendered.
+
+**One-time Google Cloud setup:**
+1. Create (or reuse) a Google Cloud project, enable the **Google Drive API**.
+2. Create a **service account** (IAM & Admin → Service Accounts), then
+   generate and download a JSON key for it.
+3. In your own Google Drive, create a folder for these docs, then **share
+   that folder with the service account's email address as Editor** --
+   service accounts have no Drive storage quota of their own, so the docs
+   must live in a folder a real account owns and has shared with it.
+4. Copy the folder's ID out of its URL
+   (`https://drive.google.com/drive/folders/<THIS_PART>`).
+
+**Add as Streamlit secrets:**
+```toml
+GOOGLE_SERVICE_ACCOUNT_JSON = '''{"type": "service_account", "project_id": "...", ...}'''
+GOOGLE_DRIVE_FOLDER_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz"
+```
+(paste the entire downloaded JSON key file's contents as the first value,
+wrapped in `'''`).
+
+Each stage's doc is created once and then overwritten in place on later
+revisions (tracked via a `doc_revision` field alongside the artifact's own
+`revision` in `user-stories/<slug>-review.json`, so it isn't recreated or
+rewritten on every 15s auto-refresh tick -- only when the artifact actually
+changes). New docs are shared as "anyone with the link can view", matching
+the rest of this project's artifacts (public repo, public dashboard).
+Leaving these two secrets unset keeps the GitHub link as-is -- this
+feature is fully optional.
+
 **Known limitation:** running Claude Code non-interactively with the
 `playwright-test` MCP server in a fresh Ubuntu CI container (as opposed to
 an interactive session) is still relatively early -- expect to iterate

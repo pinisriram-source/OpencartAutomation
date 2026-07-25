@@ -19,6 +19,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from github_commit import create_file, get_file, trigger_workflow, upsert_file, wait_for_ref
+from google_docs import upsert_google_doc
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
 CATEGORICAL = ["#2a78d6", "#008300", "#e87ba4", "#eda100", "#1baf7a", "#eb6834"]
@@ -61,6 +62,26 @@ def get_pipeline_passphrase() -> str:
 def get_github_token() -> str:
     try:
         return st.secrets.get("GITHUB_TOKEN", "")
+    except Exception:
+        return ""
+
+
+def get_google_service_account_info() -> dict | None:
+    try:
+        raw = st.secrets.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+    except Exception:
+        return None
+    if not raw:
+        return None
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return None
+
+
+def get_google_drive_folder_id() -> str:
+    try:
+        return st.secrets.get("GOOGLE_DRIVE_FOLDER_ID", "")
     except Exception:
         return ""
 
@@ -887,6 +908,68 @@ REVIEW_STATUS_LABELS = {
 }
 
 
+def _sync_stage_google_doc(
+    review_data: dict,
+    review_path: str,
+    review_slug: str,
+    stage_key: str,
+    stage_name: str,
+    stage_data: dict,
+    artifact_path: str,
+) -> tuple[dict, dict]:
+    """Ensure this stage's Google Doc reflects the current artifact revision.
+
+    Cheap no-op on every render once caught up: the doc is only (re)created
+    when doc_revision doesn't match the artifact's current revision, so the
+    15s auto-refresh tick doesn't hammer the Drive API or spam commits.
+    Falls back silently (caller shows the plain GitHub link) if Google
+    credentials aren't configured, or if the sync itself fails.
+    """
+    service_account_info = get_google_service_account_info()
+    folder_id = get_google_drive_folder_id()
+    if not service_account_info or not folder_id:
+        return stage_data, review_data
+
+    current_revision = stage_data.get("revision", 0)
+    if stage_data.get("doc_url") and stage_data.get("doc_revision") == current_revision:
+        return stage_data, review_data
+
+    content_result = get_file(
+        owner=GITHUB_OWNER, repo=GITHUB_REPO, path=artifact_path, ref=GITHUB_BRANCH, token=get_github_token(),
+    )
+    if not content_result.success:
+        return stage_data, review_data
+
+    doc_result = upsert_google_doc(
+        service_account_info=service_account_info,
+        folder_id=folder_id,
+        title=f"{review_slug} -- {stage_name}",
+        markdown_content=content_result.content,
+        existing_doc_id=stage_data.get("doc_id") or None,
+    )
+    if not doc_result.success:
+        st.warning(f"Couldn't sync Google Doc for {stage_name}: {doc_result.message}")
+        return stage_data, review_data
+
+    updated_stage = {
+        **stage_data,
+        "doc_id": doc_result.doc_id,
+        "doc_url": doc_result.doc_url,
+        "doc_revision": current_revision,
+    }
+    updated_review = {**review_data, stage_key: updated_stage}
+    upsert_file(
+        owner=GITHUB_OWNER,
+        repo=GITHUB_REPO,
+        branch=GITHUB_BRANCH,
+        path=review_path,
+        content=json.dumps(updated_review, indent=2) + "\n",
+        commit_message=f"chore(review): sync {stage_key} google doc for {review_slug}",
+        token=get_github_token(),
+    )
+    return updated_stage, updated_review
+
+
 def render_review_stage(
     review_data: dict,
     review_path: str,
@@ -912,7 +995,14 @@ def render_review_stage(
         st.caption(f"Revision {stage_data['revision']}")
     artifact_path = stage_data.get("path", "")
     if artifact_path:
-        st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
+        stage_data, review_data = _sync_stage_google_doc(
+            review_data, review_path, review_slug, stage_key, stage_name, stage_data, artifact_path,
+        )
+        doc_url = stage_data.get("doc_url", "")
+        if doc_url:
+            st.markdown(f"[{artifact_label} (Google Doc)]({doc_url})")
+        else:
+            st.markdown(f"[{artifact_label} on GitHub]({github_url(artifact_path)})")
 
     if status != "pending_review":
         if status == "changes_requested" and stage_data.get("feedback"):
