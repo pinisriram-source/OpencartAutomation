@@ -36,7 +36,7 @@ LOCATOR_METHOD_RE = re.compile(
 )
 ASSERTION_LINE_RE = re.compile(r"expect\(")
 STEP_MARKER_RE = re.compile(r"^\s*//\s*(\d+)\.\s*(.+)$")
-EXPECT_MARKER_RE = re.compile(r"^\s*//\s*(?:expect|verify):\s*(.+)$", re.IGNORECASE)
+EXPECT_MARKER_RE = re.compile(r"^\s*//\s*(?:expect|verify)\b\s*:?\s*(.+)$", re.IGNORECASE)
 
 
 def parse_step_markers(block: str) -> list[dict]:
@@ -121,6 +121,18 @@ def annotate_step_results(steps: list[dict], outcome: str, defect: dict | None) 
             step["result"] = "failed"
         else:
             step["result"] = "not_reached"
+
+
+def step_expected_lines(step: dict) -> list[str]:
+    """Falls back to the step's own `expect(...)` code lines when the
+    generator didn't emit an explicit `// expect:`/`// Verify:` comment --
+    the assertions still ARE the expected validation, so showing "no
+    comment captured" alone (with real assertions sitting right below in
+    the code block) reads as if nothing was validated at all.
+    """
+    if step["expectations"]:
+        return step["expectations"]
+    return [line.strip() for line in step["code_lines"] if ASSERTION_LINE_RE.search(line)]
 
 
 def step_actual_text(step: dict, defect: dict | None) -> tuple[str, str]:
@@ -691,7 +703,15 @@ with tab_details:
                         if step["expectations"]:
                             st.markdown("\n".join(f"- {e}" for e in step["expectations"]))
                         else:
-                            st.caption("No explicit validation comment captured for this step.")
+                            inferred = step_expected_lines(step)
+                            if inferred:
+                                st.caption(
+                                    "No explicit validation comment captured -- inferred from "
+                                    "this step's assertion code:"
+                                )
+                                st.code("\n".join(inferred), language="typescript")
+                            else:
+                                st.caption("No explicit validation comment captured for this step.")
 
                         st.markdown("**Actual:**")
                         actual_kind, actual_text = step_actual_text(step, matching_defect)
