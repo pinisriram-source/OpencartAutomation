@@ -1,11 +1,11 @@
 import { Page, Locator } from '@playwright/test';
 
 /**
- * Playwright's baseURL for this project includes a path
- * (http://localhost/opencart/upload/). A goto('/some/path') resolves from
- * the domain ROOT per WHATWG URL rules, escaping the app entirely (lands on
- * XAMPP's welcome page). Every navigation must therefore be relative
- * WITHOUT a leading slash.
+ * Playwright's baseURL for this project includes a path (STOREFRONT_BASE_URL,
+ * e.g. https://tutorialsninja.com/demo/). A goto('/some/path') resolves from
+ * the domain ROOT per WHATWG URL rules, escaping the app entirely (e.g.
+ * https://tutorialsninja.com/some/path instead of .../demo/some/path).
+ * Every navigation must therefore be relative WITHOUT a leading slash.
  */
 export abstract class BasePage {
   constructor(public readonly page: Page) {}
@@ -18,6 +18,9 @@ export abstract class BasePage {
     await this.page.goto('');
   }
 
+  // OpenCart's injected alert box carries no role/testid and its message
+  // text varies per action, so there's no getBy* alternative -- CSS class
+  // is the only way to target it.
   get successAlert(): Locator {
     return this.page.locator('.alert-success');
   }

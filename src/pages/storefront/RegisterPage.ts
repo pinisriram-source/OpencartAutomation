@@ -7,16 +7,20 @@ export class RegisterPage extends BasePage {
   }
 
   async register(customer: GuestCustomer, opts: { subscribeNewsletter?: boolean } = {}): Promise<void> {
-    await this.page.locator('#input-firstname').fill(customer.firstName);
-    await this.page.locator('#input-lastname').fill(customer.lastName);
-    await this.page.locator('#input-email').fill(customer.email);
-    await this.page.locator('#input-telephone').fill(customer.telephone);
-    await this.page.locator('#input-password').fill(customer.password);
-    await this.page.locator('#input-confirm').fill(customer.password);
+    await this.page.getByLabel('First Name').fill(customer.firstName);
+    await this.page.getByLabel('Last Name').fill(customer.lastName);
+    await this.page.getByLabel('E-Mail').fill(customer.email);
+    await this.page.getByLabel('Telephone').fill(customer.telephone);
+    await this.page.getByLabel('Password', { exact: true }).fill(customer.password);
+    await this.page.getByLabel('Password Confirm').fill(customer.password);
     if (opts.subscribeNewsletter) {
-      await this.page.locator('input[name="newsletter"][value="1"]').check();
+      await this.page.getByRole('radio', { name: 'Yes' }).check();
     }
-    await this.page.locator('input[name="agree"]').check();
+    // The "I have read and agree..." checkbox isn't wrapped in a <label>
+    // (the surrounding text is loose, with an embedded Privacy Policy link),
+    // so it has no accessible name -- getByRole('checkbox') with no name
+    // filter is safe since it's the only checkbox on this form.
+    await this.page.getByRole('checkbox').check();
     await this.page.getByRole('button', { name: 'Continue' }).click();
   }
 

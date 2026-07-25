@@ -14,7 +14,7 @@ export class AccountPage extends BasePage {
   }
 
   async editLastName(newLastName: string): Promise<void> {
-    await this.page.locator('#input-lastname').fill(newLastName);
+    await this.page.getByLabel('Last Name').fill(newLastName);
     await this.page.getByRole('button', { name: 'Continue' }).click();
   }
 
@@ -23,8 +23,8 @@ export class AccountPage extends BasePage {
   }
 
   async changePassword(newPassword: string): Promise<void> {
-    await this.page.locator('#input-password').fill(newPassword);
-    await this.page.locator('#input-confirm').fill(newPassword);
+    await this.page.getByLabel('Password', { exact: true }).fill(newPassword);
+    await this.page.getByLabel('Password Confirm').fill(newPassword);
     await this.page.getByRole('button', { name: 'Continue' }).click();
   }
 
@@ -33,7 +33,7 @@ export class AccountPage extends BasePage {
   }
 
   async setNewsletterSubscription(subscribe: boolean): Promise<void> {
-    await this.page.locator(`input[name="newsletter"][value="${subscribe ? 1 : 0}"]`).check();
+    await this.page.getByRole('radio', { name: subscribe ? 'Yes' : 'No' }).check();
     await this.page.getByRole('button', { name: 'Continue' }).click();
   }
 }

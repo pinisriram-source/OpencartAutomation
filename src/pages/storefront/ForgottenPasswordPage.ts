@@ -6,7 +6,7 @@ export class ForgottenPasswordPage extends BasePage {
   }
 
   async requestReset(email: string): Promise<void> {
-    await this.page.locator('#input-email').fill(email);
+    await this.page.getByLabel('E-Mail Address').fill(email);
     await this.page.getByRole('button', { name: 'Continue' }).click();
   }
 
