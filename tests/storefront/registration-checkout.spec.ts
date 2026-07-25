@@ -25,6 +25,7 @@ test('TC-REGISTER-001 / TC-CHECKOUT-008 register, checkout while logged in, and 
 
   await checkoutPage.fillLoggedInBillingDetails(customer);
   await checkoutPage.submitAddress();
+  await checkoutPage.continueDeliveryAddressIfPresent();
 
   await checkoutPage.continueShippingMethodIfPresent();
   await checkoutPage.selectPaymentMethodIfPresent();

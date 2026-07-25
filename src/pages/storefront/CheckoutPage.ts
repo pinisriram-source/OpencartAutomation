@@ -9,40 +9,37 @@ export class CheckoutPage extends BasePage {
   // ---- Step 1: Checkout Options ----
 
   async chooseGuestCheckout(): Promise<void> {
-    await this.page.locator('input[name="account"][value="guest"]').check();
+    await this.page.getByRole('radio', { name: 'Guest Checkout' }).check();
     await this.page.locator('#button-account').click();
     await this.page.locator('#collapse-payment-address').waitFor({ state: 'visible' });
   }
 
-  async chooseLoginAtCheckout(): Promise<void> {
-    await this.page.locator('input[name="account"][value="login"]').check();
-    await this.page.locator('#button-account').click();
-  }
-
   async loginDuringCheckout(email: string, password: string): Promise<void> {
-    await this.page.locator('#collapse-checkout-option input[name="email"]').fill(email);
-    await this.page.locator('#collapse-checkout-option input[name="password"]').fill(password);
-    await this.page.getByRole('button', { name: /^login$/i }).click();
+    await this.page.getByLabel('E-Mail').fill(email);
+    await this.page.getByLabel('Password').fill(password);
+    await this.page.getByRole('button', { name: 'Login' }).click();
   }
 
   // ---- Step 2: Billing Details (guest) ----
 
   async fillGuestBillingDetails(customer: GuestCustomer): Promise<void> {
-    const p = '#collapse-payment-address';
-    await this.page.locator(`${p} #input-payment-firstname`).fill(customer.firstName);
-    await this.page.locator(`${p} #input-payment-lastname`).fill(customer.lastName);
-    await this.page.locator(`${p} #input-payment-email`).fill(customer.email);
-    await this.page.locator(`${p} #input-payment-telephone`).fill(customer.telephone);
-    await this.page.locator(`${p} #input-payment-address-1`).fill(customer.address1);
-    await this.page.locator(`${p} #input-payment-city`).fill(customer.city);
-    await this.page.locator(`${p} #input-payment-postcode`).fill(customer.postcode);
-    await this.page.locator(`${p} select[name="country_id"]`).selectOption({ label: customer.country });
-    const zoneSelect = this.page.locator(`${p} select[name="zone_id"]`);
-    await this.page.waitForFunction(
-      (el) => (el as HTMLSelectElement).options.length > 1,
-      await zoneSelect.elementHandle(),
-    );
-    await zoneSelect.selectOption({ label: customer.zone });
+    const scope = this.page.locator('#collapse-payment-address');
+    await scope.getByLabel('First Name').fill(customer.firstName);
+    await scope.getByLabel('Last Name').fill(customer.lastName);
+    await scope.getByLabel('E-Mail').fill(customer.email);
+    await scope.getByLabel('Telephone').fill(customer.telephone);
+    await scope.getByLabel('Address 1').fill(customer.address1);
+    await scope.getByLabel('City').fill(customer.city);
+    await scope.getByLabel('Post Code').fill(customer.postcode);
+    // Selecting the country (re-selecting the already-default one included)
+    // always fires this billing form's country-change AJAX, which replaces
+    // the zone <select>'s entire option list -- waiting for that response
+    // before touching the zone field avoids racing the reload.
+    await Promise.all([
+      this.page.waitForResponse((r) => /route=checkout\/checkout\/country/.test(r.url())),
+      scope.getByLabel('Country').selectOption({ label: customer.country }),
+    ]);
+    await scope.getByLabel('Region / State').selectOption({ label: customer.zone });
 
     // For shippable products, a "shipping_address" checkbox appears here,
     // checked by default. Checked means "use this billing address for
@@ -60,23 +57,38 @@ export class CheckoutPage extends BasePage {
    * fields (those belong to the account already) — otherwise same layout.
    */
   async fillLoggedInBillingDetails(customer: GuestCustomer): Promise<void> {
-    const p = '#collapse-payment-address';
-    await this.page.locator(`${p} #input-payment-firstname`).fill(customer.firstName);
-    await this.page.locator(`${p} #input-payment-lastname`).fill(customer.lastName);
-    await this.page.locator(`${p} #input-payment-address-1`).fill(customer.address1);
-    await this.page.locator(`${p} #input-payment-city`).fill(customer.city);
-    await this.page.locator(`${p} #input-payment-postcode`).fill(customer.postcode);
-    await this.page.locator(`${p} select[name="country_id"]`).selectOption({ label: customer.country });
-    const zoneSelect = this.page.locator(`${p} select[name="zone_id"]`);
-    await this.page.waitForFunction(
-      (el) => (el as HTMLSelectElement).options.length > 1,
-      await zoneSelect.elementHandle(),
-    );
-    await zoneSelect.selectOption({ label: customer.zone });
+    const scope = this.page.locator('#collapse-payment-address');
+    await scope.getByLabel('First Name').fill(customer.firstName);
+    await scope.getByLabel('Last Name').fill(customer.lastName);
+    await scope.getByLabel('Address 1').fill(customer.address1);
+    await scope.getByLabel('City').fill(customer.city);
+    await scope.getByLabel('Post Code').fill(customer.postcode);
+    await Promise.all([
+      this.page.waitForResponse((r) => /route=checkout\/checkout\/country/.test(r.url())),
+      scope.getByLabel('Country').selectOption({ label: customer.country }),
+    ]);
+    await scope.getByLabel('Region / State').selectOption({ label: customer.zone });
   }
 
   async submitAddress(): Promise<void> {
     await this.page.locator('#button-payment-address').click();
+  }
+
+  /**
+   * Logged-in customers get an extra "Delivery Details" step (choose an
+   * existing address or add a new one) that guest checkout never shows --
+   * submitting Billing Details auto-saves it to the address book, so this
+   * step always has at least that address pre-selected. Guest checkouts
+   * never reach this panel at all, so this is a no-op for them.
+   */
+  async continueDeliveryAddressIfPresent(): Promise<void> {
+    const continueButton = this.page.locator('#button-shipping-address');
+    try {
+      await continueButton.waitFor({ state: 'visible', timeout: 8_000 });
+    } catch {
+      return;
+    }
+    await continueButton.click();
   }
 
   // ---- Step 3/4: Shipping, Payment method & Confirm ----
@@ -90,7 +102,7 @@ export class CheckoutPage extends BasePage {
   // spec working regardless of which demo product is used.
 
   async continueShippingMethodIfPresent(): Promise<void> {
-    const shippingRadio = this.page.locator('input[name="shipping_method"]').first();
+    const shippingRadio = this.page.locator('#collapse-shipping-method').getByRole('radio').first();
     try {
       // The shipping method fragment loads asynchronously right after the
       // billing step; a plain .count() can race it and see zero, so give
@@ -109,19 +121,26 @@ export class CheckoutPage extends BasePage {
   }
 
   async selectPaymentMethodIfPresent(): Promise<void> {
-    const paymentRadio = this.page.locator('input[name="payment_method"]').first();
+    const paymentRadio = this.page.locator('#collapse-payment-method').getByRole('radio').first();
     await paymentRadio.waitFor({ state: 'visible', timeout: 15_000 });
     if (!(await paymentRadio.isChecked())) {
       await paymentRadio.check();
     }
   }
 
+  // The comment textarea carries no <label>, and when shipping is required
+  // BOTH the shipping-method and payment-method panels render their own copy
+  // simultaneously (neither is removed from the DOM) -- .last() targets the
+  // payment-method step's copy, which is the one actually submitted.
   async enterOrderComment(comment: string): Promise<void> {
-    await this.page.locator('textarea[name="comment"]').fill(comment);
+    await this.page.locator('textarea[name="comment"]').last().fill(comment);
   }
 
+  // The "I have read and agree..." checkbox has no <label> either (loose
+  // text with an embedded Terms & Conditions link, same as register's), but
+  // it's the only checkbox present at this step.
   async agreeToTerms(): Promise<void> {
-    await this.page.locator('input[name="agree"]').check();
+    await this.page.getByRole('checkbox').check();
   }
 
   /**
