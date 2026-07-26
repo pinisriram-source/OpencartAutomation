@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "tests/hovers/",
     "revision": 1,
     "feedback": ""
