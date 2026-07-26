@@ -8,14 +8,14 @@
     "feedback": ""
   },
   "automation": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "tests/dynamic-loading-hidden-and-rendered-elements/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-26T12:54:11.111Z"
+  "updated_at": "2026-07-26T13:04:28.624Z"
 }
