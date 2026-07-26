@@ -149,16 +149,30 @@ Generate Playwright JavaScript automation scripts.
 
 <TEST_SUITE_DIR>
 
-3. Use the test case names and steps from the test plan.
+3. Build a Page Object Model following CLAUDE.md's "Page Object contract —
+'Submit New Request' pipeline suites": one class per page/feature area in
+<TEST_SUITE_DIR>/page-objects/, extending the shared BasePage at
+tests/_shared/base-page.ts (not the OpenCart-specific storefront/admin
+BasePage), with locators exposed as `get` accessor methods rather than
+readonly constructor properties. See tests/hovers/page-objects/hovers.page.ts
+for a worked example.
 
-4. Use reliable selectors and strategies from exploratory testing.
+4. Use the test case names and steps from the test plan.
+
+5. Use reliable selectors and strategies from exploratory testing, following
+this repo's locator priority (getByRole -> getByLabel -> getByTestId ->
+getByText -> CSS only as a documented exception, e.g. for structural
+scoping of repeated identical elements or attached-but-hidden assertions).
 
 Requirements:
 
 • Follow Playwright best practices
 • Include proper assertions using expect()
 • Use descriptive test names matching the format in the test plan
-• Use robust element selectors discovered during manual testing
+• Use robust element selectors discovered during manual testing, preferring
+  getByRole/getByLabel/getByTestId/getByText over CSS per CLAUDE.md
+• Route all page interaction through the Page Object Model -- no locators
+  built ad hoc inside spec files
 • Add comments for complex steps
 • Use proper wait strategies based on actual application behavior
 • Add proper test hooks (beforeEach, afterEach)
@@ -392,7 +406,7 @@ STEP 3 - EXPLORATORY TESTING:
 Read the test plan from <TEST_PLAN_PATH> and use Playwright browser tools to manually execute each test scenario. Document findings with screenshots and note any issues discovered.
 
 STEP 4 - GENERATE AUTOMATION SCRIPTS:
-Review both the test plan (<TEST_PLAN_PATH>) and exploratory testing results from Step 3. Use the playwright-test-generator agent to create JavaScript automation scripts leveraging the element selectors and insights discovered during manual testing. Save scripts in:
+Review both the test plan (<TEST_PLAN_PATH>) and exploratory testing results from Step 3. Use the playwright-test-generator agent to create JavaScript automation scripts leveraging the element selectors and insights discovered during manual testing. Build a Page Object Model per CLAUDE.md's "Page Object contract -- 'Submit New Request' pipeline suites" (one class per page/feature area under <TEST_SUITE_DIR>/page-objects/, extending tests/_shared/base-page.ts, getter-accessor locators, getByRole/getByLabel/getByTestId/getByText before CSS -- see tests/hovers/page-objects/hovers.page.ts). Save scripts in:
 <TEST_SUITE_DIR>
 
 STEP 5 - EXECUTE AND HEAL TESTS:

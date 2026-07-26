@@ -1,28 +1,31 @@
-import { Page, Locator } from '@playwright/test';
+import { Locator } from '@playwright/test';
+import { BasePage } from '../../_shared/base-page';
 
-export class HoversPage {
-  readonly page: Page;
-  readonly url = 'https://the-internet.herokuapp.com/hovers';
+export class HoversPage extends BasePage {
+  private readonly url = 'https://the-internet.herokuapp.com/hovers';
 
-  readonly pageHeading: Locator;
-  readonly instructionText: Locator;
-  readonly avatarFigures: Locator;
-  readonly avatarImages: Locator;
-  readonly captionOverlays: Locator;
-  readonly viewProfileLinks: Locator;
+  get pageHeading(): Locator {
+    return this.page.getByRole('heading', { name: 'Hovers' });
+  }
 
-  constructor(page: Page) {
-    this.page = page;
-    this.pageHeading = page.getByRole('heading', { name: 'Hovers' });
-    this.instructionText = page.locator('.example p');
-    this.avatarFigures = page.locator('.figure');
-    this.avatarImages = page.locator('.figure img');
-    this.captionOverlays = page.locator('.figcaption');
-    this.viewProfileLinks = page.locator('.figcaption a');
+  get instructionText(): Locator {
+    return this.page.getByText('Hover over the image for additional information');
+  }
+
+  get avatarImages(): Locator {
+    return this.page.getByRole('img', { name: 'User Avatar' });
+  }
+
+  // Each avatar renders as an otherwise-identical ".figure" block with no
+  // distinguishing role/testid/text besides position, so this structural
+  // container is the only way to scope to "the Nth avatar" -- getByRole
+  // locates the actual interactive content inside it.
+  private figure(index: number): Locator {
+    return this.page.locator('.figure').nth(index);
   }
 
   async navigate(): Promise<void> {
-    await this.page.goto(this.url);
+    await this.open(this.url);
   }
 
   async hoverAvatar(index: number): Promise<void> {
@@ -33,19 +36,27 @@ export class HoversPage {
     await this.pageHeading.hover();
   }
 
+  getAvatarImage(index: number): Locator {
+    return this.avatarImages.nth(index);
+  }
+
+  // The caption wrapper itself carries no role, so this stays a scoped CSS
+  // locator -- it's the only way to assert the *wrapper's* hidden/visible
+  // state as distinct from the heading/link inside it.
   getCaptionOverlay(index: number): Locator {
-    return this.captionOverlays.nth(index);
+    return this.figure(index).locator('.figcaption');
   }
 
   getCaptionHeading(index: number): Locator {
-    return this.avatarFigures.nth(index).locator('h5');
+    return this.figure(index).getByRole('heading', { level: 5 });
   }
 
+  // Scoped CSS, not getByRole: when the caption is hidden this anchor is
+  // removed from the accessibility tree entirely, so a role-based locator
+  // resolves to zero elements and can't back a toBeAttached()-while-hidden
+  // assertion (see negative-boundary-tests.spec.ts TC-HOVERS-020) -- CSS is
+  // the only strategy that still finds the (hidden) element in the DOM.
   getViewProfileLink(index: number): Locator {
-    return this.viewProfileLinks.nth(index);
-  }
-
-  getAvatarImage(index: number): Locator {
-    return this.avatarImages.nth(index);
+    return this.figure(index).locator('.figcaption a');
   }
 }
