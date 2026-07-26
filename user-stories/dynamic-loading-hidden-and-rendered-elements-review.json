@@ -2,9 +2,9 @@
   "slug": "dynamic-loading-hidden-and-rendered-elements",
   "request_file": "user-stories/request-dynamic-loading-hidden-and-rendered-elements-20260726-125208.md",
   "plan": {
-    "status": "in_progress",
+    "status": "pending_review",
     "path": "specs/dynamic-loading-hidden-and-rendered-elements-test-plan.md",
-    "revision": 1,
+    "revision": 2,
     "feedback": ""
   },
   "automation": {
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-26T12:52:27.345Z"
+  "updated_at": "2026-07-26T12:52:28.922Z"
 }
