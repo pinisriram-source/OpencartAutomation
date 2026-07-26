@@ -90,6 +90,7 @@
   "tests": [
     {
       "id": "TC-HOVERS-001",
+      "tier": "Smoke",
       "title": "Verify page load shows three avatar images with no visible captions",
       "use_case": "UC1",
       "business_rule": "",
@@ -98,6 +99,7 @@
     },
     {
       "id": "TC-HOVERS-002",
+      "tier": "Sanity",
       "title": "Verify all three avatar images are rendered correctly",
       "use_case": "UC1",
       "business_rule": "",
@@ -106,6 +108,7 @@
     },
     {
       "id": "TC-HOVERS-003",
+      "tier": "Smoke",
       "title": "Hovering over first avatar reveals user1 caption and link",
       "use_case": "UC2",
       "business_rule": "",
@@ -114,6 +117,7 @@
     },
     {
       "id": "TC-HOVERS-004",
+      "tier": "Sanity",
       "title": "Moving mouse away from first avatar hides its caption",
       "use_case": "UC2",
       "business_rule": "",
@@ -122,6 +126,7 @@
     },
     {
       "id": "TC-HOVERS-005",
+      "tier": "Functional",
       "title": "Hovering over second avatar reveals user2 caption and link",
       "use_case": "UC3",
       "business_rule": "",
@@ -130,6 +135,7 @@
     },
     {
       "id": "TC-HOVERS-006",
+      "tier": "Functional",
       "title": "Moving mouse away from second avatar hides its caption",
       "use_case": "UC3",
       "business_rule": "",
@@ -138,6 +144,7 @@
     },
     {
       "id": "TC-HOVERS-007",
+      "tier": "Functional",
       "title": "Hovering over third avatar reveals user3 caption and link",
       "use_case": "UC4",
       "business_rule": "",
@@ -146,6 +153,7 @@
     },
     {
       "id": "TC-HOVERS-008",
+      "tier": "Functional",
       "title": "Moving mouse away from third avatar hides its caption",
       "use_case": "UC4",
       "business_rule": "",
@@ -154,6 +162,7 @@
     },
     {
       "id": "TC-HOVERS-009",
+      "tier": "Functional",
       "title": "Hovering from first to second avatar hides first caption and shows second",
       "use_case": "UC5",
       "business_rule": "",
@@ -162,6 +171,7 @@
     },
     {
       "id": "TC-HOVERS-010",
+      "tier": "Functional",
       "title": "Hovering from second to third avatar hides second caption and shows third",
       "use_case": "UC5",
       "business_rule": "",
@@ -170,6 +180,7 @@
     },
     {
       "id": "TC-HOVERS-011",
+      "tier": "Functional",
       "title": "Hovering from third to first avatar hides third caption and shows first",
       "use_case": "UC5",
       "business_rule": "",
@@ -178,6 +189,7 @@
     },
     {
       "id": "TC-HOVERS-012",
+      "tier": "Sanity",
       "title": "Hovering all three avatars in sequence shows only one caption at a time",
       "use_case": "UC5",
       "business_rule": "",
@@ -186,6 +198,7 @@
     },
     {
       "id": "TC-HOVERS-013",
+      "tier": "Smoke",
       "title": "Clicking View profile link for user1 navigates to /users/1",
       "use_case": "UC6",
       "business_rule": "",
@@ -194,6 +207,7 @@
     },
     {
       "id": "TC-HOVERS-014",
+      "tier": "Functional",
       "title": "Clicking View profile link for user2 navigates to /users/2",
       "use_case": "UC6",
       "business_rule": "",
@@ -202,6 +216,7 @@
     },
     {
       "id": "TC-HOVERS-015",
+      "tier": "Functional",
       "title": "Clicking View profile link for user3 navigates to /users/3",
       "use_case": "UC6",
       "business_rule": "",
@@ -210,6 +225,7 @@
     },
     {
       "id": "TC-HOVERS-016",
+      "tier": "Sanity",
       "title": "Hovering over page does not trigger navigation",
       "use_case": "UC7",
       "business_rule": "",
@@ -218,6 +234,7 @@
     },
     {
       "id": "TC-HOVERS-017",
+      "tier": "Functional",
       "title": "Caption remains hidden when hovering outside avatar area",
       "use_case": "UC7",
       "business_rule": "",
@@ -226,6 +243,7 @@
     },
     {
       "id": "TC-HOVERS-018",
+      "tier": "Functional",
       "title": "Rapid hover changes show correct caption without delay",
       "use_case": "UC7",
       "business_rule": "",
@@ -234,6 +252,7 @@
     },
     {
       "id": "TC-HOVERS-019",
+      "tier": "Functional",
       "title": "Caption hides correctly when mouse leaves page viewport while hovering",
       "use_case": "UC7",
       "business_rule": "",
@@ -242,6 +261,7 @@
     },
     {
       "id": "TC-HOVERS-020",
+      "tier": "Functional",
       "title": "View profile link is not clickable when caption is hidden",
       "use_case": "UC7",
       "business_rule": "",
@@ -250,6 +270,7 @@
     },
     {
       "id": "TC-HOVERS-021",
+      "tier": "Sanity",
       "title": "First avatar caption displays correct user name format",
       "use_case": "UC8",
       "business_rule": "",
@@ -258,6 +279,7 @@
     },
     {
       "id": "TC-HOVERS-022",
+      "tier": "Functional",
       "title": "Second avatar caption displays correct user name format",
       "use_case": "UC8",
       "business_rule": "",
@@ -266,6 +288,7 @@
     },
     {
       "id": "TC-HOVERS-023",
+      "tier": "Functional",
       "title": "Third avatar caption displays correct user name format",
       "use_case": "UC8",
       "business_rule": "",
@@ -274,6 +297,7 @@
     },
     {
       "id": "TC-HOVERS-024",
+      "tier": "Sanity",
       "title": "All View profile links have correct href attributes",
       "use_case": "UC8",
       "business_rule": "",

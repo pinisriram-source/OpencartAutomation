@@ -511,32 +511,63 @@ with tab_matrix:
     st.subheader("Full Test Execution Matrix")
     st.caption(f"Run command: `{meta['run_command']}`")
 
-    col_a, col_b, col_c = st.columns([2, 2, 2])
+    # Only pipeline suites migrated to the Smoke/Sanity/Functional tier
+    # convention (CLAUDE.md's "Test tiers" section) have a "tier" column at
+    # all -- older suites' data predates it, so every use of it below is
+    # conditional on its presence rather than assumed.
+    has_tier = "tier" in tests.columns
+
+    if has_tier:
+        col_a, col_b, col_c, col_d = st.columns([2, 2, 1.5, 2])
+    else:
+        col_a, col_b, col_c = st.columns([2, 2, 2])
+        col_d = None
     with col_a:
         uc_filter = st.multiselect("Filter by Use Case", sorted(tests["use_case"].unique()))
     with col_b:
         br_filter = st.multiselect(
             "Filter by Business Rule", sorted([b for b in tests["business_rule"].unique() if b])
         )
-    with col_c:
-        search = st.text_input("Search Test ID or title")
+    tier_filter: list[str] = []
+    if has_tier:
+        with col_c:
+            tier_filter = st.multiselect(
+                "Filter by Tier", ["Smoke", "Sanity", "Functional"], key="tier_filter"
+            )
+        with col_d:
+            search = st.text_input("Search Test ID or title")
+    else:
+        with col_c:
+            search = st.text_input("Search Test ID or title")
 
     filtered = tests.copy()
     if uc_filter:
         filtered = filtered[filtered["use_case"].isin(uc_filter)]
     if br_filter:
         filtered = filtered[filtered["business_rule"].isin(br_filter)]
+    if tier_filter:
+        filtered = filtered[filtered["tier"].isin(tier_filter)]
     if search:
         mask = filtered["id"].str.contains(search, case=False) | filtered["title"].str.contains(
             search, case=False
         )
         filtered = filtered[mask]
 
+    if has_tier:
+        tier_counts = tests["tier"].value_counts()
+        st.caption(
+            "Tier breakdown: "
+            + " · ".join(
+                f"{tier} {tier_counts.get(tier, 0)}" for tier in ["Smoke", "Sanity", "Functional"]
+            )
+        )
+
     # Only render browser columns this suite's data actually has -- a chromium-only
     # pipeline run won't have firefox/webkit keys at all, unlike the SauceDemo suite.
     browser_cols = [c for c in ("chromium", "firefox", "webkit") if c in filtered.columns]
     rename_map = {
         "id": "Test Case ID",
+        "tier": "Tier",
         "title": "Title",
         "use_case": "Use Case",
         "business_rule": "Business Rule",
@@ -551,7 +582,16 @@ with tab_matrix:
             return f"color: {STATUS_GOOD}; font-weight: 600;"
         return ""
 
+    def style_tier(val: str) -> str:
+        if val == "Smoke":
+            return f"background-color: {STATUS_WARNING}; color: #3a2a00; font-weight:600;"
+        if val == "Sanity":
+            return f"background-color: {MUTED_BG}; color: {SECONDARY_INK}; font-weight:600;"
+        return ""
+
     styled = display.style.map(style_status, subset=display_browser_cols)
+    if has_tier:
+        styled = styled.map(style_tier, subset=["Tier"])
     st.dataframe(styled, use_container_width=True, height=560, hide_index=True)
     st.caption(f"Showing {len(filtered)} of {len(tests)} test cases · all shown executions passed.")
 

@@ -390,6 +390,17 @@ revisions of an existing suite) are checked by
 `.github/scripts/check-test-tiers.js`, which fails the stage if any `test()`
 lacks a tier tag.
 
+The tag on each `test()` is necessary but not sufficient for the tier to be
+*visible* anywhere: the Streamlit dashboard reads
+`streamlit_app/data/<slug>-test-results.json`, not the spec files directly,
+so each test object in that file's `tests` array also needs a `"tier"` key
+(`"Smoke"` / `"Sanity"` / `"Functional"`) — see `hovers-test-results.json`
+for the reference schema. `pipeline-execute.yml`'s report-generation prompt
+populates this from the test plan's `**Tier:**` lines. Suites whose data
+file predates this (pre-tier-convention suites) simply have no `"tier"` key
+at all; the dashboard's Test Execution Matrix tab treats that as "no tier
+data" and hides the Tier column/filter rather than erroring.
+
 ## Assertion rules
 
 - Web-first assertions only (`expect(locator).toBeVisible()`)
