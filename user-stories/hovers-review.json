@@ -2,7 +2,7 @@
   "slug": "hovers",
   "request_file": "user-stories/request-hovers-20260726-065512.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/hovers-test-plan.md",
     "revision": 1,
     "feedback": ""
