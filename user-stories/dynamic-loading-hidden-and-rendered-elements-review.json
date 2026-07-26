@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "tests/dynamic-loading-hidden-and-rendered-elements/",
     "revision": 1,
     "feedback": ""
