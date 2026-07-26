@@ -1053,7 +1053,11 @@ and automation suite.*
     status_path = st.text_input(
         "Request file path",
         value=st.session_state.get("last_request_path", ""),
-        placeholder="user-stories/request-my-title-20260722-060822.md",
+        placeholder="e.g. user-stories/request-my-title-20260722-060822.md",
+        help="Shown here automatically right after you submit a request above "
+        "(in this same browser session), or copy it from the Review Pipeline "
+        "Artifacts tab / GitHub. This field is empty until you paste or type "
+        "a path into it -- the greyed-out text is only a format example.",
     )
     auto_refresh_status = st.checkbox(
         "Auto-refresh every 10s",
