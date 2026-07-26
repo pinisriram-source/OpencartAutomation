@@ -1,8 +1,8 @@
 {
   "slug": "dynamic-loading-hidden-and-rendered-elements",
-  "request_file": "user-stories/request-dynamic-loading-hidden-and-rendered-elements-20260726-114005.md",
+  "request_file": "user-stories/request-dynamic-loading-hidden-and-rendered-elements-20260726-125208.md",
   "plan": {
-    "status": "pending_review",
+    "status": "in_progress",
     "path": "specs/dynamic-loading-hidden-and-rendered-elements-test-plan.md",
     "revision": 1,
     "feedback": ""
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-26T11:45:06.396Z"
+  "updated_at": "2026-07-26T12:52:27.345Z"
 }
