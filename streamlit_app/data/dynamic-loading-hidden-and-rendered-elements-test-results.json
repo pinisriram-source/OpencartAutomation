@@ -1,0 +1,363 @@
+{
+  "meta": {
+    "app_under_test": "Dynamic Loading - Hidden and Rendered Elements",
+    "app_url": "https://the-internet.herokuapp.com/dynamic_loading",
+    "report_date": "2026-07-26",
+    "test_account": "",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/dynamic-loading-hidden-and-rendered-elements --project=chromium",
+    "duration_minutes": 2.8,
+    "test_plan_path": "specs/dynamic-loading-hidden-and-rendered-elements-test-plan.md",
+    "suite_path": "tests/dynamic-loading-hidden-and-rendered-elements/",
+    "story": "",
+    "report_generated_at": "2026-07-26T13:14:13.921Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30203497606"
+  },
+  "summary": {
+    "test_cases": 32,
+    "browsers": 1,
+    "executions": 32,
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "healing_actions": 0,
+    "status": "PASS"
+  },
+  "suites": [
+    {
+      "name": "Landing Page",
+      "use_case": "AC1",
+      "file": "landing-page.spec.ts",
+      "tests": 1
+    },
+    {
+      "name": "Example 1 - Initial State",
+      "use_case": "AC2",
+      "file": "example-1-initial-state.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Example 1 - Loading Sequence",
+      "use_case": "AC3",
+      "file": "example-1-loading-sequence.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Example 2 - Initial State",
+      "use_case": "AC4",
+      "file": "example-2-initial-state.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Example 2 - Loading Sequence",
+      "use_case": "AC5",
+      "file": "example-2-loading-sequence.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Mutual Exclusivity - State Transitions",
+      "use_case": "AC6",
+      "file": "mutual-exclusivity.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Page Reload Reset",
+      "use_case": "AC7",
+      "file": "page-reload-reset.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "No Double-Start Protection",
+      "use_case": "AC8",
+      "file": "no-double-start.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Cross-Example Consistency",
+      "use_case": "AC9",
+      "file": "cross-example-consistency.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Edge Cases and Error Conditions",
+      "use_case": "AC10",
+      "file": "edge-cases.spec.ts",
+      "tests": 5
+    }
+  ],
+  "use_cases": {
+    "AC1": "Landing Page — displays feature overview and navigation links to both dynamic loading examples",
+    "AC2": "Example 1 Initial State — element exists in DOM but is hidden via CSS display:none",
+    "AC3": "Example 1 Loading Sequence — clicking Start triggers loading indicator then reveals hidden element",
+    "AC4": "Example 2 Initial State — element does not exist in DOM initially",
+    "AC5": "Example 2 Loading Sequence — clicking Start triggers loading indicator then renders element into DOM",
+    "AC6": "Mutual Exclusivity — only one UI state (Start, Loading, Message) is visible at any moment",
+    "AC7": "Page Reload Reset — reloading at any point returns page to initial Start button state",
+    "AC8": "No Double-Start Protection — Start button is not clickable during loading, preventing duplicate triggers",
+    "AC9": "Cross-Example Consistency — both examples produce identical Hello World message, loading indicator, and timing",
+    "AC10": "Edge Cases — repeated runs, browser back navigation, and direct URL access work correctly"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-DYNLOAD-001",
+      "title": "Landing page displays feature overview and links to both examples",
+      "use_case": "AC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-002",
+      "title": "Example 1 initial state shows Start button with no visible message or loading indicator",
+      "use_case": "AC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-003",
+      "title": "Example 1 has Hello World element in DOM but hidden",
+      "use_case": "AC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-004",
+      "title": "Example 1 clicking Start shows loading indicator immediately",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-005",
+      "title": "Example 1 displays Hello World message after loading completes",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-006",
+      "title": "Example 1 complete sequence from start to finish",
+      "use_case": "AC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-007",
+      "title": "Example 2 initial state shows Start button with no visible message or loading indicator",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-008",
+      "title": "Example 2 has no Hello World element in DOM initially",
+      "use_case": "AC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-009",
+      "title": "Example 2 clicking Start shows loading indicator immediately",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-010",
+      "title": "Example 2 renders Hello World element after loading completes",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-011",
+      "title": "Example 2 complete sequence from start to finish",
+      "use_case": "AC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-012",
+      "title": "Example 1 shows exactly one state at any moment - Start OR Loading OR Message",
+      "use_case": "AC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-013",
+      "title": "Example 2 shows exactly one state at any moment - Start OR Loading OR Message",
+      "use_case": "AC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-014",
+      "title": "Loading indicator and Hello World message are never visible simultaneously on Example 1",
+      "use_case": "AC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-015",
+      "title": "Loading indicator and Hello World message are never visible simultaneously on Example 2",
+      "use_case": "AC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-016",
+      "title": "Example 1 reloading after completion resets to initial Start button state",
+      "use_case": "AC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-017",
+      "title": "Example 2 reloading after completion resets to initial Start button state",
+      "use_case": "AC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-018",
+      "title": "Example 1 reloading during loading resets to initial state",
+      "use_case": "AC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-019",
+      "title": "Example 2 reloading during loading resets to initial state",
+      "use_case": "AC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-020",
+      "title": "Example 1 Start button is not clickable during loading",
+      "use_case": "AC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-021",
+      "title": "Example 2 Start button is not clickable during loading",
+      "use_case": "AC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-022",
+      "title": "Example 1 rapid clicks on Start button only trigger loading once",
+      "use_case": "AC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-023",
+      "title": "Example 2 rapid clicks on Start button only trigger loading once",
+      "use_case": "AC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-024",
+      "title": "Both examples produce identical Hello World message text and styling",
+      "use_case": "AC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-025",
+      "title": "Both examples show identical loading indicator during loading phase",
+      "use_case": "AC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-026",
+      "title": "Both examples have approximately same loading duration",
+      "use_case": "AC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-027",
+      "title": "Both examples use the same Start button text and styling",
+      "use_case": "AC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-028",
+      "title": "Example 1 can be successfully run multiple times in succession",
+      "use_case": "AC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-029",
+      "title": "Example 2 can be successfully run multiple times in succession",
+      "use_case": "AC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-030",
+      "title": "Example 1 handles browser back navigation correctly",
+      "use_case": "AC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-031",
+      "title": "Example 2 handles browser back navigation correctly",
+      "use_case": "AC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-DYNLOAD-032",
+      "title": "Direct URL access to examples works correctly",
+      "use_case": "AC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": []
+}
