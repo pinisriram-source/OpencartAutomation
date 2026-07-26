@@ -2,7 +2,7 @@
   "slug": "dynamic-loading-hidden-and-rendered-elements",
   "request_file": "user-stories/request-dynamic-loading-hidden-and-rendered-elements-20260726-125208.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/dynamic-loading-hidden-and-rendered-elements-test-plan.md",
     "revision": 2,
     "feedback": ""
