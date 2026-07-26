@@ -100,15 +100,19 @@ jobs:
           bash .github/scripts/git-push-retry.sh
 
       - name: Claude Code -- generate or revise automation suite
+        id: generate
         run: |
           FEEDBACK=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" automation feedback)
           if [ -n "$FEEDBACK" ]; then
             echo "Revising existing automation suite per reviewer feedback."
+            echo "fresh_generation=false" >> "$GITHUB_OUTPUT"
             npx claude -p "Read the existing automation suite under tests/${SLUG}/ and the test plan at specs/${SLUG}-test-plan.md for context. A stakeholder reviewed the suite and requested changes: ${FEEDBACK}. Revise the suite under tests/${SLUG}/ to address every point raised, using the playwright-test-generator subagent as needed. Keep the existing Page Object Model structure, TC-ID-named tests, and { tag: '@smoke' | '@sanity' | '@functional' } tags where still applicable, adding a tag to any test that's missing one per its plan Tier. Do not modify anything outside tests/${SLUG}/." \
               --dangerously-skip-permissions
           elif [ -n "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
             echo "tests/${SLUG}/ already has spec files and no feedback is pending -- skipping regeneration (idempotent re-run for this slug)."
+            echo "fresh_generation=false" >> "$GITHUB_OUTPUT"
           else
+            echo "fresh_generation=true" >> "$GITHUB_OUTPUT"
             npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md. Use the playwright-test-generator subagent to create a Playwright TypeScript automation suite implementing every test case in that plan, one test() per test case named with its Test Case ID. Build a Page Object Model framework following CLAUDE.md's 'Page Object contract -- Submit New Request pipeline suites' section exactly: one class per page/feature area under tests/${SLUG}/page-objects/, each extending the shared BasePage already committed at tests/_shared/base-page.ts, with locators exposed as get accessor methods (not readonly constructor properties) and this project's getByRole/getByLabel/getByTestId/getByText-before-CSS locator priority. See tests/hovers/page-objects/hovers.page.ts for a worked example, including its two documented CSS exceptions (structural scoping of repeated identical elements, and attached-but-hidden assertions that getByRole locators can't represent). Every test case in the plan has a '**Tier:** Smoke/Sanity/Functional' line -- carry it onto the matching test() using the { tag: '@smoke' } / { tag: '@sanity' } / { tag: '@functional' } test option (the object-option form, not a string suffix on the title) per CLAUDE.md's 'Test tiers' section; see tests/hovers/*.spec.ts for a worked example. Write all files under tests/${SLUG}/ only -- do not write outside that directory (other than reading, never modifying, tests/_shared/base-page.ts), and do not modify your own agent definition or any .claude/ file." \
               --dangerously-skip-permissions
           fi
@@ -120,6 +124,22 @@ jobs:
             node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at generation stage -- see Actions run"
             git add "$REVIEW_FILE" "$REQUEST_FILE"
             git commit -m "chore(pipeline): generation failed for $SLUG"
+            bash .github/scripts/git-push-retry.sh
+            exit 1
+          fi
+
+      # Only gated on brand-new suites: CLAUDE.md's tier convention explicitly
+      # doesn't apply retroactively to suites generated before it existed, so
+      # revising one of those (or an idempotent skip) must not newly start
+      # failing here for tags that were never expected to be there.
+      - name: Verify every test has a Smoke/Sanity/Functional tier tag
+        if: steps.generate.outputs.fresh_generation == 'true'
+        run: |
+          if ! node .github/scripts/check-test-tiers.js "tests/${SLUG}"; then
+            node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status failed
+            node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at generation stage -- see Actions run (missing Smoke/Sanity/Functional tier tags)"
+            git add "$REVIEW_FILE" "$REQUEST_FILE"
+            git commit -m "chore(pipeline): generation failed for $SLUG (missing tier tags)"
             bash .github/scripts/git-push-retry.sh
             exit 1
           fi

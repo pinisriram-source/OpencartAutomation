@@ -384,6 +384,12 @@ Apply this to every suite generated going forward, same scope-of-adoption
 caveat as the Page Object contract above (older pipeline suites have not
 been retrofitted).
 
+This is a hard-enforced gate, not just a prompt instruction: brand-new
+suites (`pipeline-automation.yml`'s fresh-generation path only — not
+revisions of an existing suite) are checked by
+`.github/scripts/check-test-tiers.js`, which fails the stage if any `test()`
+lacks a tier tag.
+
 ## Assertion rules
 
 - Web-first assertions only (`expect(locator).toBeVisible()`)
