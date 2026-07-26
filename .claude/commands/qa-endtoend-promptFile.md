@@ -70,6 +70,9 @@ Ensure each test scenario includes:
 • Detailed step-by-step instructions
 • Expected results for each step
 • Test data requirements
+• A Tier classification of Smoke, Sanity, or Functional per CLAUDE.md's
+  "Test tiers -- 'Submit New Request' pipeline suites" section (each test
+  case gets exactly one tier)
 ```
 
 ### Expected Output
@@ -176,6 +179,9 @@ Requirements:
   getByRole/getByLabel/getByTestId/getByText over CSS per CLAUDE.md
 • Route all page interaction through the Page Object Model -- no locators
   built ad hoc inside spec files
+• Tag every test() with its Tier from the test plan using the { tag: '@smoke'
+  | '@sanity' | '@functional' } test option per CLAUDE.md's "Test tiers --
+  'Submit New Request' pipeline suites" section (see tests/hovers/*.spec.ts)
 • Add comments for complex steps
 • Use proper wait strategies based on actual application behavior
 • Add proper test hooks (beforeEach, afterEach)
@@ -407,14 +413,14 @@ First, read the user story from:
 Provide a brief summary of what needs to be tested.
 
 STEP 2 - CREATE TEST PLAN:
-Use the playwright-test-planner agent to create a comprehensive test plan based on the user story. The agent should explore the application URL from the user story and cover all acceptance criteria. Save it as:
+Use the playwright-test-planner agent to create a comprehensive test plan based on the user story. The agent should explore the application URL from the user story and cover all acceptance criteria. Classify every test case as Smoke, Sanity, or Functional per CLAUDE.md's "Test tiers -- 'Submit New Request' pipeline suites" section. Save it as:
 <TEST_PLAN_PATH>
 
 STEP 3 - EXPLORATORY TESTING:
 Read the test plan from <TEST_PLAN_PATH> and use Playwright browser tools to manually execute each test scenario. Document findings with screenshots and note any issues discovered.
 
 STEP 4 - GENERATE AUTOMATION SCRIPTS:
-Review both the test plan (<TEST_PLAN_PATH>) and exploratory testing results from Step 3. Use the playwright-test-generator agent to create JavaScript automation scripts leveraging the element selectors and insights discovered during manual testing. Build a Page Object Model per CLAUDE.md's "Page Object contract -- 'Submit New Request' pipeline suites" (one class per page/feature area under <TEST_SUITE_DIR>/page-objects/, extending tests/_shared/base-page.ts, getter-accessor locators, getByRole/getByLabel/getByTestId/getByText before CSS -- see tests/hovers/page-objects/hovers.page.ts). Save scripts in:
+Review both the test plan (<TEST_PLAN_PATH>) and exploratory testing results from Step 3. Use the playwright-test-generator agent to create JavaScript automation scripts leveraging the element selectors and insights discovered during manual testing. Build a Page Object Model per CLAUDE.md's "Page Object contract -- 'Submit New Request' pipeline suites" (one class per page/feature area under <TEST_SUITE_DIR>/page-objects/, extending tests/_shared/base-page.ts, getter-accessor locators, getByRole/getByLabel/getByTestId/getByText before CSS -- see tests/hovers/page-objects/hovers.page.ts). Tag every test() with its Tier (Smoke/Sanity/Functional) from the test plan via { tag: '@smoke' | '@sanity' | '@functional' } per CLAUDE.md's "Test tiers" section. Save scripts in:
 <TEST_SUITE_DIR>
 
 STEP 5 - EXECUTE AND HEAL TESTS:

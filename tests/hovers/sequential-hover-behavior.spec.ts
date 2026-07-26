@@ -9,7 +9,7 @@ test.describe('Sequential Hover Behavior', () => {
     await hoversPage.navigate();
   });
 
-  test('TC-HOVERS-009: Hovering from first to second avatar hides first caption and shows second', async ({ page }) => {
+  test('TC-HOVERS-009: Hovering from first to second avatar hides first caption and shows second', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');
@@ -45,7 +45,7 @@ test.describe('Sequential Hover Behavior', () => {
     await expect(hoversPage.getCaptionOverlay(2)).not.toBeVisible();
   });
 
-  test('TC-HOVERS-010: Hovering from second to third avatar hides second caption and shows third', async ({ page }) => {
+  test('TC-HOVERS-010: Hovering from second to third avatar hides second caption and shows third', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');
@@ -81,7 +81,7 @@ test.describe('Sequential Hover Behavior', () => {
     await expect(hoversPage.getCaptionOverlay(2)).toBeVisible();
   });
 
-  test('TC-HOVERS-011: Hovering from third to first avatar hides third caption and shows first', async ({ page }) => {
+  test('TC-HOVERS-011: Hovering from third to first avatar hides third caption and shows first', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');
@@ -117,7 +117,7 @@ test.describe('Sequential Hover Behavior', () => {
     await expect(hoversPage.getCaptionOverlay(2)).not.toBeVisible();
   });
 
-  test('TC-HOVERS-012: Hovering all three avatars in sequence shows only one caption at a time', async ({ page }) => {
+  test('TC-HOVERS-012: Hovering all three avatars in sequence shows only one caption at a time', { tag: '@sanity' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');

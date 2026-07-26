@@ -9,7 +9,7 @@ test.describe('Single Image Hover - First Avatar', () => {
     await hoversPage.navigate();
   });
 
-  test('TC-HOVERS-003: Hovering over first avatar reveals user1 caption and link', async ({ page }) => {
+  test('TC-HOVERS-003: Hovering over first avatar reveals user1 caption and link', { tag: '@smoke' }, async ({ page }) => {
     // 1. Navigate to the Hovers page at https://the-internet.herokuapp.com/hovers
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');
@@ -38,7 +38,7 @@ test.describe('Single Image Hover - First Avatar', () => {
     await expect(hoversPage.getCaptionOverlay(2)).not.toBeVisible();
   });
 
-  test('TC-HOVERS-004: Moving mouse away from first avatar hides its caption', async ({ page }) => {
+  test('TC-HOVERS-004: Moving mouse away from first avatar hides its caption', { tag: '@sanity' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');

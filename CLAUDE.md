@@ -353,6 +353,37 @@ contract:
   saucedemo-checkout, practice-login-page-smoke-test) have not been
   retrofitted.
 
+## Test tiers — "Submit New Request" pipeline suites
+
+Every test case in a pipeline-generated suite (`tests/<suite>/`) is
+classified into exactly **one** of three mutually exclusive tiers, recorded
+as a `**Tier:**` line on the test case in `specs/<slug>-test-plan.md` and
+carried into the generated spec as a Playwright tag via the `test(title,
+{ tag: '@tier' }, fn)` option (not an `@tag` suffix baked into the title
+string):
+
+- **Smoke** (`{ tag: '@smoke' }`) — the smallest possible set proving the
+  feature works at all: the page loads and the single primary happy-path
+  action succeeds. Usually 1-3 per suite; this is the fastest signal and
+  should run on every change.
+- **Sanity** (`{ tag: '@sanity' }`) — broader-but-still-quick checks that
+  each acceptance criterion's core documented behavior works, without deep
+  edge cases or repeated variants.
+- **Functional** (`{ tag: '@functional' }`) — everything else: repeated
+  variants (e.g. the same check against a second/third instance), negative
+  and boundary cases, validation, cross-cutting checks. This is the bulk of
+  the suite and the full regression pass.
+
+Run one tier with `npx playwright test tests/<suite> --grep @smoke` (swap
+the tag), or combine tiers with `npx playwright test tests/<suite> --grep
+"@smoke|@sanity"`.
+
+Worked example: `specs/hovers-test-plan.md`'s `**Tier:**` lines and the
+matching `{ tag: '@...' }` on each `test()` in `tests/hovers/*.spec.ts`.
+Apply this to every suite generated going forward, same scope-of-adoption
+caveat as the Page Object contract above (older pipeline suites have not
+been retrofitted).
+
 ## Assertion rules
 
 - Web-first assertions only (`expect(locator).toBeVisible()`)

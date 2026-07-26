@@ -12,7 +12,7 @@ test.describe('Negative and Boundary Tests', () => {
     await hoversPage.navigate();
   });
 
-  test('TC-HOVERS-016: Hovering over page does not trigger navigation', async ({ page }) => {
+  test('TC-HOVERS-016: Hovering over page does not trigger navigation', { tag: '@sanity' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveTitle('The Internet');
@@ -45,7 +45,7 @@ test.describe('Negative and Boundary Tests', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/hovers');
   });
 
-  test('TC-HOVERS-017: Caption remains hidden when hovering outside avatar area', async ({ page }) => {
+  test('TC-HOVERS-017: Caption remains hidden when hovering outside avatar area', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveTitle('The Internet');
@@ -79,7 +79,7 @@ test.describe('Negative and Boundary Tests', () => {
     await expect(hoversPage.getCaptionOverlay(2)).not.toBeVisible();
   });
 
-  test('TC-HOVERS-018: Rapid hover changes show correct caption without delay', async ({ page }) => {
+  test('TC-HOVERS-018: Rapid hover changes show correct caption without delay', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveTitle('The Internet');
@@ -102,7 +102,7 @@ test.describe('Negative and Boundary Tests', () => {
     await expect(hoversPage.getCaptionHeading(2)).toHaveText('name: user3');
   });
 
-  test('TC-HOVERS-019: Caption hides correctly when mouse leaves page viewport while hovering', async ({ page }) => {
+  test('TC-HOVERS-019: Caption hides correctly when mouse leaves page viewport while hovering', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveTitle('The Internet');
@@ -121,7 +121,7 @@ test.describe('Negative and Boundary Tests', () => {
     await expect(hoversPage.getCaptionOverlay(2)).not.toBeVisible();
   });
 
-  test('TC-HOVERS-020: View profile link is not clickable when caption is hidden', async ({ page }) => {
+  test('TC-HOVERS-020: View profile link is not clickable when caption is hidden', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // expect: Page loads successfully
     await expect(page).toHaveTitle('The Internet');

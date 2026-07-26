@@ -14,6 +14,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/initial-page-state.spec.ts`
 
+**Tier:** Smoke
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -28,6 +30,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 1.2. TC-HOVERS-002: Verify all three avatar images are rendered correctly
 
 **File:** `tests/hovers/initial-page-state.spec.ts`
+
+**Tier:** Sanity
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -46,6 +50,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/first-avatar-hover.spec.ts`
 
+**Tier:** Smoke
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -60,6 +66,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 2.2. TC-HOVERS-004: Moving mouse away from first avatar hides its caption
 
 **File:** `tests/hovers/first-avatar-hover.spec.ts`
+
+**Tier:** Sanity
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -79,6 +87,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/second-avatar-hover.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -93,6 +103,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 3.2. TC-HOVERS-006: Moving mouse away from second avatar hides its caption
 
 **File:** `tests/hovers/second-avatar-hover.spec.ts`
+
+**Tier:** Functional
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -112,6 +124,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/third-avatar-hover.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -126,6 +140,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 4.2. TC-HOVERS-008: Moving mouse away from third avatar hides its caption
 
 **File:** `tests/hovers/third-avatar-hover.spec.ts`
+
+**Tier:** Functional
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -145,6 +161,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/sequential-hover-behavior.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -160,6 +178,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 5.2. TC-HOVERS-010: Hovering from second to third avatar hides second caption and shows third
 
 **File:** `tests/hovers/sequential-hover-behavior.spec.ts`
+
+**Tier:** Functional
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -177,6 +197,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/sequential-hover-behavior.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -192,6 +214,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 5.4. TC-HOVERS-012: Hovering all three avatars in sequence shows only one caption at a time
 
 **File:** `tests/hovers/sequential-hover-behavior.spec.ts`
+
+**Tier:** Sanity
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -214,6 +238,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/view-profile-navigation.spec.ts`
 
+**Tier:** Smoke
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -229,6 +255,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/view-profile-navigation.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -243,6 +271,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 6.3. TC-HOVERS-015: Clicking View profile link for user3 navigates to /users/3
 
 **File:** `tests/hovers/view-profile-navigation.spec.ts`
+
+**Tier:** Functional
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -262,6 +292,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 7.1. TC-HOVERS-016: Hovering over page does not trigger navigation
 
 **File:** `tests/hovers/negative-boundary-tests.spec.ts`
+
+**Tier:** Sanity
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -284,6 +316,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/negative-boundary-tests.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -300,6 +334,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/negative-boundary-tests.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -313,6 +349,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/negative-boundary-tests.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -325,6 +363,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 7.5. TC-HOVERS-020: View profile link is not clickable when caption is hidden
 
 **File:** `tests/hovers/negative-boundary-tests.spec.ts`
+
+**Tier:** Functional
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -345,6 +385,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/caption-content-verification.spec.ts`
 
+**Tier:** Sanity
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -359,6 +401,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 8.2. TC-HOVERS-022: Second avatar caption displays correct user name format
 
 **File:** `tests/hovers/caption-content-verification.spec.ts`
+
+**Tier:** Functional
 
 **Steps:**
   1. Navigate to the Hovers page
@@ -375,6 +419,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 
 **File:** `tests/hovers/caption-content-verification.spec.ts`
 
+**Tier:** Functional
+
 **Steps:**
   1. Navigate to the Hovers page
     - expect: Page loads successfully
@@ -389,6 +435,8 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 #### 8.4. TC-HOVERS-024: All View profile links have correct href attributes
 
 **File:** `tests/hovers/caption-content-verification.spec.ts`
+
+**Tier:** Sanity
 
 **Steps:**
   1. Navigate to the Hovers page

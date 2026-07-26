@@ -8,7 +8,7 @@ test.describe('Navigation via View Profile Links', () => {
     hoversPage = new HoversPage(page);
   });
 
-  test('TC-HOVERS-013: Clicking View profile link for user1 navigates to /users/1', async ({ page }) => {
+  test('TC-HOVERS-013: Clicking View profile link for user1 navigates to /users/1', { tag: '@smoke' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     await hoversPage.navigate();
 
@@ -36,7 +36,7 @@ test.describe('Navigation via View Profile Links', () => {
     await expect(page).toHaveTitle('The Internet');
   });
 
-  test('TC-HOVERS-014: Clicking View profile link for user2 navigates to /users/2', async ({ page }) => {
+  test('TC-HOVERS-014: Clicking View profile link for user2 navigates to /users/2', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     await hoversPage.navigate();
 
@@ -64,7 +64,7 @@ test.describe('Navigation via View Profile Links', () => {
     await expect(page).toHaveTitle('The Internet');
   });
 
-  test('TC-HOVERS-015: Clicking View profile link for user3 navigates to /users/3', async ({ page }) => {
+  test('TC-HOVERS-015: Clicking View profile link for user3 navigates to /users/3', { tag: '@functional' }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     await hoversPage.navigate();
 
