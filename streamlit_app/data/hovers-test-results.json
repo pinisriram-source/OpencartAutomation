@@ -2,7 +2,7 @@
   "meta": {
     "app_under_test": "The Internet - Hovers",
     "app_url": "https://the-internet.herokuapp.com/hovers",
-    "report_date": "2026-07-24",
+    "report_date": "2026-07-26",
     "test_account": "",
     "browsers": [
       "Chromium (Desktop Chrome)"
@@ -12,7 +12,8 @@
     "test_plan_path": "specs/hovers-test-plan.md",
     "suite_path": "tests/hovers/",
     "story": "",
-    "report_generated_at": "2026-07-24T07:08:36.699Z"
+    "report_generated_at": "2026-07-26T07:26:05.562Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30192695169"
   },
   "summary": {
     "test_cases": 24,

@@ -1,0 +1,21 @@
+{
+  "slug": "hovers",
+  "request_file": "user-stories/request-hovers-20260726-065512.md",
+  "plan": {
+    "status": "approved",
+    "path": "specs/hovers-test-plan.md",
+    "revision": 1,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "approved",
+    "path": "tests/hovers/",
+    "revision": 1,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "completed",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30192695169"
+  },
+  "updated_at": "2026-07-26T07:26:05.614Z"
+}
