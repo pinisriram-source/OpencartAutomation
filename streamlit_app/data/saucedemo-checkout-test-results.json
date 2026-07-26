@@ -767,7 +767,10 @@
       "id": "BUG-001",
       "severity": "Low",
       "title": "Cart page displays no subtotal/total price",
-      "steps": "Add items to the cart and open the Cart page.",
+      "steps": [
+        "Add items to the cart.",
+        "Open the Cart page."
+      ],
       "expected": "AC1: cart review shows the total price calculation.",
       "actual": "No subtotal/tax/total is rendered anywhere on the Cart page; the total first appears on the Order Overview page.",
       "test_ref": "TC-CART-011-NoTotalOnCartPage"
@@ -776,7 +779,10 @@
       "id": "BUG-002",
       "severity": "Medium",
       "title": "Empty cart does not block checkout access",
-      "steps": "Log in with an empty cart, open the Cart page or navigate directly to Checkout Information.",
+      "steps": [
+        "Log in with an empty cart.",
+        "Open the Cart page, or navigate directly to Checkout Information."
+      ],
       "expected": "Business Rule 3: cart cannot be empty when proceeding to checkout.",
       "actual": "The Checkout button remains enabled and clickable, and checkout-step-one.html loads normally with zero items in cart.",
       "test_ref": "TC-CART-006-EmptyCart, TC-CHECKOUT-016-EmptyCartAccess, TC-ERROR-007-EmptyCartCheckoutButtonEnabled"
@@ -785,7 +791,11 @@
       "id": "BUG-003",
       "severity": "Medium",
       "title": "Checkout Information step can be bypassed via direct URL",
-      "steps": "Log in, add an item to cart, navigate directly to checkout-step-two.html without visiting checkout-step-one.html first.",
+      "steps": [
+        "Log in.",
+        "Add an item to the cart.",
+        "Navigate directly to checkout-step-two.html without visiting checkout-step-one.html first."
+      ],
       "expected": "Business Rule 1: all checkout form fields are mandatory before an order can proceed.",
       "actual": "The Order Overview page renders fully and Finish successfully completes the order, without First Name/Last Name/Zip ever being required.",
       "test_ref": "TC-OVERVIEW-011-SkipInformationPage, TC-NAV-007-DirectSkipToOverview"
@@ -794,7 +804,10 @@
       "id": "BUG-004",
       "severity": "Low",
       "title": "No format validation on Checkout Information fields",
-      "steps": "Enter whitespace-only, special-character, or very long values into First Name/Last Name/Zip and click Continue.",
+      "steps": [
+        "Enter whitespace-only, special-character, or very long values into First Name/Last Name/Zip.",
+        "Click Continue."
+      ],
       "expected": "AC5 implies meaningful validation beyond presence-checking for invalid data.",
       "actual": "All such values are silently accepted and the user proceeds to the Overview page — validation is presence-only.",
       "test_ref": "TC-CHECKOUT-009-WhitespaceOnly, TC-CHECKOUT-010-SpecialCharacters, TC-CHECKOUT-011-LongInput"
@@ -803,7 +816,10 @@
       "id": "BUG-005",
       "severity": "Medium",
       "title": "Overview Cancel returns to Products, not Cart",
-      "steps": "Reach the Order Overview page with items in cart, click Cancel.",
+      "steps": [
+        "Reach the Order Overview page with items in cart.",
+        "Click Cancel."
+      ],
       "expected": "Business Rule 5: users can cancel checkout at any step and return to cart.",
       "actual": "Cancel on Overview redirects to the Products (inventory) page, not the Cart page. Cart contents remain intact either way.",
       "test_ref": "TC-OVERVIEW-007, TC-NAV-003-CancelFromOverviewToProducts"
@@ -812,7 +828,11 @@
       "id": "BUG-006",
       "severity": "Medium",
       "title": "Stale post-completion Overview page allows re-submitting a cleared order",
-      "steps": "Complete a full checkout, then press the browser Back button and click Finish again.",
+      "steps": [
+        "Complete a full checkout.",
+        "Press the browser Back button.",
+        "Click Finish again."
+      ],
       "expected": "Undefined by user story, but a completed/cleared order should not be re-submittable.",
       "actual": "Back reveals a stale Overview page with $0 totals and an active Finish button; clicking it re-navigates to the Confirmation page despite the empty cart.",
       "test_ref": "TC-NAV-004-BrowserBackAfterCompletion, TC-NAV-005-ReFinishStaleOverview"
@@ -821,7 +841,10 @@
       "id": "BUG-007",
       "severity": "Info",
       "title": "Undocumented 'Generate PDF order' button on confirmation page",
-      "steps": "Reach the Order Confirmation page after completing checkout.",
+      "steps": [
+        "Complete a full checkout.",
+        "Reach the Order Confirmation page."
+      ],
       "expected": "Undefined by AC4; noted for product-owner awareness.",
       "actual": "A 'Generate PDF order' button is present alongside 'Back Home', with static Payment/Shipping info fixed across all orders — not mentioned in the acceptance criteria.",
       "test_ref": "TC-COMPLETE-006"

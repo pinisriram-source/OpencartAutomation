@@ -146,7 +146,10 @@
       "id": "BUG-001",
       "severity": "Low",
       "title": "Dialog handler race condition causes failure on repeated right-click alert cycles",
-      "steps": "Navigate to the context menu page, right-click the hot spot 5 times in succession, dismissing each alert.",
+      "steps": [
+        "Navigate to the context menu page.",
+        "Right-click the hot spot 5 times in succession, dismissing each alert."
+      ],
       "expected": "Each right-click triggers a new alert that can be accepted independently, and page content remains intact after all cycles.",
       "actual": "Test fails with 'Cannot accept dialog which is already handled!' — the dialog is auto-dismissed before the explicit accept call, causing a race condition in the handler on repeated alert cycles.",
       "test_ref": "TC-CONTEXTMENU-008"

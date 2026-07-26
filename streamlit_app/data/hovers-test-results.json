@@ -285,7 +285,11 @@
       "id": "BUG-001",
       "severity": "Medium",
       "title": "View profile navigation fails — target page returns empty title",
-      "steps": "Navigate to /hovers, hover over any avatar, click the 'View profile' link.",
+      "steps": [
+        "Navigate to /hovers.",
+        "Hover over any avatar.",
+        "Click the 'View profile' link."
+      ],
       "expected": "Browser navigates to /users/[1-3] and the page loads with title 'The Internet'.",
       "actual": "Navigation to /users/[1-3] results in a page with an empty title; toHaveTitle('The Internet') times out after 10 seconds.",
       "test_ref": "TC-HOVERS-013, TC-HOVERS-014, TC-HOVERS-015"

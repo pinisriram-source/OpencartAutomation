@@ -9,6 +9,7 @@ defects log. A suite picker lets the viewer switch between suites.
 """
 
 import hashlib
+import html
 import json
 import re
 from datetime import datetime, timezone
@@ -786,19 +787,48 @@ with tab_defects:
                 return f"background-color: {MUTED_BG}; color: {SECONDARY_INK}; font-weight:600;"
             return ""
 
-        defects_display = defects.rename(
-            columns={
-                "id": "ID",
-                "severity": "Severity",
-                "title": "Title",
-                "steps": "Steps to Reproduce",
-                "expected": "Expected",
-                "actual": "Actual",
-                "test_ref": "Test Reference",
-            }
+        # st.dataframe renders every cell on a single line (no wrapping), which
+        # collapsed multi-step repro instructions into one run-on sentence.
+        # Steps need one line per action, so this table is hand-built as HTML
+        # with an <ol> per row instead of going through st.dataframe.
+        def esc(val) -> str:
+            return html.escape(str(val))
+
+        rows_html = []
+        for defect in data["defects"]:
+            steps = defect["steps"]
+            if isinstance(steps, str):
+                steps = [steps]
+            steps_html = "<ol style='margin:0; padding-left:1.1em;'>" + "".join(
+                f"<li>{esc(step)}</li>" for step in steps
+            ) + "</ol>"
+            cell = "padding:6px 8px; border-bottom:1px solid #ddd; vertical-align:top;"
+            rows_html.append(
+                "<tr>"
+                f"<td style='{cell}'>{esc(defect['id'])}</td>"
+                f"<td style='{cell}'><span style='{severity_style(defect['severity'])} padding:2px 8px; border-radius:4px;'>{esc(defect['severity'])}</span></td>"
+                f"<td style='{cell}'>{esc(defect['title'])}</td>"
+                f"<td style='{cell}'>{steps_html}</td>"
+                f"<td style='{cell}'>{esc(defect['expected'])}</td>"
+                f"<td style='{cell}'>{esc(defect['actual'])}</td>"
+                f"<td style='{cell}'>{esc(defect['test_ref'])}</td>"
+                "</tr>"
+            )
+
+        header_cell = f"text-align:left; padding:6px 8px; border-bottom:2px solid {SECONDARY_INK};"
+        st.markdown(
+            "<div style='overflow-x:auto;'>"
+            "<table style='width:100%; border-collapse:collapse;'>"
+            "<tr>"
+            + "".join(
+                f"<th style='{header_cell}'>{h}</th>"
+                for h in ["ID", "Severity", "Title", "Steps to Reproduce", "Expected", "Actual", "Test Reference"]
+            )
+            + "</tr>"
+            + "".join(rows_html)
+            + "</table></div>",
+            unsafe_allow_html=True,
         )
-        styled_defects = defects_display.style.map(severity_style, subset=["Severity"])
-        st.dataframe(styled_defects, use_container_width=True, height=280, hide_index=True)
 
 # --- Submit New Request tab ------------------------------------------------------
 with tab_submit:
