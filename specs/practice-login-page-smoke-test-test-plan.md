@@ -15,14 +15,14 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-001-valid-login.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
     - expect: Page title is 'Test Login | Practice Test Automation'
-  2. Enter 'student' into Username field
+2. Enter 'student' into Username field
     - expect: Username field accepts the input
-  3. Enter 'Password123' into Password field
+3. Enter 'Password123' into Password field
     - expect: Password field accepts the input (masked)
-  4. Click Submit button
+4. Click Submit button
     - expect: Page navigates to success page
     - expect: URL is 'https://practicetestautomation.com/logged-in-successfully/'
     - expect: Page title is 'Logged In Successfully | Practice Test Automation'
@@ -35,13 +35,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-002-invalid-username.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter 'invaliduser' into Username field
+2. Enter 'invaliduser' into Username field
     - expect: Username field accepts the input
-  3. Enter 'Password123' into Password field
+3. Enter 'Password123' into Password field
     - expect: Password field accepts the input
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page (URL unchanged)
     - expect: Error message 'Your username is invalid!' is displayed
     - expect: Error message is visible to the user
@@ -52,13 +52,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-003-invalid-password.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter 'student' into Username field
+2. Enter 'student' into Username field
     - expect: Username field accepts the input
-  3. Enter 'wrongpassword' into Password field
+3. Enter 'wrongpassword' into Password field
     - expect: Password field accepts the input
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page (URL unchanged)
     - expect: Error message 'Your password is invalid!' is displayed
     - expect: Error message is visible to the user
@@ -69,13 +69,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-004-empty-fields.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Leave Username field empty
+2. Leave Username field empty
     - expect: Username field is empty
-  3. Leave Password field empty
+3. Leave Password field empty
     - expect: Password field is empty
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page
     - expect: Error message 'Your username is invalid!' is displayed
     - expect: User cannot proceed with empty credentials
@@ -85,13 +85,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-005-empty-username.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Leave Username field empty
+2. Leave Username field empty
     - expect: Username field is empty
-  3. Enter 'Password123' into Password field
+3. Enter 'Password123' into Password field
     - expect: Password field accepts the input
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page
     - expect: Error message 'Your username is invalid!' is displayed
 
@@ -100,13 +100,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-006-empty-password.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter 'student' into Username field
+2. Enter 'student' into Username field
     - expect: Username field accepts the input
-  3. Leave Password field empty
+3. Leave Password field empty
     - expect: Password field is empty
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page
     - expect: Error message 'Your password is invalid!' is displayed
 
@@ -115,13 +115,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-007-password-case-sensitive.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter 'student' into Username field
+2. Enter 'student' into Username field
     - expect: Username field accepts the input
-  3. Enter 'password123' (all lowercase) into Password field
+3. Enter 'password123' (all lowercase) into Password field
     - expect: Password field accepts the input
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page
     - expect: Error message 'Your password is invalid!' is displayed
     - expect: Login fails due to incorrect case (Password123 vs password123)
@@ -131,13 +131,13 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-008-username-with-spaces.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter ' student ' (with leading and trailing spaces) into Username field
+2. Enter ' student ' (with leading and trailing spaces) into Username field
     - expect: Username field accepts the input with spaces
-  3. Enter 'Password123' into Password field
+3. Enter 'Password123' into Password field
     - expect: Password field accepts the input
-  4. Click Submit button
+4. Click Submit button
     - expect: Page remains on login page
     - expect: Error message 'Your username is invalid!' is displayed
     - expect: Login fails because spaces are not trimmed from username
@@ -147,7 +147,7 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-009-form-elements-visible.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
     - expect: Page heading 'Test login' is displayed
     - expect: Username field is visible and enabled
@@ -163,18 +163,18 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-010-logout-link-navigation.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter 'student' into Username field
+2. Enter 'student' into Username field
     - expect: Username field accepts the input
-  3. Enter 'Password123' into Password field
+3. Enter 'Password123' into Password field
     - expect: Password field accepts the input
-  4. Click Submit button
+4. Click Submit button
     - expect: Success page loads with 'Logged In Successfully' heading
-  5. Verify Log out link is present
+5. Verify Log out link is present
     - expect: Log out link is visible
     - expect: Log out link has href 'https://practicetestautomation.com/practice-test-login/'
-  6. Click Log out link
+6. Click Log out link
     - expect: User is navigated back to login page
     - expect: URL is 'https://practicetestautomation.com/practice-test-login/'
     - expect: Login form is displayed and ready for new login attempt
@@ -184,21 +184,21 @@ This test plan covers comprehensive testing of the Practice Login Page at https:
 **File:** `tests/login/tc-login-011-multiple-failed-attempts.spec.ts`
 
 **Steps:**
-  1. Navigate to https://practicetestautomation.com/practice-test-login/
+1. Navigate to https://practicetestautomation.com/practice-test-login/
     - expect: Login page loads successfully
-  2. Enter 'wronguser' into Username field and 'Password123' into Password field
+2. Enter 'wronguser' into Username field and 'Password123' into Password field
     - expect: Fields accept the input
-  3. Click Submit button
+3. Click Submit button
     - expect: Error message 'Your username is invalid!' is displayed
     - expect: User remains on login page
-  4. Enter 'student' into Username field and 'wrongpass' into Password field
+4. Enter 'student' into Username field and 'wrongpass' into Password field
     - expect: Fields accept the new input
-  5. Click Submit button
+5. Click Submit button
     - expect: Error message 'Your password is invalid!' is displayed
     - expect: User remains on login page
     - expect: No account lockout or rate limiting is enforced
-  6. Enter 'student' into Username field and 'Password123' into Password field
+6. Enter 'student' into Username field and 'Password123' into Password field
     - expect: Fields accept the valid input
-  7. Click Submit button
+7. Click Submit button
     - expect: Login succeeds
     - expect: User is navigated to success page

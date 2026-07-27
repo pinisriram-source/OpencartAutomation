@@ -15,16 +15,16 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/page-load-hot-spot-visible.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
     - expect: The URL is https://the-internet.herokuapp.com/context_menu
     - expect: The page title is 'The Internet'
-  2. Verify the page heading
+2. Verify the page heading
     - expect: The h3 heading displays 'Context Menu'
-  3. Verify the instructional text
+3. Verify the instructional text
     - expect: The first paragraph reads 'Context menu items are custom additions that appear in the right-click menu.'
     - expect: The second paragraph reads 'Right-click in the box below to see one called 'the-internet'. When you click it, it will trigger a JavaScript alert.'
-  4. Verify the hot spot box is present
+4. Verify the hot spot box is present
     - expect: A div element with id='hot-spot' is visible on the page
     - expect: The hot spot has a dashed border style
     - expect: The hot spot has dimensions of 250px width and 150px height
@@ -39,9 +39,9 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/right-click-triggers-alert.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Right-click inside the hot spot box (div#hot-spot)
+2. Right-click inside the hot spot box (div#hot-spot)
     - expect: A JavaScript alert dialog appears immediately
     - expect: The alert dialog type is 'alert' (not confirm or prompt)
     - expect: The alert message is exactly 'You selected a context menu' (case-sensitive, exact match)
@@ -51,13 +51,13 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/dismiss-alert-no-navigation.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Right-click inside the hot spot box to trigger the alert
+2. Right-click inside the hot spot box to trigger the alert
     - expect: A JavaScript alert dialog appears with message 'You selected a context menu'
-  3. Accept/dismiss the alert dialog
+3. Accept/dismiss the alert dialog
     - expect: The alert closes successfully
-  4. Verify the page state after alert dismissal
+4. Verify the page state after alert dismissal
     - expect: The URL remains https://the-internet.herokuapp.com/context_menu (no navigation occurred)
     - expect: The page title is still 'The Internet'
     - expect: The hot spot box is still visible and interactive
@@ -70,18 +70,18 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/repeatable-alert-trigger.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Right-click inside the hot spot box (first time)
+2. Right-click inside the hot spot box (first time)
     - expect: A JavaScript alert appears with message 'You selected a context menu'
-  3. Accept/dismiss the first alert
+3. Accept/dismiss the first alert
     - expect: The alert closes
-  4. Right-click inside the hot spot box (second time)
+4. Right-click inside the hot spot box (second time)
     - expect: A JavaScript alert appears again with the same message 'You selected a context menu'
     - expect: The alert is triggered immediately without delay
-  5. Accept/dismiss the second alert
+5. Accept/dismiss the second alert
     - expect: The alert closes
-  6. Right-click inside the hot spot box (third time)
+6. Right-click inside the hot spot box (third time)
     - expect: A JavaScript alert appears again with the same message 'You selected a context menu'
     - expect: The behavior is consistent and repeatable
 
@@ -94,13 +94,13 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/right-click-outside-no-alert.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Right-click on an area of the page outside the hot spot box (e.g., on the heading or instructional text)
+2. Right-click on an area of the page outside the hot spot box (e.g., on the heading or instructional text)
     - expect: No JavaScript alert dialog appears
     - expect: The browser's default context menu may appear (normal browser behavior)
     - expect: No custom alert is triggered
-  3. Right-click on another area outside the hot spot (e.g., empty space to the right of the hot spot)
+3. Right-click on another area outside the hot spot (e.g., empty space to the right of the hot spot)
     - expect: No JavaScript alert dialog appears
     - expect: The page remains in its normal state
 
@@ -109,15 +109,15 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/url-persistence.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The initial URL is https://the-internet.herokuapp.com/context_menu
-  2. Right-click inside the hot spot to trigger the alert
+2. Right-click inside the hot spot to trigger the alert
     - expect: The URL remains https://the-internet.herokuapp.com/context_menu
-  3. Dismiss the alert
+3. Dismiss the alert
     - expect: The URL remains https://the-internet.herokuapp.com/context_menu
-  4. Right-click inside the hot spot again and dismiss the alert
+4. Right-click inside the hot spot again and dismiss the alert
     - expect: The URL remains https://the-internet.herokuapp.com/context_menu
-  5. Right-click outside the hot spot
+5. Right-click outside the hot spot
     - expect: The URL remains https://the-internet.herokuapp.com/context_menu
     - expect: No navigation occurs at any point during the test
 
@@ -126,13 +126,13 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/left-click-no-alert.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Left-click (normal click) inside the hot spot box
+2. Left-click (normal click) inside the hot spot box
     - expect: No JavaScript alert dialog appears
     - expect: The hot spot does not respond to left-click
     - expect: The page remains in its normal state
-  3. Double-click inside the hot spot box
+3. Double-click inside the hot spot box
     - expect: No JavaScript alert dialog appears
     - expect: Only right-click triggers the alert behavior
 
@@ -141,14 +141,14 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/content-integrity-after-alerts.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu and capture initial page state
+1. Navigate to https://the-internet.herokuapp.com/context_menu and capture initial page state
     - expect: The page heading is 'Context Menu'
     - expect: There are 2 instructional paragraphs
     - expect: The hot spot box exists with proper styling
-  2. Right-click inside the hot spot and dismiss the alert (repeat 5 times)
+2. Right-click inside the hot spot and dismiss the alert (repeat 5 times)
     - expect: Each right-click triggers the alert successfully
     - expect: Each alert is dismissed successfully
-  3. Verify the page content after multiple alert cycles
+3. Verify the page content after multiple alert cycles
     - expect: The page heading is still 'Context Menu'
     - expect: The 2 instructional paragraphs are still present with unchanged text
     - expect: The hot spot box still exists with the same styling (dashed border, 250x150 dimensions)
@@ -165,16 +165,16 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/border-click-triggers-alert.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Right-click on the top border edge of the hot spot box
+2. Right-click on the top border edge of the hot spot box
     - expect: A JavaScript alert appears with message 'You selected a context menu'
     - expect: Border clicks are treated as clicks inside the hot spot
-  3. Dismiss the alert and right-click on the bottom border edge
+3. Dismiss the alert and right-click on the bottom border edge
     - expect: A JavaScript alert appears again
-  4. Dismiss the alert and right-click on the left border edge
+4. Dismiss the alert and right-click on the left border edge
     - expect: A JavaScript alert appears again
-  5. Dismiss the alert and right-click on the right border edge
+5. Dismiss the alert and right-click on the right border edge
     - expect: A JavaScript alert appears again
 
 #### 4.2. TC-CONTEXTMENU-010: Alert message is exact and case-sensitive
@@ -182,9 +182,9 @@ The Context Menu page at https://the-internet.herokuapp.com/context_menu is a si
 **File:** `tests/context-menu/alert-message-exact-match.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/context_menu
+1. Navigate to https://the-internet.herokuapp.com/context_menu
     - expect: The page loads successfully
-  2. Right-click inside the hot spot and capture the alert message
+2. Right-click inside the hot spot and capture the alert message
     - expect: The alert message is exactly 'You selected a context menu' (capital Y, lowercase rest)
     - expect: The message has no leading or trailing whitespace
     - expect: The message has no extra punctuation beyond the period (if any)

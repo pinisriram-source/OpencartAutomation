@@ -17,10 +17,10 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Smoke
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
     - expect: URL is https://the-internet.herokuapp.com/hovers
-  2. Inspect the page content
+2. Inspect the page content
     - expect: Exactly 3 avatar images are present on the page
     - expect: No caption overlay is visible for any avatar
     - expect: No 'View profile' link is visible for any avatar
@@ -34,9 +34,9 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Locate all avatar images on the page
+2. Locate all avatar images on the page
     - expect: First avatar image is visible
     - expect: Second avatar image is visible
     - expect: Third avatar image is visible
@@ -53,9 +53,9 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Smoke
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the first avatar image
+2. Hover mouse cursor over the first avatar image
     - expect: Caption overlay becomes visible for the first avatar
     - expect: Caption displays 'name: user1'
     - expect: 'View profile' link becomes visible
@@ -70,11 +70,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the first avatar image
+2. Hover mouse cursor over the first avatar image
     - expect: Caption for user1 becomes visible
-  3. Move mouse cursor away from the first avatar (hover over page heading)
+3. Move mouse cursor away from the first avatar (hover over page heading)
     - expect: Caption overlay for user1 is no longer visible
     - expect: 'View profile' link for user1 is no longer visible
     - expect: All avatar captions are hidden
@@ -90,9 +90,9 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the second avatar image
+2. Hover mouse cursor over the second avatar image
     - expect: Caption overlay becomes visible for the second avatar
     - expect: Caption displays 'name: user2'
     - expect: 'View profile' link becomes visible
@@ -107,11 +107,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the second avatar image
+2. Hover mouse cursor over the second avatar image
     - expect: Caption for user2 becomes visible
-  3. Move mouse cursor away from the second avatar (hover over page heading)
+3. Move mouse cursor away from the second avatar (hover over page heading)
     - expect: Caption overlay for user2 is no longer visible
     - expect: 'View profile' link for user2 is no longer visible
     - expect: All avatar captions are hidden
@@ -127,9 +127,9 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the third avatar image
+2. Hover mouse cursor over the third avatar image
     - expect: Caption overlay becomes visible for the third avatar
     - expect: Caption displays 'name: user3'
     - expect: 'View profile' link becomes visible
@@ -144,11 +144,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the third avatar image
+2. Hover mouse cursor over the third avatar image
     - expect: Caption for user3 becomes visible
-  3. Move mouse cursor away from the third avatar (hover over page heading)
+3. Move mouse cursor away from the third avatar (hover over page heading)
     - expect: Caption overlay for user3 is no longer visible
     - expect: 'View profile' link for user3 is no longer visible
     - expect: All avatar captions are hidden
@@ -164,12 +164,12 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the first avatar image
+2. Hover mouse cursor over the first avatar image
     - expect: Caption for user1 becomes visible
     - expect: Captions for user2 and user3 remain hidden
-  3. Move mouse cursor to hover over the second avatar image
+3. Move mouse cursor to hover over the second avatar image
     - expect: Caption for user1 is now hidden
     - expect: Caption for user2 becomes visible
     - expect: Caption for user3 remains hidden
@@ -182,12 +182,12 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the second avatar image
+2. Hover mouse cursor over the second avatar image
     - expect: Caption for user2 becomes visible
     - expect: Captions for user1 and user3 remain hidden
-  3. Move mouse cursor to hover over the third avatar image
+3. Move mouse cursor to hover over the third avatar image
     - expect: Caption for user2 is now hidden
     - expect: Caption for user3 becomes visible
     - expect: Caption for user1 remains hidden
@@ -200,12 +200,12 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the third avatar image
+2. Hover mouse cursor over the third avatar image
     - expect: Caption for user3 becomes visible
     - expect: Captions for user1 and user2 remain hidden
-  3. Move mouse cursor to hover over the first avatar image
+3. Move mouse cursor to hover over the first avatar image
     - expect: Caption for user3 is now hidden
     - expect: Caption for user1 becomes visible
     - expect: Caption for user2 remains hidden
@@ -218,16 +218,16 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
     - expect: No captions are visible
-  2. Hover over first avatar
+2. Hover over first avatar
     - expect: Only user1 caption is visible
-  3. Hover over second avatar
+3. Hover over second avatar
     - expect: Only user2 caption is visible
-  4. Hover over third avatar
+4. Hover over third avatar
     - expect: Only user3 caption is visible
-  5. Move mouse away from all avatars
+5. Move mouse away from all avatars
     - expect: No captions are visible
 
 ### 6. Navigation via View Profile Links
@@ -241,12 +241,12 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Smoke
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the first avatar image
+2. Hover mouse cursor over the first avatar image
     - expect: Caption for user1 becomes visible
     - expect: 'View profile' link is visible
-  3. Click the 'View profile' link for user1
+3. Click the 'View profile' link for user1
     - expect: Browser navigates to https://the-internet.herokuapp.com/users/1
     - expect: URL changes from /hovers to /users/1
     - expect: Navigation completes successfully
@@ -258,12 +258,12 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the second avatar image
+2. Hover mouse cursor over the second avatar image
     - expect: Caption for user2 becomes visible
     - expect: 'View profile' link is visible
-  3. Click the 'View profile' link for user2
+3. Click the 'View profile' link for user2
     - expect: Browser navigates to https://the-internet.herokuapp.com/users/2
     - expect: URL changes from /hovers to /users/2
     - expect: Navigation completes successfully
@@ -275,12 +275,12 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover mouse cursor over the third avatar image
+2. Hover mouse cursor over the third avatar image
     - expect: Caption for user3 becomes visible
     - expect: 'View profile' link is visible
-  3. Click the 'View profile' link for user3
+3. Click the 'View profile' link for user3
     - expect: Browser navigates to https://the-internet.herokuapp.com/users/3
     - expect: URL changes from /hovers to /users/3
     - expect: Navigation completes successfully
@@ -296,19 +296,19 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
     - expect: URL is https://the-internet.herokuapp.com/hovers
-  2. Hover over the first avatar image
+2. Hover over the first avatar image
     - expect: Caption becomes visible
-  3. Wait 2 seconds while hovering
+3. Wait 2 seconds while hovering
     - expect: Page does not navigate
     - expect: URL remains https://the-internet.herokuapp.com/hovers
     - expect: No page reload occurs
-  4. Hover over the second avatar image
+4. Hover over the second avatar image
     - expect: Page does not navigate
     - expect: URL remains https://the-internet.herokuapp.com/hovers
-  5. Hover over the third avatar image
+5. Hover over the third avatar image
     - expect: Page does not navigate
     - expect: URL remains https://the-internet.herokuapp.com/hovers
 
@@ -319,15 +319,15 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover over the page heading 'Hovers'
+2. Hover over the page heading 'Hovers'
     - expect: No caption overlays are visible
-  3. Hover over the instruction text
+3. Hover over the instruction text
     - expect: No caption overlays are visible
-  4. Hover over the area between the first and second avatar
+4. Hover over the area between the first and second avatar
     - expect: No caption overlays are visible
-  5. Hover over the footer area
+5. Hover over the footer area
     - expect: No caption overlays are visible
 
 #### 7.3. TC-HOVERS-018: Rapid hover changes show correct caption without delay
@@ -337,9 +337,9 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Rapidly hover over first avatar then second avatar then third avatar in quick succession
+2. Rapidly hover over first avatar then second avatar then third avatar in quick succession
     - expect: Each caption appears correctly when its avatar is hovered
     - expect: Previous caption hides when moving to next avatar
     - expect: No captions overlap or display incorrectly
@@ -352,11 +352,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover over the first avatar image
+2. Hover over the first avatar image
     - expect: Caption for user1 becomes visible
-  3. Move mouse cursor outside the browser viewport
+3. Move mouse cursor outside the browser viewport
     - expect: Caption for user1 hides
     - expect: No captions remain visible
 
@@ -367,13 +367,13 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
     - expect: No captions are visible
-  2. Attempt to locate the 'View profile' link for user1 in the DOM
+2. Attempt to locate the 'View profile' link for user1 in the DOM
     - expect: Link element exists in DOM but is not visible
     - expect: Link is not interactable in its hidden state
-  3. Verify attempting to click the hidden link area has no effect
+3. Verify attempting to click the hidden link area has no effect
     - expect: Page does not navigate
     - expect: No error occurs
 
@@ -388,11 +388,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover over the first avatar image
+2. Hover over the first avatar image
     - expect: Caption is visible
-  3. Verify the caption text content
+3. Verify the caption text content
     - expect: Caption text exactly matches 'name: user1'
     - expect: Text format uses lowercase for 'name:' and 'user1'
     - expect: Heading level is h5
@@ -405,11 +405,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover over the second avatar image
+2. Hover over the second avatar image
     - expect: Caption is visible
-  3. Verify the caption text content
+3. Verify the caption text content
     - expect: Caption text exactly matches 'name: user2'
     - expect: Text format uses lowercase for 'name:' and 'user2'
     - expect: Heading level is h5
@@ -422,11 +422,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover over the third avatar image
+2. Hover over the third avatar image
     - expect: Caption is visible
-  3. Verify the caption text content
+3. Verify the caption text content
     - expect: Caption text exactly matches 'name: user3'
     - expect: Text format uses lowercase for 'name:' and 'user3'
     - expect: Heading level is h5
@@ -439,11 +439,11 @@ The Hovers feature demonstrates hover-based interactivity on a web page. The pag
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to the Hovers page
+1. Navigate to the Hovers page
     - expect: Page loads successfully
-  2. Hover over first avatar and verify link href
+2. Hover over first avatar and verify link href
     - expect: 'View profile' link href is '/users/1'
-  3. Hover over second avatar and verify link href
+3. Hover over second avatar and verify link href
     - expect: 'View profile' link href is '/users/2'
-  4. Hover over third avatar and verify link href
+4. Hover over third avatar and verify link href
     - expect: 'View profile' link href is '/users/3'

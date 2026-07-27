@@ -15,11 +15,11 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/initial-state.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully with title 'The Internet'
     - expect: The heading 'Dropdown List' is visible
     - expect: The dropdown element with id='dropdown' is visible on the page
-  2. Inspect the dropdown's selected value
+2. Inspect the dropdown's selected value
     - expect: The dropdown's selected index is 0
     - expect: The dropdown's selected text is 'Please select an option'
     - expect: The dropdown's selected value is an empty string ''
@@ -30,9 +30,9 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/option-count-and-order.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Retrieve all options from the dropdown element
+2. Retrieve all options from the dropdown element
     - expect: The dropdown contains exactly 3 options (no more, no fewer)
     - expect: Option at index 0 has text 'Please select an option', value='', disabled=true
     - expect: Option at index 1 has text 'Option 1', value='1', disabled=false
@@ -48,13 +48,13 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/placeholder-disabled.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Inspect the placeholder option (index 0) for the disabled attribute
+2. Inspect the placeholder option (index 0) for the disabled attribute
     - expect: The placeholder option has disabled=true
     - expect: The placeholder option has the HTML disabled attribute present
     - expect: The disabled attribute prevents the placeholder from being clickable in the browser UI
-  3. Attempt to select the placeholder option via automated UI interaction (click simulation)
+3. Attempt to select the placeholder option via automated UI interaction (click simulation)
     - expect: The dropdown does not allow selection of the disabled placeholder via UI interaction
     - expect: If a valid option was previously selected, it remains selected (disabled option cannot override it via UI)
 
@@ -67,15 +67,15 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/select-option-1.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
     - expect: The placeholder 'Please select an option' is displayed by default
-  2. Select 'Option 1' from the dropdown (value='1')
+2. Select 'Option 1' from the dropdown (value='1')
     - expect: The dropdown's selected index changes to 1
     - expect: The dropdown's selected value changes to '1'
     - expect: The dropdown's selected text changes to 'Option 1'
     - expect: The dropdown visually displays 'Option 1' as the selected option
-  3. Verify the page URL
+3. Verify the page URL
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown
     - expect: No navigation or page reload has occurred
 
@@ -84,15 +84,15 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/select-option-2.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
     - expect: The placeholder 'Please select an option' is displayed by default
-  2. Select 'Option 2' from the dropdown (value='2')
+2. Select 'Option 2' from the dropdown (value='2')
     - expect: The dropdown's selected index changes to 2
     - expect: The dropdown's selected value changes to '2'
     - expect: The dropdown's selected text changes to 'Option 2'
     - expect: The dropdown visually displays 'Option 2' as the selected option
-  3. Verify the page URL
+3. Verify the page URL
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown
     - expect: No navigation or page reload has occurred
 
@@ -105,18 +105,18 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/switch-option-1-to-option-2.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Select 'Option 1' from the dropdown (value='1')
+2. Select 'Option 1' from the dropdown (value='1')
     - expect: The dropdown's selected value is '1'
     - expect: The dropdown's selected text is 'Option 1'
-  3. Without reselecting the placeholder, directly select 'Option 2' from the dropdown (value='2')
+3. Without reselecting the placeholder, directly select 'Option 2' from the dropdown (value='2')
     - expect: The dropdown's selected index changes immediately to 2
     - expect: The dropdown's selected value changes immediately to '2'
     - expect: The dropdown's selected text changes immediately to 'Option 2'
     - expect: No stale or intermediate state (such as placeholder or Option 1) is shown during or after the transition
     - expect: The dropdown reflects the new selection cleanly
-  4. Verify the page URL
+4. Verify the page URL
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown
     - expect: No navigation or page reload has occurred during the switch
 
@@ -125,18 +125,18 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/switch-option-2-to-option-1.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Select 'Option 2' from the dropdown (value='2')
+2. Select 'Option 2' from the dropdown (value='2')
     - expect: The dropdown's selected value is '2'
     - expect: The dropdown's selected text is 'Option 2'
-  3. Without reselecting the placeholder, directly select 'Option 1' from the dropdown (value='1')
+3. Without reselecting the placeholder, directly select 'Option 1' from the dropdown (value='1')
     - expect: The dropdown's selected index changes immediately to 1
     - expect: The dropdown's selected value changes immediately to '1'
     - expect: The dropdown's selected text changes immediately to 'Option 1'
     - expect: No stale or intermediate state is shown during or after the transition
     - expect: The dropdown reflects the new selection cleanly
-  4. Verify the page URL
+4. Verify the page URL
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown
     - expect: No navigation or page reload has occurred during the switch
 
@@ -149,15 +149,15 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/no-persistence-after-reload.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Select 'Option 2' from the dropdown (value='2')
+2. Select 'Option 2' from the dropdown (value='2')
     - expect: The dropdown's selected value is '2'
     - expect: The dropdown's selected text is 'Option 2'
-  3. Reload the page (navigate to https://the-internet.herokuapp.com/dropdown again or use browser refresh)
+3. Reload the page (navigate to https://the-internet.herokuapp.com/dropdown again or use browser refresh)
     - expect: The page reloads successfully
     - expect: The page URL is still https://the-internet.herokuapp.com/dropdown
-  4. Inspect the dropdown's selected value after reload
+4. Inspect the dropdown's selected value after reload
     - expect: The dropdown's selected index is 0
     - expect: The dropdown's selected value is an empty string ''
     - expect: The dropdown's selected text is 'Please select an option'
@@ -173,19 +173,19 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/url-stability.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
     - expect: The current URL is https://the-internet.herokuapp.com/dropdown
-  2. Select 'Option 1' from the dropdown
+2. Select 'Option 1' from the dropdown
     - expect: The dropdown's selected value changes to '1'
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown (no query params, no hash, no navigation)
-  3. Select 'Option 2' from the dropdown
+3. Select 'Option 2' from the dropdown
     - expect: The dropdown's selected value changes to '2'
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown
-  4. Select 'Option 1' again
+4. Select 'Option 1' again
     - expect: The dropdown's selected value changes to '1'
     - expect: The page URL remains https://the-internet.herokuapp.com/dropdown
-  5. Verify no page reload occurred during any of the above interactions
+5. Verify no page reload occurred during any of the above interactions
     - expect: The page title remains 'The Internet' throughout
     - expect: The DOM is not refreshed (no full page reload)
     - expect: Only the dropdown's selected state changes in-place
@@ -200,9 +200,9 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/rapid-successive-selections.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Rapidly select 'Option 1', then immediately 'Option 2', then immediately 'Option 1' again in quick succession
+2. Rapidly select 'Option 1', then immediately 'Option 2', then immediately 'Option 1' again in quick succession
     - expect: Each selection is registered correctly
     - expect: The final selected value is 'Option 1' (the last selection)
     - expect: No intermediate state is left hanging
@@ -214,9 +214,9 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/invalid-option-value.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Attempt to programmatically set the dropdown value to an invalid value (e.g., '3', 'invalid', 'Option 3') that does not exist in the option list
+2. Attempt to programmatically set the dropdown value to an invalid value (e.g., '3', 'invalid', 'Option 3') that does not exist in the option list
     - expect: The dropdown does not change its selected value to the invalid value
     - expect: The dropdown retains its previous valid state (placeholder if no selection was made)
     - expect: No JavaScript error is thrown
@@ -227,9 +227,9 @@ This test plan validates the dropdown selection behavior on the Internet Heroku 
 **File:** `tests/dropdown/option-count-boundary.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dropdown
+1. Navigate to https://the-internet.herokuapp.com/dropdown
     - expect: The page loads successfully
-  2. Retrieve the total count of options in the dropdown
+2. Retrieve the total count of options in the dropdown
     - expect: The dropdown has exactly 3 options
     - expect: The count is neither 2 (missing an option) nor 4 or more (extra options)
     - expect: Any deviation from exactly 3 options is treated as a failure

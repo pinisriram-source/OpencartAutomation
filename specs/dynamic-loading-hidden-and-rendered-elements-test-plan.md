@@ -17,18 +17,18 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading
     - expect: Page title is 'The Internet'
     - expect: Page displays heading 'Dynamically Loaded Page Elements'
     - expect: Page displays explanatory text about dynamic content loading
     - expect: Link 'Example 1: Element on page that is hidden' is visible
     - expect: Link 'Example 2: Element rendered after the fact' is visible
-  2. Click on 'Example 1: Element on page that is hidden' link
+2. Click on 'Example 1: Element on page that is hidden' link
     - expect: Browser navigates to /dynamic_loading/1
     - expect: Page displays heading 'Example 1: Element on page that is hidden'
-  3. Navigate back to landing page
+3. Navigate back to landing page
     - expect: Landing page is displayed again
-  4. Click on 'Example 2: Element rendered after the fact' link
+4. Click on 'Example 2: Element rendered after the fact' link
     - expect: Browser navigates to /dynamic_loading/2
     - expect: Page displays heading 'Example 2: Element rendered after the fact'
 
@@ -43,7 +43,7 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Smoke
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Page displays heading 'Example 1: Element on page that is hidden'
     - expect: Start button is visible
     - expect: Start button is enabled
@@ -58,9 +58,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Check the DOM for #finish element
+2. Check the DOM for #finish element
     - expect: Element with id 'finish' exists in the DOM
     - expect: Element has CSS display: none
     - expect: Element contains 'Hello World!' heading in its innerHTML
@@ -76,9 +76,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button is no longer visible
     - expect: 'Loading...' text is visible
     - expect: Loading spinner image is visible
@@ -91,11 +91,11 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Smoke
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Loading indicator appears
-  3. Wait for loading to complete (up to 10 seconds)
+3. Wait for loading to complete (up to 10 seconds)
     - expect: 'Hello World!' heading is visible
     - expect: Loading indicator ('Loading...' text) is no longer visible
     - expect: Loading spinner image is no longer visible
@@ -108,14 +108,14 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
     - expect: Loading indicator is not visible
     - expect: 'Hello World!' message is not visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button disappears immediately
     - expect: Loading indicator appears immediately
-  3. Wait for loading to complete
+3. Wait for loading to complete
     - expect: Loading indicator disappears
     - expect: 'Hello World!' heading becomes visible
 
@@ -130,7 +130,7 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Page displays heading 'Example 2: Element rendered after the fact'
     - expect: Start button is visible
     - expect: Start button is enabled
@@ -145,9 +145,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Check the DOM for #finish element
+2. Check the DOM for #finish element
     - expect: Element with id 'finish' does not exist in the DOM
     - expect: No 'Hello World!' text can be found anywhere in the page source
 
@@ -162,9 +162,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button is no longer visible
     - expect: 'Loading...' text is visible
     - expect: Loading spinner image is visible
@@ -177,16 +177,16 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Smoke
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Loading indicator appears
-  3. Wait for loading to complete (up to 10 seconds)
+3. Wait for loading to complete (up to 10 seconds)
     - expect: 'Hello World!' heading is visible
     - expect: Loading indicator ('Loading...' text) is no longer visible
     - expect: Loading spinner image is no longer visible
     - expect: Start button is not visible
-  4. Check the DOM for #finish element
+4. Check the DOM for #finish element
     - expect: Element with id 'finish' now exists in the DOM
     - expect: Element is visible (not display: none)
     - expect: Element contains 'Hello World!' heading
@@ -198,14 +198,14 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
     - expect: Loading indicator is not visible
     - expect: 'Hello World!' message is not visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button disappears immediately
     - expect: Loading indicator appears immediately
-  3. Wait for loading to complete
+3. Wait for loading to complete
     - expect: Loading indicator disappears
     - expect: 'Hello World!' heading becomes visible
     - expect: Element was added to the DOM, not just unhidden
@@ -221,15 +221,15 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
     - expect: Loading indicator is not visible
     - expect: 'Hello World!' message is not visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button is not visible
     - expect: Loading indicator is visible
     - expect: 'Hello World!' message is not visible
-  3. Wait for loading to complete
+3. Wait for loading to complete
     - expect: Start button is not visible
     - expect: Loading indicator is not visible
     - expect: 'Hello World!' message is visible
@@ -241,15 +241,15 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
     - expect: Loading indicator is not visible
     - expect: 'Hello World!' message is not visible
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button is not visible
     - expect: Loading indicator is visible
     - expect: 'Hello World!' message is not visible
-  3. Wait for loading to complete
+3. Wait for loading to complete
     - expect: Start button is not visible
     - expect: Loading indicator is not visible
     - expect: 'Hello World!' message is visible
@@ -261,9 +261,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1 and click Start
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1 and click Start
     - expect: Loading indicator becomes visible
-  2. Poll element visibility every 100ms during loading
+2. Poll element visibility every 100ms during loading
     - expect: At no point are both 'Loading...' text and 'Hello World!' heading visible at the same time
 
 #### 6.4. TC-DYNLOAD-015: Loading indicator and Hello World message are never visible simultaneously on Example 2
@@ -273,9 +273,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2 and click Start
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2 and click Start
     - expect: Loading indicator becomes visible
-  2. Poll element visibility every 100ms during loading
+2. Poll element visibility every 100ms during loading
     - expect: At no point are both 'Loading...' text and 'Hello World!' heading visible at the same time
 
 ### 7. Page Reload Reset
@@ -289,13 +289,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click Start and wait for 'Hello World!' message to appear
+2. Click Start and wait for 'Hello World!' message to appear
     - expect: 'Hello World!' heading is visible
     - expect: Start button is not visible
     - expect: Loading indicator is not visible
-  3. Reload the page (browser refresh)
+3. Reload the page (browser refresh)
     - expect: Page returns to initial state
     - expect: Start button is visible
     - expect: 'Hello World!' message is not visible
@@ -308,13 +308,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click Start and wait for 'Hello World!' message to appear
+2. Click Start and wait for 'Hello World!' message to appear
     - expect: 'Hello World!' heading is visible
     - expect: Start button is not visible
     - expect: Loading indicator is not visible
-  3. Reload the page (browser refresh)
+3. Reload the page (browser refresh)
     - expect: Page returns to initial state
     - expect: Start button is visible
     - expect: 'Hello World!' message is not visible (and not in DOM)
@@ -327,11 +327,11 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click Start button
+2. Click Start button
     - expect: Loading indicator appears
-  3. Reload the page while loading indicator is still showing
+3. Reload the page while loading indicator is still showing
     - expect: Page returns to initial state
     - expect: Start button is visible
     - expect: 'Hello World!' message is not visible
@@ -344,11 +344,11 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click Start button
+2. Click Start button
     - expect: Loading indicator appears
-  3. Reload the page while loading indicator is still showing
+3. Reload the page while loading indicator is still showing
     - expect: Page returns to initial state
     - expect: Start button is visible
     - expect: 'Hello World!' message is not visible
@@ -365,12 +365,12 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible and enabled
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button disappears
     - expect: Loading indicator appears
-  3. Attempt to locate and click the Start button during loading
+3. Attempt to locate and click the Start button during loading
     - expect: Start button is not present in the DOM or not clickable
     - expect: No error occurs from attempting to interact with hidden element
     - expect: Loading sequence continues normally
@@ -382,12 +382,12 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible and enabled
-  2. Click the Start button
+2. Click the Start button
     - expect: Start button disappears
     - expect: Loading indicator appears
-  3. Attempt to locate and click the Start button during loading
+3. Attempt to locate and click the Start button during loading
     - expect: Start button is not present in the DOM or not clickable
     - expect: No error occurs from attempting to interact with hidden element
     - expect: Loading sequence continues normally
@@ -399,9 +399,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click the Start button rapidly multiple times in succession
+2. Click the Start button rapidly multiple times in succession
     - expect: Loading indicator appears only once
     - expect: After loading completes, only one 'Hello World!' message is shown
     - expect: No duplicate loading indicators or messages appear
@@ -413,9 +413,9 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click the Start button rapidly multiple times in succession
+2. Click the Start button rapidly multiple times in succession
     - expect: Loading indicator appears only once
     - expect: After loading completes, only one 'Hello World!' message is shown
     - expect: No duplicate loading indicators or messages appear
@@ -431,14 +431,14 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Sanity
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1, click Start, and wait for completion
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1, click Start, and wait for completion
     - expect: 'Hello World!' heading is visible
-  2. Capture the text content, element type, and computed styles of the Hello World element
+2. Capture the text content, element type, and computed styles of the Hello World element
     - expect: Text is exactly 'Hello World!'
     - expect: Element is an h4 heading
-  3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2, click Start, and wait for completion
+3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2, click Start, and wait for completion
     - expect: 'Hello World!' heading is visible
-  4. Capture the text content, element type, and computed styles of the Hello World element
+4. Capture the text content, element type, and computed styles of the Hello World element
     - expect: Text is exactly 'Hello World!'
     - expect: Element is an h4 heading
     - expect: Styles match those from Example 1
@@ -450,14 +450,14 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1 and click Start
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1 and click Start
     - expect: Loading indicator with 'Loading...' text and spinner image is visible
-  2. Capture the loading indicator structure and content
+2. Capture the loading indicator structure and content
     - expect: Container has 'Loading...' text
     - expect: Container has an img element (spinner)
-  3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2 and click Start
+3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2 and click Start
     - expect: Loading indicator with 'Loading...' text and spinner image is visible
-  4. Capture the loading indicator structure and content
+4. Capture the loading indicator structure and content
     - expect: Loading indicator structure is identical to Example 1
     - expect: Same 'Loading...' text
     - expect: Same spinner image element
@@ -469,13 +469,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click Start and measure time from click until Hello World appears
+2. Click Start and measure time from click until Hello World appears
     - expect: Loading duration is approximately 5 seconds (±1 second)
-  3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  4. Click Start and measure time from click until Hello World appears
+4. Click Start and measure time from click until Hello World appears
     - expect: Loading duration is approximately 5 seconds (±1 second)
     - expect: Duration is within 1 second of Example 1 duration
 
@@ -486,14 +486,14 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible with text 'Start'
-  2. Capture button element type and properties
+2. Capture button element type and properties
     - expect: Element is a button
     - expect: Button text is 'Start'
-  3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+3. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible with text 'Start'
-  4. Capture button element type and properties
+4. Capture button element type and properties
     - expect: Element is a button
     - expect: Button text is 'Start'
     - expect: Button properties match Example 1
@@ -509,13 +509,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click Start and wait for Hello World to appear
+2. Click Start and wait for Hello World to appear
     - expect: 'Hello World!' message is visible
-  3. Reload the page
+3. Reload the page
     - expect: Start button is visible again
-  4. Click Start and wait for Hello World to appear
+4. Click Start and wait for Hello World to appear
     - expect: 'Hello World!' message is visible
     - expect: Second run completes successfully just like the first
 
@@ -526,13 +526,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click Start and wait for Hello World to appear
+2. Click Start and wait for Hello World to appear
     - expect: 'Hello World!' message is visible
-  3. Reload the page
+3. Reload the page
     - expect: Start button is visible again
-  4. Click Start and wait for Hello World to appear
+4. Click Start and wait for Hello World to appear
     - expect: 'Hello World!' message is visible
     - expect: Second run completes successfully just like the first
 
@@ -543,13 +543,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/1
     - expect: Start button is visible
-  2. Click Start and wait for Hello World to appear
+2. Click Start and wait for Hello World to appear
     - expect: 'Hello World!' message is visible
-  3. Navigate to the landing page (/dynamic_loading)
+3. Navigate to the landing page (/dynamic_loading)
     - expect: Landing page is displayed
-  4. Use browser back button to return to Example 1
+4. Use browser back button to return to Example 1
     - expect: Page shows initial state with Start button visible
     - expect: No Hello World message is visible
     - expect: State was reset, not preserved
@@ -561,13 +561,13 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
+1. Navigate to https://the-internet.herokuapp.com/dynamic_loading/2
     - expect: Start button is visible
-  2. Click Start and wait for Hello World to appear
+2. Click Start and wait for Hello World to appear
     - expect: 'Hello World!' message is visible
-  3. Navigate to the landing page (/dynamic_loading)
+3. Navigate to the landing page (/dynamic_loading)
     - expect: Landing page is displayed
-  4. Use browser back button to return to Example 2
+4. Use browser back button to return to Example 2
     - expect: Page shows initial state with Start button visible
     - expect: No Hello World message is visible
     - expect: State was reset, not preserved
@@ -579,11 +579,11 @@ The Dynamic Loading feature at https://the-internet.herokuapp.com/dynamic_loadin
 **Tier:** Functional
 
 **Steps:**
-  1. Navigate directly to https://the-internet.herokuapp.com/dynamic_loading/1 without visiting landing page first
+1. Navigate directly to https://the-internet.herokuapp.com/dynamic_loading/1 without visiting landing page first
     - expect: Example 1 page loads successfully
     - expect: Start button is visible
     - expect: Page heading shows 'Example 1: Element on page that is hidden'
-  2. Navigate directly to https://the-internet.herokuapp.com/dynamic_loading/2 without visiting landing page first
+2. Navigate directly to https://the-internet.herokuapp.com/dynamic_loading/2 without visiting landing page first
     - expect: Example 2 page loads successfully
     - expect: Start button is visible
     - expect: Page heading shows 'Example 2: Element rendered after the fact'

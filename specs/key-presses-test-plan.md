@@ -15,13 +15,13 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/initial-state.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/key_presses
+1. Navigate to https://the-internet.herokuapp.com/key_presses
     - expect: Page loads successfully with title 'The Internet'
     - expect: URL is exactly https://the-internet.herokuapp.com/key_presses (no query string)
-  2. Locate the text input field
+2. Locate the text input field
     - expect: Input field is visible
     - expect: Input field is empty (contains no text)
-  3. Locate the result message paragraph
+3. Locate the result message paragraph
     - expect: Result paragraph element exists below the input
     - expect: Result paragraph contains no text (no message displayed)
 
@@ -30,11 +30,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/letter-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus (active state)
-  3. Press the lowercase letter 'a'
+3. Press the lowercase letter 'a'
     - expect: Input field contains 'a'
     - expect: Result message displays 'You entered: A' (uppercase)
     - expect: URL remains https://the-internet.herokuapp.com/key_presses
@@ -44,17 +44,17 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/letter-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the letter 'a'
+3. Press the letter 'a'
     - expect: Result message displays 'You entered: A'
-  4. Press the letter 'b'
+4. Press the letter 'b'
     - expect: Input field contains 'ab'
     - expect: Result message updates to 'You entered: B' (only latest key, not history)
     - expect: URL remains unchanged
-  5. Press the letter 'c'
+5. Press the letter 'c'
     - expect: Input field contains 'abc'
     - expect: Result message updates to 'You entered: C'
 
@@ -63,11 +63,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/number-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the number key '5'
+3. Press the number key '5'
     - expect: Input field contains '5'
     - expect: Result message displays 'You entered: 5' (numbers are not uppercased)
     - expect: URL remains unchanged
@@ -77,9 +77,9 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/number-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page and focus the input
+1. Navigate to the Key Presses page and focus the input
     - expect: Input is focused
-  2. Press each number key from 0-9 sequentially
+2. Press each number key from 0-9 sequentially
     - expect: Each key press displays 'You entered: [0-9]' respectively
     - expect: Result message updates to show only the most recent number pressed
 
@@ -92,11 +92,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/special-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Enter key
+3. Press the Enter key
     - expect: Page performs a form submission
     - expect: URL changes to https://the-internet.herokuapp.com/key_presses? (query string added)
     - expect: Result message disappears (paragraph is empty)
@@ -106,11 +106,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/special-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Space key
+3. Press the Space key
     - expect: Result message displays 'You entered: SPACE'
     - expect: Input field contains a space character
     - expect: URL remains unchanged
@@ -120,11 +120,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/special-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Escape key
+3. Press the Escape key
     - expect: Result message displays 'You entered: ESCAPE'
     - expect: URL remains unchanged
     - expect: Page does not navigate away
@@ -134,11 +134,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/special-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Tab key
+3. Press the Tab key
     - expect: Result message displays 'You entered: TAB'
     - expect: Focus moves to the next focusable element (Elemental Selenium link)
     - expect: URL remains unchanged
@@ -148,11 +148,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/special-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field and type 'abc'
+2. Click on the input field and type 'abc'
     - expect: Input field contains 'abc'
-  3. Press the Backspace key
+3. Press the Backspace key
     - expect: Result message displays 'You entered: BACK_SPACE' (with underscore)
     - expect: Input field now contains 'ab' (last character deleted)
     - expect: URL remains unchanged
@@ -162,11 +162,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/special-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Delete key
+3. Press the Delete key
     - expect: Result message displays 'You entered: DELETE'
     - expect: URL remains unchanged
 
@@ -175,11 +175,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/arrow-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the ArrowUp key
+3. Press the ArrowUp key
     - expect: Result message displays 'You entered: UP'
     - expect: URL remains unchanged
 
@@ -188,15 +188,15 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/arrow-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page and focus the input
+1. Navigate to the Key Presses page and focus the input
     - expect: Input is focused
-  2. Press ArrowUp key
+2. Press ArrowUp key
     - expect: Result message displays 'You entered: UP'
-  3. Press ArrowDown key
+3. Press ArrowDown key
     - expect: Result message displays 'You entered: DOWN'
-  4. Press ArrowLeft key
+4. Press ArrowLeft key
     - expect: Result message displays 'You entered: LEFT'
-  5. Press ArrowRight key
+5. Press ArrowRight key
     - expect: Result message displays 'You entered: RIGHT'
 
 #### 2.9. Home key detection displays HOME
@@ -204,9 +204,9 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/navigation-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Press the Home key (input not focused)
+2. Press the Home key (input not focused)
     - expect: Result message displays 'You entered: HOME'
     - expect: URL remains unchanged
 
@@ -215,9 +215,9 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/navigation-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Press the End key
+2. Press the End key
     - expect: Result message displays 'You entered: END'
     - expect: URL remains unchanged
 
@@ -226,9 +226,9 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/navigation-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Press the PageDown key
+2. Press the PageDown key
     - expect: Result message displays 'You entered: PAGE_DOWN' (with underscore)
     - expect: URL remains unchanged
 
@@ -237,9 +237,9 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/navigation-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Press the PageUp key
+2. Press the PageUp key
     - expect: Result message displays 'You entered: PAGE_UP' (with underscore)
     - expect: URL remains unchanged
 
@@ -252,11 +252,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/modifier-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Shift key alone (not in combination)
+3. Press the Shift key alone (not in combination)
     - expect: Result message displays 'You entered: SHIFT'
     - expect: URL remains unchanged
 
@@ -265,11 +265,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/modifier-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Control key alone
+3. Press the Control key alone
     - expect: Result message displays 'You entered: CONTROL'
     - expect: URL remains unchanged
 
@@ -278,11 +278,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/modifier-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Alt key alone
+3. Press the Alt key alone
     - expect: Result message displays 'You entered: ALT'
     - expect: URL remains unchanged
 
@@ -291,11 +291,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/function-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the F1 function key
+3. Press the F1 function key
     - expect: Result message displays 'You entered: F1'
     - expect: URL remains unchanged
 
@@ -304,9 +304,9 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/function-keys.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page and focus the input
+1. Navigate to the Key Presses page and focus the input
     - expect: Input is focused
-  2. Press F1 through F12 keys sequentially
+2. Press F1 through F12 keys sequentially
     - expect: Each function key displays 'You entered: F[1-12]' respectively
     - expect: URL remains unchanged for each key press
     - expect: No browser default actions are triggered (e.g., help menu, developer tools)
@@ -320,10 +320,10 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/global-detection.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
     - expect: Input field is not focused (no active state)
-  2. Press the letter 'x' without clicking on the input field
+2. Press the letter 'x' without clicking on the input field
     - expect: Result message displays 'You entered: X'
     - expect: Input field remains unfocused
     - expect: Input field remains empty (key press detected globally but not typed into unfocused input)
@@ -334,14 +334,14 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/global-detection.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
     - expect: Input field is not focused
-  2. Press the Escape key without focusing the input
+2. Press the Escape key without focusing the input
     - expect: Result message displays 'You entered: ESCAPE'
     - expect: URL remains https://the-internet.herokuapp.com/key_presses (no query string)
     - expect: Page does not navigate
-  3. Press the Space key without focusing the input
+3. Press the Space key without focusing the input
     - expect: Result message displays 'You entered: SPACE'
     - expect: Input field remains empty
     - expect: Page does not scroll (default space bar behavior is prevented)
@@ -351,14 +351,14 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/global-detection.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Tab key to move focus away
+3. Press the Tab key to move focus away
     - expect: Result message displays 'You entered: TAB'
     - expect: Focus moves to the next element (link)
-  4. Press the letter 'z'
+4. Press the letter 'z'
     - expect: Result message updates to 'You entered: Z'
     - expect: Input field remains empty (key press not typed because input is not focused)
     - expect: Global listener still captures the key press
@@ -372,17 +372,17 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/url-stability.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/key_presses
+1. Navigate to https://the-internet.herokuapp.com/key_presses
     - expect: Page loads with URL exactly https://the-internet.herokuapp.com/key_presses
-  2. Press Escape key
+2. Press Escape key
     - expect: URL remains https://the-internet.herokuapp.com/key_presses
-  3. Press Space key
+3. Press Space key
     - expect: URL remains unchanged
-  4. Press Tab key
+4. Press Tab key
     - expect: URL remains unchanged
-  5. Press any letter key
+5. Press any letter key
     - expect: URL remains unchanged
-  6. Press any arrow key
+6. Press any arrow key
     - expect: URL remains unchanged
 
 #### 5.2. Enter key with focused input submits form and changes URL
@@ -390,11 +390,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/url-stability.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/key_presses
+1. Navigate to https://the-internet.herokuapp.com/key_presses
     - expect: Page loads with base URL
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press the Enter key
+3. Press the Enter key
     - expect: URL changes to https://the-internet.herokuapp.com/key_presses? (query string '?' is added)
     - expect: Result message disappears (paragraph becomes empty)
     - expect: Page performs a form submission but stays on the same route
@@ -404,10 +404,10 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/url-stability.spec.ts`
 
 **Steps:**
-  1. Navigate to https://the-internet.herokuapp.com/key_presses
+1. Navigate to https://the-internet.herokuapp.com/key_presses
     - expect: Page loads with base URL
     - expect: Input is not focused
-  2. Press the Enter key without clicking on the input
+2. Press the Enter key without clicking on the input
     - expect: Result message may or may not display (test and document actual behavior)
     - expect: URL should remain https://the-internet.herokuapp.com/key_presses without query string
     - expect: No form submission occurs
@@ -417,12 +417,12 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/url-stability.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Press F5 (typically refresh/reload)
+2. Press F5 (typically refresh/reload)
     - expect: Page may refresh (browser default behavior) but returns to same URL
     - expect: After refresh, page returns to initial state
-  3. Navigate back to the page and press F11 (typically fullscreen)
+3. Navigate back to the page and press F11 (typically fullscreen)
     - expect: Result message displays 'You entered: F11' if captured
     - expect: URL remains unchanged
     - expect: Page does not navigate away
@@ -436,11 +436,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/edge-cases.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press keys 'a', 'b', 'c' in rapid succession (minimal delay)
+3. Press keys 'a', 'b', 'c' in rapid succession (minimal delay)
     - expect: Result message updates to show the most recent key pressed
     - expect: Final result message displays 'You entered: C'
     - expect: No race conditions or display errors occur
@@ -451,11 +451,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/edge-cases.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on the input field to focus it
+2. Click on the input field to focus it
     - expect: Input field receives focus
-  3. Press and hold the letter 'a' for several seconds
+3. Press and hold the letter 'a' for several seconds
     - expect: Result message displays 'You entered: A'
     - expect: Input field may contain multiple 'a' characters (due to key repeat)
     - expect: Result message remains stable showing 'A'
@@ -466,11 +466,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/edge-cases.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page and focus the input
+1. Navigate to the Key Presses page and focus the input
     - expect: Input is focused
-  2. Press lowercase 'a'
+2. Press lowercase 'a'
     - expect: Result message displays 'You entered: A' (uppercase)
-  3. Press Shift+A (uppercase A)
+3. Press Shift+A (uppercase A)
     - expect: Result message displays 'You entered: A' (same uppercase display)
     - expect: Input contains uppercase 'A' character
 
@@ -479,15 +479,15 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/edge-cases.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page and focus the input
+1. Navigate to the Key Presses page and focus the input
     - expect: Input is focused
-  2. Press period/dot key '.'
+2. Press period/dot key '.'
     - expect: Result message displays 'You entered: .' (or standardized key name)
     - expect: Input contains '.' character
-  3. Press comma key ','
+3. Press comma key ','
     - expect: Result message displays 'You entered: ,' (or standardized key name)
     - expect: Input contains ',' character
-  4. Press semicolon key ';'
+4. Press semicolon key ';'
     - expect: Result message displays 'You entered: ;' (or standardized key name)
     - expect: Input contains ';' character
 
@@ -496,11 +496,11 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/edge-cases.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page
+1. Navigate to the Key Presses page
     - expect: Page loads successfully
-  2. Click on input and type 'test'
+2. Click on input and type 'test'
     - expect: Input contains 'test'
-  3. Press Enter key
+3. Press Enter key
     - expect: Form submits
     - expect: URL changes to include query string '?'
     - expect: Result message disappears
@@ -511,12 +511,12 @@ The Key Presses page (https://the-internet.herokuapp.com/key_presses) is a singl
 **File:** `tests/key-presses/edge-cases.spec.ts`
 
 **Steps:**
-  1. Navigate to the Key Presses page and focus the input
+1. Navigate to the Key Presses page and focus the input
     - expect: Input is focused
-  2. Press Ctrl+A (select all shortcut)
+2. Press Ctrl+A (select all shortcut)
     - expect: Result message displays 'You entered: A' (only the A key, not the combination)
     - expect: Default browser behavior may occur (select all text in input)
     - expect: Alternative: test if Control is detected when pressed first
-  3. Press Ctrl+C (copy shortcut)
+3. Press Ctrl+C (copy shortcut)
     - expect: Result message displays 'You entered: C' (only the C key)
     - expect: Default copy behavior may occur if text is selected
