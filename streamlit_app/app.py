@@ -438,10 +438,21 @@ k6.metric("Failed", summary["failed"], delta=None)
 
 st.divider()
 
-tab_submit, tab_review, tab_overview, tab_matrix, tab_usecase, tab_rules, tab_details, tab_defects = st.tabs(
+(
+    tab_submit,
+    tab_review,
+    tab_artifacts,
+    tab_overview,
+    tab_matrix,
+    tab_usecase,
+    tab_rules,
+    tab_details,
+    tab_defects,
+) = st.tabs(
     [
         "Submit New Request",
         "Review Pipeline Artifacts",
+        "Approved Test Artifacts",
         "Overview",
         "Test Execution Matrix",
         "Coverage by Use Case",
@@ -1438,3 +1449,66 @@ with tab_review:
             )
 
     render_review_tab()
+
+# --- Approved Test Artifacts tab -----------------------------------------------
+with tab_artifacts:
+    st.subheader("Approved Test Artifacts")
+    st.caption(
+        "Test plans (with their test cases) and automation suites (test scripts) "
+        "that have cleared review, across every 'Submit New Request' slug -- browse "
+        "here without needing to know a specific slug up front first, unlike the "
+        "Review Pipeline Artifacts tab. Only covers slugs run through that pipeline "
+        "(a user-stories/<slug>-review.json exists); older suites predating it "
+        "aren't tracked this way."
+    )
+
+    review_files = sorted((REPO_ROOT / "user-stories").glob("*-review.json"))
+    shown_any = False
+    for review_file in review_files:
+        slug = review_file.name.removesuffix("-review.json")
+        try:
+            review_data = json.loads(review_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+
+        plan_stage = review_data.get("plan", {})
+        automation_stage = review_data.get("automation", {})
+        plan_approved = plan_stage.get("status") == "approved"
+        automation_approved = automation_stage.get("status") == "approved"
+        if not (plan_approved or automation_approved):
+            continue
+        shown_any = True
+
+        with st.expander(slug):
+            if plan_approved:
+                plan_path = plan_stage.get("path", f"specs/{slug}-test-plan.md")
+                st.markdown(f"**Test Plan & Test Cases:** [{plan_path} on GitHub]({github_url(plan_path)})")
+                local_plan = REPO_ROOT / plan_path
+                if local_plan.exists() and st.checkbox(
+                    "Show test plan content inline", key=f"show_plan_{slug}"
+                ):
+                    st.markdown(local_plan.read_text(encoding="utf-8"))
+            else:
+                st.caption(f"Test plan: {REVIEW_STATUS_LABELS.get(plan_stage.get('status', 'not_started'), 'not started')}")
+
+            if automation_approved:
+                suite_path = automation_stage.get("path", f"tests/{slug}/")
+                suite_dir = REPO_ROOT / suite_path
+                spec_files = sorted(suite_dir.rglob("*.spec.ts")) if suite_dir.exists() else []
+                st.markdown(f"**Test Scripts:** [{suite_path} on GitHub]({github_url(suite_path)})")
+                if spec_files:
+                    for spec_file in spec_files:
+                        rel_path = spec_file.relative_to(REPO_ROOT).as_posix()
+                        st.markdown(f"- [{rel_path}]({github_url(rel_path)})")
+                else:
+                    st.caption("No spec files found in this checkout yet -- see the GitHub link above.")
+            else:
+                st.caption(
+                    f"Automation suite: {REVIEW_STATUS_LABELS.get(automation_stage.get('status', 'not_started'), 'not started')}"
+                )
+
+    if not shown_any:
+        st.info(
+            "No approved test plans or automation suites yet -- approve a stage in "
+            "the Review Pipeline Artifacts tab first."
+        )
