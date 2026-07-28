@@ -1,10 +1,66 @@
 # Hovers Test Plan
 
-## Application Overview
+## 1. Project Overview
+
+**Project Name:** Hovers (the-internet.herokuapp.com/hovers) — a "Submit New Request" pipeline suite
+
+**Objective:** Validate hover-triggered UI behavior (caption reveal/hide per avatar, profile-link navigation) end-to-end via automated regression coverage, so future changes to this interaction don't regress silently and manual re-testing time is reduced.
+
+**Target Audience:** The stakeholder who submitted this request, the reviewer approving each pipeline stage in the Streamlit dashboard's Review Pipeline Artifacts tab, and future QA/dev maintaining this suite.
+
+## 2. Scope of Automation
+
+**In-Scope:**
+- Hover-triggered caption show/hide behavior for all three avatars, individually and in sequence
+- "View profile" link visibility and navigation for each avatar
+- Initial page-load state verification
+
+**Out-of-Scope:**
+- Visual/pixel-level styling of the caption overlay (covered by functional visibility checks only, not appearance)
+- Cross-browser matrix beyond Chromium (this repo's `playwright.config.ts` runs Chromium only)
+- Performance/load testing of the page
+
+## 3. Test Strategy & Framework
+
+**Automation Tools:** Playwright (TypeScript), `@playwright/test`
+
+**Test Architecture:** Page Object Model — `tests/hovers/page-objects/hovers.page.ts` extends the shared `tests/_shared/base-page.ts` `BasePage`, using getter-accessor locators per this repo's convention (see CLAUDE.md)
+
+**Test Data Strategy:** No persistent test data — the-internet.herokuapp.com/hovers is a static demo page with no login/session state; every test starts from a fresh navigation via `tests/seed.spec.ts`
+
+## 4. Test Environment
+
+**Application Under Test:** https://the-internet.herokuapp.com/hovers
+
+**Browser Matrix:** Chromium (this repo's configured Playwright project)
+
+**CI/CD Integration:** GitHub Actions — `pipeline-execute.yml` runs this suite non-interactively once both this plan and the generated automation are approved
+
+## 5. Execution & Schedule
+
+**Execution Frequency:** Triggered on demand through the Streamlit dashboard's three-stage pipeline (plan → review → automation → review → execute); re-triggered automatically on a "Request Changes" review
+
+**Milestones:** Plan drafted → Plan approved → Automation suite generated → Automation approved → Suite executed & report published
+
+## 6. Entry and Exit Criteria
+
+**Entry Criteria:** Acceptance criteria for this request are unambiguous (see Section 8); target URL is reachable; this plan has been approved in the Review tab
+
+**Exit Criteria:** Every Smoke/Sanity/Functional test case in Section 9 has been executed; results committed to `streamlit_app/data/hovers-test-results.json`; no unresolved Smoke-tier failures
+
+## 7. Roles and Responsibilities
+
+**QA Automation Engineer:** `playwright-test-planner` (this plan) and `playwright-test-generator` (the automation suite) Claude Code subagents
+
+**DevOps / CI Engineer:** the three-stage GitHub Actions pipeline (`pipeline-plan.yml` / `pipeline-automation.yml` / `pipeline-execute.yml`)
+
+**Product Owner / QA Lead:** whoever approves each stage in the dashboard's Review Pipeline Artifacts tab
+
+## 8. Application Overview
 
 The Hovers feature demonstrates hover-based interactivity on a web page. The page displays three user avatar images arranged horizontally. Each avatar has an associated caption overlay that contains the user's name (formatted as "name: user1", "name: user2", or "name: user3") and a "View profile" link. These caption overlays are hidden by default and only become visible when the user hovers their mouse cursor over the corresponding avatar image. When the mouse moves away from an image (either by hovering over a different image or moving off all images entirely), the caption overlay for that image automatically hides again. Clicking the "View profile" link while hovering navigates to the user's profile page at the URL pattern /users/[1-3]. The page should never navigate or reload from hovering alone—only from an explicit click on a profile link.
 
-## Test Scenarios
+## 9. Detailed Test Scenarios
 
 ### 1. Initial Page State
 
