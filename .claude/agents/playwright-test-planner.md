@@ -52,13 +52,18 @@ You will:
 
 5. **Create Documentation**
 
-   Prepend the 7-section strategy overview described in CLAUDE.md's "Test plan document structure"
-   section (Project Overview, Scope of Automation, Test Strategy & Framework, Test Environment,
-   Execution & Schedule, Entry and Exit Criteria, Roles and Responsibilities) before the scenario
-   content -- see `specs/hovers-test-plan.md` for the worked example. Sections 3-7 are mostly fixed
-   facts about this project (Playwright/TypeScript, Page Object Model, GitHub Actions); only
-   Project Overview, Scope, and the target URL are suite-specific -- derive those from the
-   acceptance criteria in the request, don't invent generic filler.
+   Prepend the 16-section test plan overview described in CLAUDE.md's "Test plan document structure"
+   section (Introduction, Scope, Test Strategy, Environment Requirements, Test Schedule, Control
+   Procedures, Functions to be Tested, Resources and Responsibilities, Deliverables, Suspension/Exit
+   Criteria, Resumption Criteria, Dependencies, Risks, Tools, Documentation, Approvals) before the
+   scenario content -- see `specs/hovers-test-plan.md` and `specs/single-file-upload-flow-test-plan.md`
+   for worked examples. Most subsections are fixed facts about this project's pipeline and
+   infrastructure -- reuse the same wording across suites. Where a subsection genuinely doesn't apply
+   to a browser-only Playwright suite (Mainframe, Beta Test, Performance Test, Security Test, Stress
+   and Volume Test, Recovery Test, Bug Review Meetings), mark it "Not applicable" with a one-line
+   reason rather than deleting the heading -- every generated plan must keep the same 16-section shape.
+   Sections 1, 2, 3.1/3.4, 7, and the Test Data & Database line are suite-specific -- derive those from
+   the acceptance criteria in the request, don't invent generic filler.
 
    Submit your test plan using `planner_save_plan` tool.
 
@@ -85,17 +90,20 @@ You will:
 **Output Format**: Always save the complete test plan as a markdown file with clear headings, numbered steps, and
 professional formatting suitable for sharing with development and QA teams. Structure the whole document as:
 
-- Sections `1.`-`7.` -- the strategy overview (Project Overview / Scope of Automation / Test Strategy & Framework /
-  Test Environment / Execution & Schedule / Entry and Exit Criteria / Roles and Responsibilities) per CLAUDE.md's
-  "Test plan document structure" section.
-- Section `8. Application Overview` -- the free-text feature description.
-- Section `9. Detailed Test Scenarios` -- this project's established structure: `#### <feature-group>.<scenario>.
+- Title (`# <Suite> Test Plan`) followed by a `**Prepared By:**` / `**Date:**` line pair.
+- Sections `1.`-`16.` -- the full test plan overview (Introduction / Scope / Test Strategy / Environment
+  Requirements / Test Schedule / Control Procedures / Functions to be Tested / Resources and Responsibilities /
+  Deliverables / Suspension-Exit Criteria / Resumption Criteria / Dependencies / Risks / Tools / Documentation /
+  Approvals, with their numbered subsections) per CLAUDE.md's "Test plan document structure" section.
+- Section `17. Application Overview` -- the free-text feature description.
+- Section `18. Detailed Test Scenarios` -- this project's established structure: `#### <feature-group>.<scenario>.
   TC-<MODULE>-<NNN>: <Title>` headings (e.g. `2.1. TC-DYNLOAD-002: ...`), with `**File:**`, `**Tier:**`, and
   `**Steps:**` (numbered actions starting at column 0, each with nested `- expect: ...` bullets indented exactly 4
   spaces so they render as a proper nested list, not a run-on paragraph). The two-part `<feature-group>.<scenario>`
   numbering lets the Generator agent reference scenarios unambiguously.
 
-See `specs/hovers-test-plan.md` for a worked example of the full structure.
+See `specs/hovers-test-plan.md` and `specs/single-file-upload-flow-test-plan.md` for worked examples of the full
+structure.
 
 Whether to create a fresh plan or revise an existing one is decided by the orchestrating prompt that invoked you
 (this agent runs unattended in CI, so there is no one to ask) -- follow whichever it asks for.

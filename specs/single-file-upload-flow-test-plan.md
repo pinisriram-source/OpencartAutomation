@@ -1,67 +1,160 @@
 # Single File Upload Flow Test Plan
 
-## 1. Project Overview
+**Prepared By:** playwright-test-planner subagent (Claude Code, automated)
+**Date:** 2026-07-28
 
-**Project Name:** File Upload - Single File Upload Flow (the-internet.herokuapp.com/upload) — a "Submit New Request" pipeline suite
+## 1. Introduction
 
-**Objective:** Validate the single-file upload flow end-to-end (file selection, successful upload, file-name integrity, navigation, and the no-file-selected edge case) via automated regression coverage, so future changes to this flow don't regress silently and manual re-testing time is reduced.
+### 1.1 Test Plan Objectives
 
-**Target Audience:** The stakeholder who submitted this request, the reviewer approving each pipeline stage in the Streamlit dashboard's Review Pipeline Artifacts tab, and future QA/dev maintaining this suite.
+Validate the single-file upload flow on the-internet.herokuapp.com/upload end-to-end (file selection, successful upload, file-name integrity, navigation, and the no-file-selected edge case) via automated regression coverage, so future changes to this flow don't regress silently and manual re-testing time is reduced.
 
-## 2. Scope of Automation
+## 2. Scope
 
-**In-Scope:**
+### 2.1 In Scope
 - File selection behavior (single valid file, different extensions, cancel, re-selection)
 - Successful upload flow and the resulting success page's displayed file name
 - The no-file-selected case, including the real HTTP 500 currently returned by the live app (see TC-UPLOAD-014) — captured as-is so the suite continues to flag it as a regression signal rather than being "fixed" in test data
 - File-name integrity (exact match, case, punctuation) and navigation back/forward between the form and success page
 
-**Out-of-Scope:**
+### 2.2 Out of Scope
 - Visual/pixel-level styling of the upload form or success page
 - Cross-browser matrix beyond Chromium (this repo's `playwright.config.ts` runs Chromium only)
 - Actual file content/virus-scanning validation — only the file *name* round-trip is in scope, per the acceptance criteria
 
-## 3. Test Strategy & Framework
+## 3. Test Strategy
 
-**Automation Tools:** Playwright (TypeScript), `@playwright/test`
+### 3.1 System Test
+Functional/system-level UI testing of the file upload flow via Playwright, covering file selection through to the success page end-to-end in the browser.
 
-**Test Architecture:** Page Object Model — `tests/single-file-upload-flow/page-objects/*.page.ts` extends the shared `tests/_shared/base-page.ts` `BasePage`, using getter-accessor locators per this repo's convention (see CLAUDE.md)
+### 3.2 Performance Test
+Not applicable — performance/load testing is explicitly out of scope for this project (see CLAUDE.md's "Testing Objective").
 
-**Test Data Strategy:** Small static files already present in this repo (`upload-sample.txt`, `package.json`, `CLAUDE.md`) are reused as upload fixtures via Playwright's file-chooser API — no generated or externally-hosted test files, no persistent state to clean up between runs
+### 3.3 Security Test
+Not applicable — security penetration testing is explicitly out of scope for this project.
 
-## 4. Test Environment
+### 3.4 Automated Test
+100% of this suite is automated — Playwright (TypeScript), executed non-interactively by `pipeline-execute.yml`. There is no manual test execution step in this pipeline.
 
-**Application Under Test:** https://the-internet.herokuapp.com/upload
+### 3.5 Stress and Volume Test
+Not applicable — this pipeline does not exercise concurrent load or high data volumes; each test runs a single Chromium browser context sequentially with small static files.
 
-**Browser Matrix:** Chromium (this repo's configured Playwright project)
+### 3.6 Recovery Test
+Not applicable — no crash/failover recovery scenarios are in scope for this UI-level suite (the no-file-selected HTTP 500 is a functional negative case, not a recovery test).
 
-**CI/CD Integration:** GitHub Actions — `pipeline-execute.yml` runs this suite non-interactively once both this plan and the generated automation are approved
+### 3.7 Documentation Test
+This test plan, the generated Playwright specs, and the Streamlit dashboard report constitute the suite's documentation, reviewed for accuracy at each pipeline stage's human review gate (see Section 6).
 
-## 5. Execution & Schedule
+### 3.8 Beta Test
+Not applicable — this suite targets a stable, already-live target application; there is no beta/pre-release build to validate.
 
-**Execution Frequency:** Triggered on demand through the Streamlit dashboard's three-stage pipeline (plan → review → automation → review → execute); re-triggered automatically on a "Request Changes" review
+### 3.9 User Acceptance Test
+The stakeholder who submitted the request acts as the acceptance reviewer, approving or requesting changes to this plan and the generated suite via the Streamlit dashboard's Review Pipeline Artifacts tab before execution.
 
-**Milestones:** Plan drafted → Plan approved → Automation suite generated → Automation approved → Suite executed & report published
+## 4. Environment Requirements
 
-## 6. Entry and Exit Criteria
+### 4.1 Data Entry Workstations
+Not applicable (legacy field from the source template) — see the actual environment below.
 
-**Entry Criteria:** Acceptance criteria for this request are unambiguous (see Section 8); target URL is reachable; this plan has been approved in the Review tab
+### 4.2 Mainframe
+Not applicable — this application has no mainframe/back-end component in scope; testing is entirely browser-driven.
 
-**Exit Criteria:** Every Smoke/Sanity/Functional test case in Section 9 has been executed; results committed to `streamlit_app/data/single-file-upload-flow-test-results.json`; no unresolved Smoke-tier failures (TC-UPLOAD-014's HTTP 500 is Sanity-tier by design — a known, intentionally-tracked live-app defect, not a Smoke blocker)
+**Actual environment:** GitHub Actions `ubuntu-latest` runner, Node.js (`lts/*`), Playwright + Chromium (installed via `npx playwright install --with-deps chromium`), target application reachable at https://the-internet.herokuapp.com/upload.
 
-## 7. Roles and Responsibilities
+## 5. Test Schedule
 
-**QA Automation Engineer:** `playwright-test-planner` (this plan) and `playwright-test-generator` (the automation suite) Claude Code subagents
+Triggered on demand through the Streamlit dashboard's three-stage pipeline (plan → review → automation → review → execute); re-triggered automatically whenever a stage is sent back with reviewer feedback. No fixed calendar schedule — cadence is driven by stakeholder submissions and reviews.
 
-**DevOps / CI Engineer:** the three-stage GitHub Actions pipeline (`pipeline-plan.yml` / `pipeline-automation.yml` / `pipeline-execute.yml`)
+## 6. Control Procedures
 
-**Product Owner / QA Lead:** whoever approves each stage in the dashboard's Review Pipeline Artifacts tab
+### 6.1 Reviews
+Each pipeline stage (plan, automation, execution) pauses for human review in the Streamlit dashboard's Review Pipeline Artifacts tab before the next stage runs.
 
-## 8. Application Overview
+### 6.2 Bug Review Meetings
+Not applicable — this is a lightweight, async pipeline with no synchronous meetings; defects surface directly in the dashboard's Defects Log and Test Execution Matrix tabs.
+
+### 6.3 Change Request
+A reviewer requesting changes on any stage (via "Request Changes" with free-text feedback) re-triggers that stage's workflow, which revises the existing artifact in place rather than starting over.
+
+### 6.4 Defect Reporting
+Failing tests are recorded with expected/actual behavior in `streamlit_app/data/single-file-upload-flow-test-results.json`'s `defects` array and rendered in the dashboard's Defects Log tab. TC-UPLOAD-014's HTTP 500 is expected to surface here as a tracked, known defect on execution.
+
+## 7. Functions to be Tested
+- File selection behavior (single valid file, different extensions, cancel, re-selection)
+- Successful upload flow and the resulting success page's displayed file name
+- The no-file-selected validation case
+- File-name integrity and navigation back/forward between the form and success page
+
+## 8. Resources and Responsibilities
+
+### 8.1 Resources
+Claude Code (via AWS Bedrock, non-interactive `npx claude -p` invocations), the `playwright-test-planner` and `playwright-test-generator` subagents, GitHub Actions compute, and the Streamlit dashboard for review/reporting.
+
+### 8.2 Responsibilities
+- **QA Automation Engineer:** `playwright-test-planner` (this plan) and `playwright-test-generator` (the automation suite) Claude Code subagents
+- **DevOps / CI Engineer:** the three-stage GitHub Actions pipeline (`pipeline-plan.yml` / `pipeline-automation.yml` / `pipeline-execute.yml`)
+- **Product Owner / QA Lead:** whoever approves each stage in the dashboard's Review Pipeline Artifacts tab
+
+## 9. Deliverables
+- This test plan (`specs/single-file-upload-flow-test-plan.md`)
+- The generated Playwright automation suite (`tests/single-file-upload-flow/`)
+- The executed test-results report (`streamlit_app/data/single-file-upload-flow-test-results.json`), visible in the Streamlit dashboard
+
+## 10. Suspension/Exit Criteria
+
+**Suspension:** the pipeline halts (and marks the stage `failed` in `user-stories/single-file-upload-flow-review.json`) if the target application is unreachable, or if a stage's Claude Code run errors out before producing its expected artifact.
+
+**Exit:** every Smoke/Sanity/Functional test case in Section 18 has been executed and results published to the dashboard; no unresolved Smoke-tier failures (TC-UPLOAD-014's HTTP 500 is Sanity-tier by design — a known, intentionally-tracked live-app defect, not a Smoke blocker).
+
+## 11. Resumption Criteria
+
+Once the blocking condition is resolved (application reachable again, or the failed stage re-dispatched), the pipeline resumes from the failed stage — earlier approved stages are not re-run.
+
+## 12. Dependencies
+
+### 12.1 Personal Dependencies
+Availability of a human reviewer to approve/reject each pipeline stage in the Streamlit dashboard — the pipeline pauses indefinitely otherwise.
+
+### 12.2 Software Dependencies
+Node.js, Playwright, `@playwright/test`, the Claude Code CLI, this repo's `.github/workflows/pipeline-*.yml` and `.claude/agents/*.md`.
+
+### 12.3 Hardware Dependencies
+None beyond the GitHub Actions `ubuntu-latest` runner — no dedicated hardware.
+
+### 12.4 Test Data & Database
+No database. Small static files already present in this repo (`upload-sample.txt`, `package.json`, `CLAUDE.md`) are reused as upload fixtures via Playwright's file-chooser API — no generated or externally-hosted test files, no persistent state to clean up between runs.
+
+## 13. Risks
+
+### 13.1 Schedule
+None — execution is on-demand, not calendar-bound; the only schedule risk is a stalled human review.
+
+### 13.2 Technical
+Running Claude Code non-interactively with the `playwright-test` MCP server in a fresh CI container is still relatively early — permission flags, MCP startup timing, or transient tool failures can cause a stage to need a re-run.
+
+### 13.3 Management
+None specific to this suite.
+
+### 13.4 Personnel
+Single-reviewer bottleneck — if the designated reviewer is unavailable, the pipeline pauses at that stage.
+
+### 13.5 Requirements
+Acceptance criteria ambiguity is caught proactively by the Submit New Request form's own quality checks before a plan is even generated.
+
+## 14. Tools
+Playwright (TypeScript), `@playwright/test`, GitHub Actions, Streamlit (dashboard/reporting), Claude Code (via AWS Bedrock).
+
+## 15. Documentation
+This file, the generated spec files under `tests/single-file-upload-flow/`, and `CLAUDE.md` (project rules and conventions).
+
+## 16. Approvals
+Recorded per-stage in `user-stories/single-file-upload-flow-review.json` (`plan.status`, `automation.status`, `execute.status`) and reflected in the Streamlit dashboard's Review Pipeline Artifacts tab — not a signature block, since approvals happen through that tab's Approve/Request Changes actions.
+
+## 17. Application Overview
 
 The File Upload application is a simple web interface that allows users to select and upload a single file from their local file system. The page displays a file input control with a "Choose File" button and an "Upload" button. When a user selects a file, the file input shows the chosen file's name. After clicking "Upload", the application navigates to a success page displaying "File Uploaded!" and the name of the uploaded file. The application uses a POST form submission with multipart/form-data encoding to handle the upload.
 
-## 9. Detailed Test Scenarios
+## 18. Detailed Test Scenarios
 
 ### 1. Initial Page State
 
