@@ -1480,8 +1480,24 @@ def render_review_stage(
         doc_url = stage_data.get("doc_url", "")
         if doc_url:
             st.markdown(f"[{artifact_label} (Google Doc)]({doc_url})")
+        elif artifact_path.endswith("/"):
+            # A directory (the automation suite) -- no single file to render inline,
+            # GitHub's tree view is the right destination.
+            st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
         else:
-            st.markdown(f"[{artifact_label} on GitHub]({github_url(artifact_path)})")
+            # A single file (the test plan) -- fetch and render its content inline
+            # rather than just linking out, via the GitHub API (not a local file
+            # read) so a just-completed pipeline run shows up immediately even if
+            # this app instance's own checkout hasn't redeployed yet.
+            st.caption(f"`{artifact_path}`")
+            artifact_result = get_file(
+                owner=GITHUB_OWNER, repo=GITHUB_REPO, path=artifact_path, ref=GITHUB_BRANCH, token=get_github_token(),
+            )
+            if artifact_result.success and artifact_result.content:
+                st.markdown(artifact_result.content)
+            else:
+                st.caption(f"Could not load content inline ({artifact_result.message}).")
+                st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
 
     if status != "pending_review":
         if status == "changes_requested" and stage_data.get("feedback"):
