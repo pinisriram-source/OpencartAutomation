@@ -40,6 +40,8 @@ LOCATOR_METHOD_RE = re.compile(
 ASSERTION_LINE_RE = re.compile(r"expect\(")
 STEP_MARKER_RE = re.compile(r"^\s*//\s*(\d+)\.\s*(.+)$")
 EXPECT_MARKER_RE = re.compile(r"^\s*//\s*(?:expect|verify)\b\s*:?\s*(.+)$", re.IGNORECASE)
+TEST_CALL_RE = re.compile(r"\btest\(\s*(['\"])(.*?)\1(?:\s*,\s*\{\s*tag:\s*(['\"])(@\w+)\3\s*\})?")
+TC_ID_RE = re.compile(r"TC-[A-Z0-9]+-\d+")
 
 
 def parse_step_markers(block: str) -> list[dict]:
@@ -540,6 +542,51 @@ def find_test_block(suite_dir_str: str, test_id: str) -> tuple[str, str] | tuple
             return str(spec_file.relative_to(REPO_ROOT).as_posix()), block
 
     return None, None
+
+
+def extract_test_cases_from_spec(spec_text: str) -> list[dict]:
+    """Splits a generated spec file into its individual test() cases.
+
+    Mirrors find_test_block's brace-matching body extraction, but returns
+    every test() in the file (with its TC-ID, title, and tier tag) instead of
+    searching for one specific test_id -- lets the Approved Test Artifacts tab
+    show each test case paired with its own automation script inline, rather
+    than just a bare list of file links out to GitHub.
+    """
+    cases: list[dict] = []
+    for m in TEST_CALL_RE.finditer(spec_text):
+        title = m.group(2)
+        tag = m.group(4)
+        arrow_idx = spec_text.find("=>", m.end())
+        if arrow_idx == -1:
+            continue
+        brace_start = spec_text.find("{", arrow_idx)
+        if brace_start == -1:
+            continue
+        depth = 0
+        i = brace_start
+        while i < len(spec_text):
+            if spec_text[i] == "{":
+                depth += 1
+            elif spec_text[i] == "}":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        end = spec_text.find(");", i)
+        end = end + 2 if end != -1 else i + 1
+        block = spec_text[m.start() : end].strip()
+
+        tc_id_match = TC_ID_RE.search(title)
+        cases.append(
+            {
+                "tc_id": tc_id_match.group(0) if tc_id_match else None,
+                "title": title,
+                "tier": tag.lstrip("@").capitalize() if tag else None,
+                "block": block,
+            }
+        )
+    return cases
 
 
 def _results_fingerprint() -> tuple:
@@ -1678,13 +1725,41 @@ with tab_artifacts:
                 suite_path = automation_stage.get("path", f"tests/{slug}/")
                 suite_dir = REPO_ROOT / suite_path
                 spec_files = sorted(suite_dir.rglob("*.spec.ts")) if suite_dir.exists() else []
-                st.markdown(f"**Test Scripts:** [{suite_path} on GitHub]({github_url(suite_path)})")
+                st.markdown(f"**Automation Suite:** `{suite_path}`")
                 if spec_files:
                     for spec_file in spec_files:
                         rel_path = spec_file.relative_to(REPO_ROOT).as_posix()
-                        st.markdown(f"- [{rel_path}]({github_url(rel_path)})")
+                        try:
+                            spec_text = spec_file.read_text(encoding="utf-8")
+                        except OSError:
+                            st.caption(f"Could not read `{rel_path}`.")
+                            continue
+                        test_cases = extract_test_cases_from_spec(spec_text)
+                        plural = "s" if len(test_cases) != 1 else ""
+                        st.markdown(f"**`{rel_path}`** ({len(test_cases)} test case{plural})")
+                        if not test_cases:
+                            st.caption("No `test()` calls found in this file.")
+                            continue
+                        for tc in test_cases:
+                            # tc["title"] is the full test() title string, which already starts
+                            # with the TC-ID by this project's naming convention -- don't prepend
+                            # tc["tc_id"] again or it duplicates ("TC-HOVERS-001: TC-HOVERS-001: ...").
+                            label = tc["title"]
+                            if tc["tier"]:
+                                label += f"  ·  {tc['tier']}"
+                            with st.expander(label):
+                                steps = parse_step_markers(tc["block"])
+                                if steps:
+                                    st.markdown("**Test Case Steps:**")
+                                    step_lines = []
+                                    for step in steps:
+                                        step_lines.append(f"{step['number']}. {step['text']}")
+                                        step_lines.extend(f"    - expect: {e}" for e in step["expectations"])
+                                    st.markdown("\n".join(step_lines))
+                                st.markdown("**Automation Script:**")
+                                st.code(tc["block"], language="typescript")
                 else:
-                    st.caption("No spec files found in this checkout yet -- see the GitHub link above.")
+                    st.caption("No spec files found in this checkout yet.")
             else:
                 st.caption(
                     f"Automation suite: {REVIEW_STATUS_LABELS.get(automation_stage.get('status', 'not_started'), 'not started')}"
