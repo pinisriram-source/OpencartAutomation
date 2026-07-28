@@ -1712,12 +1712,12 @@ with tab_artifacts:
         with st.expander(slug):
             if plan_approved:
                 plan_path = plan_stage.get("path", f"specs/{slug}-test-plan.md")
-                st.markdown(f"**Test Plan & Test Cases:** [{plan_path} on GitHub]({github_url(plan_path)})")
+                st.markdown(f"**Test Plan & Test Cases:** `{plan_path}`")
                 local_plan = REPO_ROOT / plan_path
-                if local_plan.exists() and st.checkbox(
-                    "Show test plan content inline", key=f"show_plan_{slug}"
-                ):
+                if local_plan.exists():
                     st.markdown(local_plan.read_text(encoding="utf-8"))
+                else:
+                    st.caption("Plan file not found in this checkout yet.")
             else:
                 st.caption(f"Test plan: {REVIEW_STATUS_LABELS.get(plan_stage.get('status', 'not_started'), 'not started')}")
 
