@@ -8,14 +8,14 @@
     "feedback": ""
   },
   "automation": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "tests/single-file-upload-flow/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-28T13:47:43.689Z"
+  "updated_at": "2026-07-28T13:53:26.203Z"
 }
