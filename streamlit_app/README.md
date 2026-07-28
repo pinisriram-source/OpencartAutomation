@@ -32,30 +32,51 @@ The app is public by default under Community Cloud's free tier.
 
 ## Login authentication
 
-The whole app sits behind a login form — the entire dashboard, not just the
-forms that can trigger GitHub Actions runs or commit to the repo. Fails
-**closed**: if the credentials below aren't configured, the app refuses to
-render anything at all (an error screen, not the dashboard) rather than
-silently staying open.
+The whole app sits behind sign-in/sign-up forms — the entire dashboard, not
+just the forms that can trigger GitHub Actions runs or commit to the repo.
+Fails **closed**: if `GITHUB_TOKEN` or `SIGNUP_INVITE_CODE` aren't
+configured, the app refuses to render anything at all (an error screen, not
+the dashboard) rather than silently staying open.
 
-**Add as Streamlit secrets:**
+Accounts are self-service — anyone with the invite code can create their own
+username/password on the **Sign up** tab. The invite code is the actual
+access control: without it, the public app would let any visitor create an
+account for themselves. Created accounts (username + salted PBKDF2 password
+hash, never plaintext) are committed to `streamlit_app/data/users.json` in
+this repo using the same `GITHUB_TOKEN` already required by the "Submit New
+Request" tab (see setup below) — this is what makes accounts survive
+Streamlit Community Cloud wiping the app's local filesystem on every
+redeploy or long idle sleep.
+
+**Add as a Streamlit secret** (`GITHUB_TOKEN` is shared with the "Submit New
+Request" tab below — set it up once, per those instructions):
 
 ```toml
-APP_USERNAME = "choose-a-username"
-APP_PASSWORD = "choose-a-strong-password"
+SIGNUP_INVITE_CODE = "choose-any-invite-code"
 ```
 
 - **Streamlit Community Cloud:** app page → **Manage app** → **Settings** →
-  **Secrets**, same place as `GITHUB_TOKEN` below.
+  **Secrets**.
 - **Local run:** create `.streamlit/secrets.toml` at the repo root (already
   gitignored — never commit this file) with the same content, then run
   `streamlit run streamlit_app/app.py` from the repo root (not from inside
   `streamlit_app/` — secrets resolve relative to the current working
   directory, not the script's location).
 
+**Optional admin/recovery credential:** `APP_USERNAME` / `APP_PASSWORD` (the
+original shared-login secrets from before self-service sign-up existed) still
+work if set — a fixed login that keeps working even if the self-service path
+or a GitHub commit ever fails. Not required; leave unset if you don't want
+one.
+
+```toml
+APP_USERNAME = "choose-a-username"
+APP_PASSWORD = "choose-a-strong-password"
+```
+
 Login is session-only (`st.session_state`, same as the Google sign-in
 below) — a hard refresh after the server restarts, or a new browser
-session, requires logging in again. A **Log out** button is in the
+session, requires signing in again. A **Log out** button is in the
 sidebar once signed in.
 
 ## "Submit New Request" tab — GitHub token setup

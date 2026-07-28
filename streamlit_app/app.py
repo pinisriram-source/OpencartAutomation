@@ -12,6 +12,7 @@ import hashlib
 import hmac
 import html
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -190,6 +191,55 @@ def get_github_token() -> str:
         return ""
 
 
+def get_signup_invite_code() -> str:
+    try:
+        return st.secrets.get("SIGNUP_INVITE_CODE", "")
+    except Exception:
+        return ""
+
+
+# --- Self-service account storage (committed to the repo, see require_authentication) ---
+USERS_FILE_PATH = "streamlit_app/data/users.json"
+PBKDF2_ITERATIONS = 200_000
+
+
+def hash_password(password: str, salt_hex: str | None = None) -> tuple[str, str]:
+    """PBKDF2-HMAC-SHA256, stdlib only (no new dependency for bcrypt/argon2)."""
+    salt = bytes.fromhex(salt_hex) if salt_hex else os.urandom(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, PBKDF2_ITERATIONS)
+    return salt.hex(), digest.hex()
+
+
+def verify_password(password: str, salt_hex: str, expected_hash_hex: str) -> bool:
+    _, computed_hash_hex = hash_password(password, salt_hex)
+    return hmac.compare_digest(computed_hash_hex, expected_hash_hex)
+
+
+def load_users() -> dict:
+    """Reads the committed account list. Missing/unreadable file just means no accounts yet."""
+    result = get_file(
+        owner=GITHUB_OWNER, repo=GITHUB_REPO, path=USERS_FILE_PATH, ref=GITHUB_BRANCH, token=get_github_token(),
+    )
+    if not result.success or not result.content:
+        return {}
+    try:
+        return json.loads(result.content)
+    except (json.JSONDecodeError, TypeError):
+        return {}
+
+
+def save_users(users: dict):
+    return upsert_file(
+        owner=GITHUB_OWNER,
+        repo=GITHUB_REPO,
+        branch=GITHUB_BRANCH,
+        path=USERS_FILE_PATH,
+        content=json.dumps(users, indent=2, sort_keys=True) + "\n",
+        commit_message="chore(auth): register new dashboard account",
+        token=get_github_token(),
+    )
+
+
 def get_google_oauth_config() -> dict | None:
     """Reads the OAuth client used for the Review tab's "Connect Google Drive"
     button. All three must be set, or the feature is treated as disabled."""
@@ -282,28 +332,40 @@ st.set_page_config(
 
 
 def require_authentication() -> None:
-    """Gates the entire app behind a login form before anything else renders.
+    """Gates the entire app behind sign-in/sign-up forms before anything else renders.
 
-    Fails closed: if APP_USERNAME/APP_PASSWORD aren't configured in secrets,
-    the app refuses to render at all rather than silently staying open (the
-    whole point of adding this is that the app -- and the actions its forms
-    can trigger against a public repo -- should not be usable by anyone who
-    doesn't have the credentials). Session-only, same as the Google sign-in
-    used elsewhere in this app: closing the tab or a hard refresh after the
-    server restarts requires logging in again.
+    Fails closed: if GITHUB_TOKEN or SIGNUP_INVITE_CODE aren't configured in
+    secrets, the app refuses to render at all rather than silently staying
+    open. Accounts are self-service (Sign up tab) but gated behind an invite
+    code -- without that gate, anyone visiting the public app could create
+    their own account and the login screen would stop being real access
+    control. Created accounts (username + salted password hash, never
+    plaintext) are committed to USERS_FILE_PATH via the same GitHub token
+    already used by the "Submit New Request" tab, so they survive Streamlit
+    Community Cloud wiping the local filesystem on redeploy/sleep.
+
+    APP_USERNAME/APP_PASSWORD (this app's original shared-login secrets) are
+    still honored if configured, as an admin/recovery credential that keeps
+    working even if the self-service path or GitHub commit ever fails --
+    but they're optional now, not required.
+
+    Session-only, same as the Google sign-in used elsewhere in this app:
+    closing the tab or a hard refresh after the server restarts requires
+    signing in again.
     """
+    github_token = get_github_token()
+    invite_code = get_signup_invite_code()
     try:
-        expected_username = st.secrets.get("APP_USERNAME", "")
-        expected_password = st.secrets.get("APP_PASSWORD", "")
+        legacy_username = st.secrets.get("APP_USERNAME", "")
+        legacy_password = st.secrets.get("APP_PASSWORD", "")
     except Exception:
-        expected_username = ""
-        expected_password = ""
+        legacy_username, legacy_password = "", ""
 
-    if not (expected_username and expected_password):
+    if not github_token or not invite_code:
         st.error(
-            "This app requires login credentials to be configured before it can be "
-            "used -- set APP_USERNAME and APP_PASSWORD in Streamlit secrets "
-            "(Manage app → Settings → Secrets). See streamlit_app/README.md."
+            "This app requires GITHUB_TOKEN and SIGNUP_INVITE_CODE to be configured in "
+            "Streamlit secrets before it can be used (Manage app → Settings → Secrets). "
+            "See streamlit_app/README.md."
         )
         st.stop()
 
@@ -311,29 +373,93 @@ def require_authentication() -> None:
         return
 
     st.title("QA Test Execution Report")
-    st.subheader("Sign in")
-    with st.form("login_form"):
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        submitted = st.form_submit_button("Log in")
-    if submitted:
-        # Constant-time comparison -- avoids leaking how many leading
-        # characters matched via response-time differences.
-        username_ok = hmac.compare_digest(username, expected_username)
-        password_ok = hmac.compare_digest(password, expected_password)
-        if username_ok and password_ok:
-            st.session_state["authenticated"] = True
-            st.rerun()
-        else:
-            st.error("Incorrect username or password.")
+    tab_signin, tab_signup = st.tabs(["Sign in", "Sign up"])
+
+    with tab_signin:
+        with st.form("login_form"):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            submitted = st.form_submit_button("Sign in")
+        if submitted:
+            username_clean = username.strip()
+            authenticated = False
+            if legacy_username and legacy_password:
+                if hmac.compare_digest(username_clean, legacy_username) and hmac.compare_digest(
+                    password, legacy_password
+                ):
+                    authenticated = True
+            if not authenticated:
+                record = load_users().get(username_clean.lower())
+                if record and verify_password(password, record["salt"], record["hash"]):
+                    authenticated = True
+            if authenticated:
+                st.session_state["authenticated"] = True
+                st.session_state["auth_username"] = username_clean
+                st.rerun()
+            else:
+                st.error("Incorrect username or password.")
+
+    with tab_signup:
+        st.caption("Requires an invite code -- ask whoever manages this dashboard for one.")
+        with st.form("signup_form"):
+            code = st.text_input("Invite code", type="password")
+            new_username = st.text_input("Choose a username")
+            new_password = st.text_input("Choose a password", type="password")
+            confirm_password = st.text_input("Confirm password", type="password")
+            signup_submitted = st.form_submit_button("Create account")
+        if signup_submitted:
+            new_username_clean = new_username.strip()
+            key = new_username_clean.lower()
+            errors = []
+            if not hmac.compare_digest(code, invite_code):
+                errors.append("Invalid invite code.")
+            if not re.fullmatch(r"[A-Za-z0-9_-]{3,32}", new_username_clean):
+                errors.append(
+                    "Username must be 3-32 characters: letters, numbers, underscore, or hyphen."
+                )
+            if len(new_password) < 8:
+                errors.append("Password must be at least 8 characters.")
+            if new_password != confirm_password:
+                errors.append("Passwords do not match.")
+
+            users = {}
+            if not errors:
+                users = load_users()
+                if key in users or (legacy_username and key == legacy_username.lower()):
+                    errors.append(f"Username '{new_username_clean}' is already taken.")
+
+            if errors:
+                for err in errors:
+                    st.error(err)
+            else:
+                salt_hex, hash_hex = hash_password(new_password)
+                users[key] = {
+                    "username": new_username_clean,
+                    "salt": salt_hex,
+                    "hash": hash_hex,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+                result = save_users(users)
+                if result.success:
+                    st.session_state["authenticated"] = True
+                    st.session_state["auth_username"] = new_username_clean
+                    st.success("Account created — signing you in...")
+                    st.rerun()
+                else:
+                    st.error(f"Could not save the new account: {result.message}")
+
     st.stop()
 
 
 require_authentication()
 
 with st.sidebar:
+    signed_in_as = st.session_state.get("auth_username")
+    if signed_in_as:
+        st.caption(f"Signed in as **{signed_in_as}**")
     if st.button("Log out"):
         st.session_state.pop("authenticated", None)
+        st.session_state.pop("auth_username", None)
         st.rerun()
 
 
