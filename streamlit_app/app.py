@@ -1485,16 +1485,18 @@ def render_review_stage(
             # GitHub's tree view is the right destination.
             st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
         else:
-            # A single file (the test plan) -- fetch and render its content inline
-            # rather than just linking out, via the GitHub API (not a local file
-            # read) so a just-completed pipeline run shows up immediately even if
-            # this app instance's own checkout hasn't redeployed yet.
+            # A single file (the test plan) -- fetch its content via the GitHub API
+            # (not a local file read, so a just-completed pipeline run shows up
+            # immediately even if this app instance's own checkout hasn't
+            # redeployed yet) and reveal it inline behind a click, rather than
+            # either navigating away to GitHub or always dumping the full plan.
             st.caption(f"`{artifact_path}`")
             artifact_result = get_file(
                 owner=GITHUB_OWNER, repo=GITHUB_REPO, path=artifact_path, ref=GITHUB_BRANCH, token=get_github_token(),
             )
             if artifact_result.success and artifact_result.content:
-                st.markdown(artifact_result.content)
+                with st.expander(artifact_label.removesuffix(" on GitHub")):
+                    st.markdown(artifact_result.content)
             else:
                 st.caption(f"Could not load content inline ({artifact_result.message}).")
                 st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
