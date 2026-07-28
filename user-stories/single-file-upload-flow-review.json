@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "pending_review",
+    "status": "in_progress",
     "path": "tests/single-file-upload-flow/",
     "revision": 1,
     "feedback": ""
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-28T15:38:17.630Z"
+  "updated_at": "2026-07-28T15:58:18.772Z"
 }
