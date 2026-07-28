@@ -641,8 +641,11 @@ def parse_test_plan_steps(plan_text: str) -> dict[str, list[dict]]:
 
 
 def render_spec_files_inline(
-    spec_files: list[tuple[str, str]], plan_steps: dict[str, list[dict]] | None = None
-) -> None:
+    spec_files: list[tuple[str, str]],
+    plan_steps: dict[str, list[dict]] | None = None,
+    collect_feedback: bool = False,
+    feedback_key_prefix: str = "",
+) -> list[tuple[str, str]]:
     """Renders each spec file's test cases as expanders: test-plan steps
     alongside the full automation script.
 
@@ -652,7 +655,17 @@ def render_spec_files_inline(
     identically regardless of where the content came from. `plan_steps`
     (from parse_test_plan_steps) is tried first per TC-ID; a script whose
     generation run didn't embed `// N. ...` comments still shows its steps.
+
+    When `collect_feedback` is True, each test case also gets a feedback
+    text_area (the automation stage's per-test-case review flow in the
+    Review Pipeline Artifacts tab) and the return value maps a
+    human-readable label for each test case to the widget's session_state
+    key -- the caller reads those keys after the fact to collect whatever
+    the reviewer typed, once a button is clicked. Empty when
+    collect_feedback is False (e.g. the Approved Test Artifacts tab, which
+    is browsing-only).
     """
+    feedback_fields: list[tuple[str, str]] = []
     for rel_path, spec_text in spec_files:
         test_cases = extract_test_cases_from_spec(spec_text)
         plural = "s" if len(test_cases) != 1 else ""
@@ -660,7 +673,7 @@ def render_spec_files_inline(
         if not test_cases:
             st.caption("No `test()` calls found in this file.")
             continue
-        for tc in test_cases:
+        for idx, tc in enumerate(test_cases):
             label = tc["title"]
             if tc["tier"]:
                 label += f"  ·  {tc['tier']}"
@@ -681,6 +694,15 @@ def render_spec_files_inline(
                     st.caption("No test-plan steps found for this test case.")
                 st.markdown("**Automation Script:**")
                 st.code(tc["block"], language="typescript")
+                if collect_feedback:
+                    fb_key = f"{feedback_key_prefix}__{tc['tc_id'] or f'{rel_path}:{idx}'}"
+                    st.text_area(
+                        "Feedback for this test case (leave blank if no changes needed)",
+                        key=fb_key,
+                        height=80,
+                    )
+                    feedback_fields.append((tc["tc_id"] or tc["title"], fb_key))
+    return feedback_fields
 
 
 def _results_fingerprint() -> tuple:
@@ -1552,6 +1574,7 @@ def render_review_stage(
     artifact_label: str,
     approve_workflow: str,
     revise_workflow: str,
+    per_test_case_review: bool = False,
 ) -> None:
     """Render one stage's status plus Approve / Request Changes controls.
 
@@ -1559,6 +1582,13 @@ def render_review_stage(
     (this app owns that file end-to-end, unlike the request markdown which
     only the pipeline itself updates) and dispatches the workflow for
     whichever stage should run next.
+
+    `per_test_case_review` (used for the automation stage only) attaches a
+    feedback field to every individual test case rendered, and combines
+    whichever ones the reviewer filled in into the regeneration request --
+    instead of one free-text box for the whole suite, so feedback for a
+    36-test suite is unambiguously scoped to the exact test case it's about
+    rather than a paragraph the regenerating agent has to disambiguate.
     """
     stage_data = review_data.get(stage_key, {})
     status = stage_data.get("status", "not_started")
@@ -1566,7 +1596,71 @@ def render_review_stage(
     st.markdown(REVIEW_STATUS_LABELS.get(status, status))
     if stage_data.get("revision"):
         st.caption(f"Revision {stage_data['revision']}")
+
+    def submit_approval() -> None:
+        updated = dict(review_data)
+        updated[stage_key] = {**stage_data, "status": "approved"}
+        upsert_result = upsert_file(
+            owner=GITHUB_OWNER,
+            repo=GITHUB_REPO,
+            branch=GITHUB_BRANCH,
+            path=review_path,
+            content=json.dumps(updated, indent=2) + "\n",
+            commit_message=f"chore(review): approve {stage_key} for {review_slug}",
+            token=get_github_token(),
+        )
+        if upsert_result.success:
+            run_result = trigger_workflow(
+                owner=GITHUB_OWNER,
+                repo=GITHUB_REPO,
+                workflow_file=approve_workflow,
+                ref=GITHUB_BRANCH,
+                token=get_github_token(),
+                inputs={"request_file": review_data.get("request_file", ""), "slug": review_slug},
+            )
+            if run_result.success:
+                st.success("Approved -- next stage triggered.")
+            else:
+                st.warning(f"Approved, but couldn't trigger the next stage: {run_result.message}")
+        else:
+            st.error(f"Couldn't record approval: {upsert_result.message}")
+        st.rerun()
+
+    def submit_regeneration(feedback_text: str) -> None:
+        updated = dict(review_data)
+        updated[stage_key] = {
+            **stage_data,
+            "status": "changes_requested",
+            "feedback": feedback_text.strip(),
+        }
+        upsert_result = upsert_file(
+            owner=GITHUB_OWNER,
+            repo=GITHUB_REPO,
+            branch=GITHUB_BRANCH,
+            path=review_path,
+            content=json.dumps(updated, indent=2) + "\n",
+            commit_message=f"chore(review): request changes on {stage_key} for {review_slug}",
+            token=get_github_token(),
+        )
+        if upsert_result.success:
+            run_result = trigger_workflow(
+                owner=GITHUB_OWNER,
+                repo=GITHUB_REPO,
+                workflow_file=revise_workflow,
+                ref=GITHUB_BRANCH,
+                token=get_github_token(),
+                inputs={"request_file": review_data.get("request_file", ""), "slug": review_slug},
+            )
+            if run_result.success:
+                st.success("Feedback recorded -- regeneration triggered.")
+            else:
+                st.warning(f"Feedback recorded, but couldn't trigger regeneration: {run_result.message}")
+        else:
+            st.error(f"Couldn't record feedback: {upsert_result.message}")
+        st.rerun()
+
     artifact_path = stage_data.get("path", "")
+    feedback_fields: list[tuple[str, str]] = []
     if artifact_path:
         stage_data, review_data = _sync_stage_google_doc(
             review_data, review_path, review_slug, stage_key, stage_name, stage_data, artifact_path,
@@ -1609,7 +1703,11 @@ def render_review_stage(
                 plan_steps = parse_test_plan_steps(plan_result.content) if plan_result.success and plan_result.content else None
                 with st.expander(artifact_label.removesuffix(" on GitHub")):
                     if spec_files:
-                        render_spec_files_inline(sorted(spec_files), plan_steps)
+                        feedback_fields = render_spec_files_inline(
+                            sorted(spec_files), plan_steps,
+                            collect_feedback=(per_test_case_review and status == "pending_review"),
+                            feedback_key_prefix=f"tcfb_{review_slug}_{stage_key}",
+                        )
                     else:
                         st.caption("No `.spec.ts` files found directly in this folder.")
             else:
@@ -1637,36 +1735,35 @@ def render_review_stage(
             st.caption(f"Feedback sent, awaiting regeneration: {stage_data['feedback']}")
         return
 
+    if per_test_case_review:
+        st.markdown("###### Approve or request changes")
+        if feedback_fields:
+            st.caption(
+                "Fill in feedback on any test case above that needs changes and leave the "
+                "rest blank, then click Regenerate -- only the ones with feedback are sent, "
+                "each scoped to its own test case."
+            )
+        approve_col, regen_col = st.columns([1, 1])
+        with approve_col:
+            if st.button("✅ Approve", key=f"approve_{stage_key}"):
+                submit_approval()
+        with regen_col:
+            if st.button("🔁 Regenerate with feedback", key=f"regen_{stage_key}"):
+                notes = []
+                for label, fb_key in feedback_fields:
+                    text = st.session_state.get(fb_key, "").strip()
+                    if text:
+                        notes.append(f"{label}: {text}")
+                if not notes:
+                    st.error("Enter feedback for at least one test case above first.")
+                else:
+                    submit_regeneration("\n".join(notes))
+        return
+
     approve_col, changes_col = st.columns([1, 1])
     with approve_col:
-        if st.button(f"✅ Approve", key=f"approve_{stage_key}"):
-            updated = dict(review_data)
-            updated[stage_key] = {**stage_data, "status": "approved"}
-            upsert_result = upsert_file(
-                owner=GITHUB_OWNER,
-                repo=GITHUB_REPO,
-                branch=GITHUB_BRANCH,
-                path=review_path,
-                content=json.dumps(updated, indent=2) + "\n",
-                commit_message=f"chore(review): approve {stage_key} for {review_slug}",
-                token=get_github_token(),
-            )
-            if upsert_result.success:
-                run_result = trigger_workflow(
-                    owner=GITHUB_OWNER,
-                    repo=GITHUB_REPO,
-                    workflow_file=approve_workflow,
-                    ref=GITHUB_BRANCH,
-                    token=get_github_token(),
-                    inputs={"request_file": review_data.get("request_file", ""), "slug": review_slug},
-                )
-                if run_result.success:
-                    st.success("Approved -- next stage triggered.")
-                else:
-                    st.warning(f"Approved, but couldn't trigger the next stage: {run_result.message}")
-            else:
-                st.error(f"Couldn't record approval: {upsert_result.message}")
-            st.rerun()
+        if st.button("✅ Approve", key=f"approve_{stage_key}"):
+            submit_approval()
 
     with changes_col:
         with st.expander("🔁 Request changes"):
@@ -1679,37 +1776,7 @@ def render_review_stage(
                 if not feedback_text.strip():
                     st.error("Enter feedback describing the gap first.")
                 else:
-                    updated = dict(review_data)
-                    updated[stage_key] = {
-                        **stage_data,
-                        "status": "changes_requested",
-                        "feedback": feedback_text.strip(),
-                    }
-                    upsert_result = upsert_file(
-                        owner=GITHUB_OWNER,
-                        repo=GITHUB_REPO,
-                        branch=GITHUB_BRANCH,
-                        path=review_path,
-                        content=json.dumps(updated, indent=2) + "\n",
-                        commit_message=f"chore(review): request changes on {stage_key} for {review_slug}",
-                        token=get_github_token(),
-                    )
-                    if upsert_result.success:
-                        run_result = trigger_workflow(
-                            owner=GITHUB_OWNER,
-                            repo=GITHUB_REPO,
-                            workflow_file=revise_workflow,
-                            ref=GITHUB_BRANCH,
-                            token=get_github_token(),
-                            inputs={"request_file": review_data.get("request_file", ""), "slug": review_slug},
-                        )
-                        if run_result.success:
-                            st.success("Feedback recorded -- regeneration triggered.")
-                        else:
-                            st.warning(f"Feedback recorded, but couldn't trigger regeneration: {run_result.message}")
-                    else:
-                        st.error(f"Couldn't record feedback: {upsert_result.message}")
-                    st.rerun()
+                    submit_regeneration(feedback_text)
 
 
 with tab_review:
@@ -1807,6 +1874,7 @@ with tab_review:
                 artifact_label="View automation suite on GitHub",
                 approve_workflow=GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE,
                 revise_workflow=GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE,
+                per_test_case_review=True,
             )
         else:
             st.markdown("##### 2. Automation Suite")
