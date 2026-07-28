@@ -1,10 +1,10 @@
 {
   "slug": "single-file-upload-flow",
-  "request_file": "user-stories/request-single-file-upload-flow-20260728-133926.md",
+  "request_file": "user-stories/request-single-file-upload-flow-20260728-153749.md",
   "plan": {
-    "status": "approved",
+    "status": "pending_review",
     "path": "specs/single-file-upload-flow-test-plan.md",
-    "revision": 3,
+    "revision": 4,
     "feedback": ""
   },
   "automation": {
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-28T13:53:26.203Z"
+  "updated_at": "2026-07-28T15:38:17.630Z"
 }
