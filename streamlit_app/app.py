@@ -42,6 +42,9 @@ STEP_MARKER_RE = re.compile(r"^\s*//\s*(\d+)\.\s*(.+)$")
 EXPECT_MARKER_RE = re.compile(r"^\s*//\s*(?:expect|verify)\b\s*:?\s*(.+)$", re.IGNORECASE)
 TEST_CALL_RE = re.compile(r"\btest\(\s*(['\"])(.*?)\1(?:\s*,\s*\{\s*tag:\s*(['\"])(@\w+)\3\s*\})?")
 TC_ID_RE = re.compile(r"TC-[A-Z0-9]+-\d+")
+PLAN_TC_HEADING_RE = re.compile(r"^####\s+.*?\b(TC-[A-Z0-9]+-\d+)\b", re.MULTILINE)
+PLAN_STEP_RE = re.compile(r"^(\d+)\.\s+(.+)$")
+PLAN_EXPECT_RE = re.compile(r"^\s*-\s*expect:\s*(.+)$", re.IGNORECASE)
 
 
 def parse_step_markers(block: str) -> list[dict]:
@@ -589,14 +592,66 @@ def extract_test_cases_from_spec(spec_text: str) -> list[dict]:
     return cases
 
 
-def render_spec_files_inline(spec_files: list[tuple[str, str]]) -> None:
-    """Renders each spec file's test cases as expanders: parsed test-plan
-    steps alongside the full automation script.
+def parse_test_plan_steps(plan_text: str) -> dict[str, list[dict]]:
+    """Maps each TC-ID in a test plan to its parsed `**Steps:**` block.
+
+    This is the primary source for the Automation Suite view's "Test Case
+    Steps" -- more robust than parsing `// N. ...` comments back out of the
+    generated code (parse_step_markers), which depends on that particular
+    pipeline run's automation-generation step having actually included them.
+    Not every run does (no hard gate on it, unlike the tier tags), which
+    silently left the steps section blank for those suites. The test plan
+    itself always has a Steps: block per CLAUDE.md's Quality Standards, so
+    parsing it directly is the reliable path.
+    """
+    headings = list(PLAN_TC_HEADING_RE.finditer(plan_text))
+    result: dict[str, list[dict]] = {}
+    for i, m in enumerate(headings):
+        tc_id = m.group(1)
+        start = m.end()
+        end = headings[i + 1].start() if i + 1 < len(headings) else len(plan_text)
+        block = plan_text[start:end]
+
+        steps_idx = block.find("**Steps:**")
+        if steps_idx == -1:
+            continue
+
+        steps: list[dict] = []
+        current: dict | None = None
+        for line in block[steps_idx:].splitlines():
+            step_match = PLAN_STEP_RE.match(line)
+            if step_match:
+                if current:
+                    steps.append(current)
+                current = {
+                    "number": int(step_match.group(1)),
+                    "text": step_match.group(2).strip(),
+                    "expectations": [],
+                }
+                continue
+            expect_match = PLAN_EXPECT_RE.match(line)
+            if expect_match and current is not None:
+                current["expectations"].append(expect_match.group(1).strip())
+        if current:
+            steps.append(current)
+
+        if steps:
+            result[tc_id] = steps
+    return result
+
+
+def render_spec_files_inline(
+    spec_files: list[tuple[str, str]], plan_steps: dict[str, list[dict]] | None = None
+) -> None:
+    """Renders each spec file's test cases as expanders: test-plan steps
+    alongside the full automation script.
 
     `spec_files` is a list of (relative_path, source_text) tuples -- shared
     by the Approved Test Artifacts tab (local filesystem reads) and the
     Review Pipeline Artifacts tab (GitHub API reads) so both render
-    identically regardless of where the content came from.
+    identically regardless of where the content came from. `plan_steps`
+    (from parse_test_plan_steps) is tried first per TC-ID; a script whose
+    generation run didn't embed `// N. ...` comments still shows its steps.
     """
     for rel_path, spec_text in spec_files:
         test_cases = extract_test_cases_from_spec(spec_text)
@@ -610,7 +665,11 @@ def render_spec_files_inline(spec_files: list[tuple[str, str]]) -> None:
             if tc["tier"]:
                 label += f"  ·  {tc['tier']}"
             with st.expander(label):
-                steps = parse_step_markers(tc["block"])
+                steps = None
+                if plan_steps and tc["tc_id"]:
+                    steps = plan_steps.get(tc["tc_id"])
+                if not steps:
+                    steps = parse_step_markers(tc["block"])
                 if steps:
                     st.markdown("**Test Case Steps:**")
                     step_lines = []
@@ -618,6 +677,8 @@ def render_spec_files_inline(spec_files: list[tuple[str, str]]) -> None:
                         step_lines.append(f"{step['number']}. {step['text']}")
                         step_lines.extend(f"    - expect: {e}" for e in step["expectations"])
                     st.markdown("\n".join(step_lines))
+                else:
+                    st.caption("No test-plan steps found for this test case.")
                 st.markdown("**Automation Script:**")
                 st.code(tc["block"], language="typescript")
 
@@ -1541,9 +1602,14 @@ def render_review_stage(
                         if file_result.success and file_result.content:
                             spec_files.append((entry["path"], file_result.content))
             if listing_ok:
+                plan_path = review_data.get("plan", {}).get("path", f"specs/{review_slug}-test-plan.md")
+                plan_result = get_file(
+                    owner=GITHUB_OWNER, repo=GITHUB_REPO, path=plan_path, ref=GITHUB_BRANCH, token=get_github_token(),
+                )
+                plan_steps = parse_test_plan_steps(plan_result.content) if plan_result.success and plan_result.content else None
                 with st.expander(artifact_label.removesuffix(" on GitHub")):
                     if spec_files:
-                        render_spec_files_inline(sorted(spec_files))
+                        render_spec_files_inline(sorted(spec_files), plan_steps)
                     else:
                         st.caption("No `.spec.ts` files found directly in this folder.")
             else:
@@ -1793,12 +1859,20 @@ with tab_artifacts:
         shown_any = True
 
         with st.expander(slug):
+            plan_path = plan_stage.get("path", f"specs/{slug}-test-plan.md")
+            local_plan = REPO_ROOT / plan_path
+            plan_text = None
+            if local_plan.exists():
+                try:
+                    plan_text = local_plan.read_text(encoding="utf-8")
+                except OSError:
+                    plan_text = None
+            plan_steps = parse_test_plan_steps(plan_text) if plan_text else None
+
             if plan_approved:
-                plan_path = plan_stage.get("path", f"specs/{slug}-test-plan.md")
                 st.markdown(f"**Test Plan & Test Cases:** `{plan_path}`")
-                local_plan = REPO_ROOT / plan_path
-                if local_plan.exists():
-                    st.markdown(local_plan.read_text(encoding="utf-8"))
+                if plan_text is not None:
+                    st.markdown(plan_text)
                 else:
                     st.caption("Plan file not found in this checkout yet.")
             else:
@@ -1817,7 +1891,7 @@ with tab_artifacts:
                             spec_files.append((rel_path, spec_file.read_text(encoding="utf-8")))
                         except OSError:
                             st.caption(f"Could not read `{rel_path}`.")
-                    render_spec_files_inline(spec_files)
+                    render_spec_files_inline(spec_files, plan_steps)
                 else:
                     st.caption("No spec files found in this checkout yet.")
             else:
