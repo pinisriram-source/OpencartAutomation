@@ -30,6 +30,34 @@ to `main`).
 
 The app is public by default under Community Cloud's free tier.
 
+## Login authentication
+
+The whole app sits behind a login form — the entire dashboard, not just the
+forms that can trigger GitHub Actions runs or commit to the repo. Fails
+**closed**: if the credentials below aren't configured, the app refuses to
+render anything at all (an error screen, not the dashboard) rather than
+silently staying open.
+
+**Add as Streamlit secrets:**
+
+```toml
+APP_USERNAME = "choose-a-username"
+APP_PASSWORD = "choose-a-strong-password"
+```
+
+- **Streamlit Community Cloud:** app page → **Manage app** → **Settings** →
+  **Secrets**, same place as `GITHUB_TOKEN` below.
+- **Local run:** create `.streamlit/secrets.toml` at the repo root (already
+  gitignored — never commit this file) with the same content, then run
+  `streamlit run streamlit_app/app.py` from the repo root (not from inside
+  `streamlit_app/` — secrets resolve relative to the current working
+  directory, not the script's location).
+
+Login is session-only (`st.session_state`, same as the Google sign-in
+below) — a hard refresh after the server restarts, or a new browser
+session, requires logging in again. A **Log out** button is in the
+sidebar once signed in.
+
 ## "Submit New Request" tab — GitHub token setup
 
 The **Submit New Request** tab lets a visitor commit a new file to

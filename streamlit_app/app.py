@@ -9,6 +9,7 @@ defects log. A suite picker lets the viewer switch between suites.
 """
 
 import hashlib
+import hmac
 import html
 import json
 import re
@@ -278,6 +279,62 @@ st.set_page_config(
     page_icon="✅",
     layout="wide",
 )
+
+
+def require_authentication() -> None:
+    """Gates the entire app behind a login form before anything else renders.
+
+    Fails closed: if APP_USERNAME/APP_PASSWORD aren't configured in secrets,
+    the app refuses to render at all rather than silently staying open (the
+    whole point of adding this is that the app -- and the actions its forms
+    can trigger against a public repo -- should not be usable by anyone who
+    doesn't have the credentials). Session-only, same as the Google sign-in
+    used elsewhere in this app: closing the tab or a hard refresh after the
+    server restarts requires logging in again.
+    """
+    try:
+        expected_username = st.secrets.get("APP_USERNAME", "")
+        expected_password = st.secrets.get("APP_PASSWORD", "")
+    except Exception:
+        expected_username = ""
+        expected_password = ""
+
+    if not (expected_username and expected_password):
+        st.error(
+            "This app requires login credentials to be configured before it can be "
+            "used -- set APP_USERNAME and APP_PASSWORD in Streamlit secrets "
+            "(Manage app → Settings → Secrets). See streamlit_app/README.md."
+        )
+        st.stop()
+
+    if st.session_state.get("authenticated"):
+        return
+
+    st.title("QA Test Execution Report")
+    st.subheader("Sign in")
+    with st.form("login_form"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Log in")
+    if submitted:
+        # Constant-time comparison -- avoids leaking how many leading
+        # characters matched via response-time differences.
+        username_ok = hmac.compare_digest(username, expected_username)
+        password_ok = hmac.compare_digest(password, expected_password)
+        if username_ok and password_ok:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect username or password.")
+    st.stop()
+
+
+require_authentication()
+
+with st.sidebar:
+    if st.button("Log out"):
+        st.session_state.pop("authenticated", None)
+        st.rerun()
 
 
 def discover_suites() -> list[Path]:
