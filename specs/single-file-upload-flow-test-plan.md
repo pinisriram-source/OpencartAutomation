@@ -1,10 +1,67 @@
 # Single File Upload Flow Test Plan
 
-## Application Overview
+## 1. Project Overview
+
+**Project Name:** File Upload - Single File Upload Flow (the-internet.herokuapp.com/upload) — a "Submit New Request" pipeline suite
+
+**Objective:** Validate the single-file upload flow end-to-end (file selection, successful upload, file-name integrity, navigation, and the no-file-selected edge case) via automated regression coverage, so future changes to this flow don't regress silently and manual re-testing time is reduced.
+
+**Target Audience:** The stakeholder who submitted this request, the reviewer approving each pipeline stage in the Streamlit dashboard's Review Pipeline Artifacts tab, and future QA/dev maintaining this suite.
+
+## 2. Scope of Automation
+
+**In-Scope:**
+- File selection behavior (single valid file, different extensions, cancel, re-selection)
+- Successful upload flow and the resulting success page's displayed file name
+- The no-file-selected case, including the real HTTP 500 currently returned by the live app (see TC-UPLOAD-014) — captured as-is so the suite continues to flag it as a regression signal rather than being "fixed" in test data
+- File-name integrity (exact match, case, punctuation) and navigation back/forward between the form and success page
+
+**Out-of-Scope:**
+- Visual/pixel-level styling of the upload form or success page
+- Cross-browser matrix beyond Chromium (this repo's `playwright.config.ts` runs Chromium only)
+- Actual file content/virus-scanning validation — only the file *name* round-trip is in scope, per the acceptance criteria
+
+## 3. Test Strategy & Framework
+
+**Automation Tools:** Playwright (TypeScript), `@playwright/test`
+
+**Test Architecture:** Page Object Model — `tests/single-file-upload-flow/page-objects/*.page.ts` extends the shared `tests/_shared/base-page.ts` `BasePage`, using getter-accessor locators per this repo's convention (see CLAUDE.md)
+
+**Test Data Strategy:** Small static files already present in this repo (`upload-sample.txt`, `package.json`, `CLAUDE.md`) are reused as upload fixtures via Playwright's file-chooser API — no generated or externally-hosted test files, no persistent state to clean up between runs
+
+## 4. Test Environment
+
+**Application Under Test:** https://the-internet.herokuapp.com/upload
+
+**Browser Matrix:** Chromium (this repo's configured Playwright project)
+
+**CI/CD Integration:** GitHub Actions — `pipeline-execute.yml` runs this suite non-interactively once both this plan and the generated automation are approved
+
+## 5. Execution & Schedule
+
+**Execution Frequency:** Triggered on demand through the Streamlit dashboard's three-stage pipeline (plan → review → automation → review → execute); re-triggered automatically on a "Request Changes" review
+
+**Milestones:** Plan drafted → Plan approved → Automation suite generated → Automation approved → Suite executed & report published
+
+## 6. Entry and Exit Criteria
+
+**Entry Criteria:** Acceptance criteria for this request are unambiguous (see Section 8); target URL is reachable; this plan has been approved in the Review tab
+
+**Exit Criteria:** Every Smoke/Sanity/Functional test case in Section 9 has been executed; results committed to `streamlit_app/data/single-file-upload-flow-test-results.json`; no unresolved Smoke-tier failures (TC-UPLOAD-014's HTTP 500 is Sanity-tier by design — a known, intentionally-tracked live-app defect, not a Smoke blocker)
+
+## 7. Roles and Responsibilities
+
+**QA Automation Engineer:** `playwright-test-planner` (this plan) and `playwright-test-generator` (the automation suite) Claude Code subagents
+
+**DevOps / CI Engineer:** the three-stage GitHub Actions pipeline (`pipeline-plan.yml` / `pipeline-automation.yml` / `pipeline-execute.yml`)
+
+**Product Owner / QA Lead:** whoever approves each stage in the dashboard's Review Pipeline Artifacts tab
+
+## 8. Application Overview
 
 The File Upload application is a simple web interface that allows users to select and upload a single file from their local file system. The page displays a file input control with a "Choose File" button and an "Upload" button. When a user selects a file, the file input shows the chosen file's name. After clicking "Upload", the application navigates to a success page displaying "File Uploaded!" and the name of the uploaded file. The application uses a POST form submission with multipart/form-data encoding to handle the upload.
 
-## Test Scenarios
+## 9. Detailed Test Scenarios
 
 ### 1. Initial Page State
 
