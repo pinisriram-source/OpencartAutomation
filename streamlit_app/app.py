@@ -21,7 +21,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from github_commit import create_file, get_file, trigger_workflow, upsert_file, wait_for_ref
+from github_commit import create_file, get_file, list_directory, trigger_workflow, upsert_file, wait_for_ref
 from google_docs import build_oauth_flow, exchange_code_for_credentials, get_authorization_url, upsert_google_doc
 
 # --- Palette (validated categorical + status colors; see dataviz skill) ---
@@ -587,6 +587,39 @@ def extract_test_cases_from_spec(spec_text: str) -> list[dict]:
             }
         )
     return cases
+
+
+def render_spec_files_inline(spec_files: list[tuple[str, str]]) -> None:
+    """Renders each spec file's test cases as expanders: parsed test-plan
+    steps alongside the full automation script.
+
+    `spec_files` is a list of (relative_path, source_text) tuples -- shared
+    by the Approved Test Artifacts tab (local filesystem reads) and the
+    Review Pipeline Artifacts tab (GitHub API reads) so both render
+    identically regardless of where the content came from.
+    """
+    for rel_path, spec_text in spec_files:
+        test_cases = extract_test_cases_from_spec(spec_text)
+        plural = "s" if len(test_cases) != 1 else ""
+        st.markdown(f"**`{rel_path}`** ({len(test_cases)} test case{plural})")
+        if not test_cases:
+            st.caption("No `test()` calls found in this file.")
+            continue
+        for tc in test_cases:
+            label = tc["title"]
+            if tc["tier"]:
+                label += f"  ·  {tc['tier']}"
+            with st.expander(label):
+                steps = parse_step_markers(tc["block"])
+                if steps:
+                    st.markdown("**Test Case Steps:**")
+                    step_lines = []
+                    for step in steps:
+                        step_lines.append(f"{step['number']}. {step['text']}")
+                        step_lines.extend(f"    - expect: {e}" for e in step["expectations"])
+                    st.markdown("\n".join(step_lines))
+                st.markdown("**Automation Script:**")
+                st.code(tc["block"], language="typescript")
 
 
 def _results_fingerprint() -> tuple:
@@ -1481,9 +1514,41 @@ def render_review_stage(
         if doc_url:
             st.markdown(f"[{artifact_label} (Google Doc)]({doc_url})")
         elif artifact_path.endswith("/"):
-            # A directory (the automation suite) -- no single file to render inline,
-            # GitHub's tree view is the right destination.
-            st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
+            # A directory (the automation suite) -- list its *.spec.ts files via
+            # the GitHub API (not a local read, same freshness reason as the
+            # plan below), fetch each one's content, and reveal them inline
+            # behind a click using the same per-test-case rendering as the
+            # Approved Test Artifacts tab, instead of just linking to GitHub.
+            st.caption(f"`{artifact_path}`")
+            listing_result = list_directory(
+                owner=GITHUB_OWNER, repo=GITHUB_REPO, path=artifact_path.rstrip("/"),
+                ref=GITHUB_BRANCH, token=get_github_token(),
+            )
+            spec_files = []
+            listing_ok = False
+            if listing_result.success and listing_result.content:
+                try:
+                    entries = json.loads(listing_result.content)
+                    listing_ok = True
+                except (json.JSONDecodeError, TypeError):
+                    entries = []
+                for entry in entries:
+                    if entry.get("type") == "file" and entry.get("name", "").endswith(".spec.ts"):
+                        file_result = get_file(
+                            owner=GITHUB_OWNER, repo=GITHUB_REPO, path=entry["path"],
+                            ref=GITHUB_BRANCH, token=get_github_token(),
+                        )
+                        if file_result.success and file_result.content:
+                            spec_files.append((entry["path"], file_result.content))
+            if listing_ok:
+                with st.expander(artifact_label.removesuffix(" on GitHub")):
+                    if spec_files:
+                        render_spec_files_inline(sorted(spec_files))
+                    else:
+                        st.caption("No `.spec.ts` files found directly in this folder.")
+            else:
+                st.caption(f"Could not load content inline ({listing_result.message}).")
+                st.markdown(f"[{artifact_label}]({github_url(artifact_path)})")
         else:
             # A single file (the test plan) -- fetch its content via the GitHub API
             # (not a local file read, so a just-completed pipeline run shows up
@@ -1742,40 +1807,17 @@ with tab_artifacts:
             if automation_approved:
                 suite_path = automation_stage.get("path", f"tests/{slug}/")
                 suite_dir = REPO_ROOT / suite_path
-                spec_files = sorted(suite_dir.rglob("*.spec.ts")) if suite_dir.exists() else []
+                spec_paths = sorted(suite_dir.rglob("*.spec.ts")) if suite_dir.exists() else []
                 st.markdown(f"**Automation Suite:** `{suite_path}`")
-                if spec_files:
-                    for spec_file in spec_files:
+                if spec_paths:
+                    spec_files = []
+                    for spec_file in spec_paths:
                         rel_path = spec_file.relative_to(REPO_ROOT).as_posix()
                         try:
-                            spec_text = spec_file.read_text(encoding="utf-8")
+                            spec_files.append((rel_path, spec_file.read_text(encoding="utf-8")))
                         except OSError:
                             st.caption(f"Could not read `{rel_path}`.")
-                            continue
-                        test_cases = extract_test_cases_from_spec(spec_text)
-                        plural = "s" if len(test_cases) != 1 else ""
-                        st.markdown(f"**`{rel_path}`** ({len(test_cases)} test case{plural})")
-                        if not test_cases:
-                            st.caption("No `test()` calls found in this file.")
-                            continue
-                        for tc in test_cases:
-                            # tc["title"] is the full test() title string, which already starts
-                            # with the TC-ID by this project's naming convention -- don't prepend
-                            # tc["tc_id"] again or it duplicates ("TC-HOVERS-001: TC-HOVERS-001: ...").
-                            label = tc["title"]
-                            if tc["tier"]:
-                                label += f"  ·  {tc['tier']}"
-                            with st.expander(label):
-                                steps = parse_step_markers(tc["block"])
-                                if steps:
-                                    st.markdown("**Test Case Steps:**")
-                                    step_lines = []
-                                    for step in steps:
-                                        step_lines.append(f"{step['number']}. {step['text']}")
-                                        step_lines.extend(f"    - expect: {e}" for e in step["expectations"])
-                                    st.markdown("\n".join(step_lines))
-                                st.markdown("**Automation Script:**")
-                                st.code(tc["block"], language="typescript")
+                    render_spec_files_inline(spec_files)
                 else:
                     st.caption("No spec files found in this checkout yet.")
             else:

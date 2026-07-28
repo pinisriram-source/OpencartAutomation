@@ -276,3 +276,42 @@ def get_file(
         return FileResult(False, "File not found. Check the path is correct.")
 
     return FileResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")
+
+
+def list_directory(
+    owner: str,
+    repo: str,
+    path: str,
+    ref: str,
+    token: str,
+) -> FileResult:
+    """Lists a directory's immediate entries via the GitHub Contents API.
+
+    Unlike get_file (which requests the raw-content media type, appropriate
+    for a single file), this requests the regular JSON media type -- the
+    Contents API returns an array of {name, path, type, ...} objects for a
+    directory, not raw text. Callers that need a file listing (e.g. finding
+    every *.spec.ts under an automation suite folder) should use this
+    instead of get_file. `.content` holds the raw JSON array text; the
+    caller is responsible for json.loads()'ing it.
+    """
+    url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/{path}"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    try:
+        resp = requests.get(url, headers=headers, params={"ref": ref}, timeout=20)
+    except requests.RequestException as exc:
+        return FileResult(False, f"Network error contacting GitHub: {exc}")
+
+    if resp.status_code == 200:
+        return FileResult(True, "OK", resp.text)
+
+    if resp.status_code == 404:
+        return FileResult(False, "Directory not found. Check the path is correct.")
+
+    return FileResult(False, f"GitHub API error {resp.status_code}: {resp.text[:300]}")
