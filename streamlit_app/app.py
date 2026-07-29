@@ -1885,10 +1885,32 @@ with tab_review:
         execute_data = review_data.get("execute", {})
         execute_status = execute_data.get("status", "not_started")
         st.markdown(REVIEW_STATUS_LABELS.get(execute_status, execute_status))
-        if execute_data.get("workflow_run_url"):
-            st.markdown(f"[View the run on GitHub]({execute_data['workflow_run_url']})")
         if execute_status == "completed":
-            st.caption("See the Overview tab for the full report.")
+            # Show the actual results inline (fetched via the GitHub API, same
+            # freshness reasoning as the plan/automation sections above) rather
+            # than just a link to the GitHub Actions run log.
+            results_path = f"streamlit_app/data/{review_slug}-test-results.json"
+            results_result = get_file(
+                owner=GITHUB_OWNER, repo=GITHUB_REPO, path=results_path, ref=GITHUB_BRANCH, token=get_github_token(),
+            )
+            if results_result.success and results_result.content:
+                try:
+                    results_summary = json.loads(results_result.content).get("summary", {})
+                except (json.JSONDecodeError, TypeError):
+                    results_summary = None
+                if results_summary:
+                    rk1, rk2, rk3, rk4 = st.columns(4)
+                    rk1.metric("Success Rate", f"{results_summary.get('success_rate', 'n/a')}%")
+                    rk2.metric("Test Cases", results_summary.get("test_cases", "n/a"))
+                    rk3.metric("Passed", results_summary.get("passed", "n/a"))
+                    rk4.metric("Failed", results_summary.get("failed", "n/a"))
+                    st.caption(f"`{results_path}` — full breakdown (execution matrix, coverage, defects log) is in the Overview tab.")
+                else:
+                    st.caption("Results file exists but isn't valid JSON yet.")
+            else:
+                st.caption(f"Could not load results inline ({results_result.message}).")
+        if execute_data.get("workflow_run_url"):
+            st.markdown(f"[View CI run on GitHub]({execute_data['workflow_run_url']})")
         if review_auto_refresh:
             st.caption(
                 f"Last checked {datetime.now(timezone.utc).strftime('%H:%M:%S')} UTC -- "
