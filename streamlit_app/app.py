@@ -1885,6 +1885,7 @@ with tab_review:
         execute_data = review_data.get("execute", {})
         execute_status = execute_data.get("status", "not_started")
         st.markdown(REVIEW_STATUS_LABELS.get(execute_status, execute_status))
+        results_loaded = False
         if execute_status == "completed":
             # Show the actual results inline (fetched via the GitHub API, same
             # freshness reasoning as the plan/automation sections above) rather
@@ -1899,6 +1900,7 @@ with tab_review:
                 except (json.JSONDecodeError, TypeError):
                     results_summary = None
                 if results_summary:
+                    results_loaded = True
                     rk1, rk2, rk3, rk4 = st.columns(4)
                     rk1.metric("Success Rate", f"{results_summary.get('success_rate', 'n/a')}%")
                     rk2.metric("Test Cases", results_summary.get("test_cases", "n/a"))
@@ -1909,7 +1911,10 @@ with tab_review:
                     st.caption("Results file exists but isn't valid JSON yet.")
             else:
                 st.caption(f"Could not load results inline ({results_result.message}).")
-        if execute_data.get("workflow_run_url"):
+        # Once the inline results loaded, the run log link is redundant (and was
+        # the exact "GitHub link instead of results" complaint this replaces) --
+        # only keep it as a fallback when there's nothing else to show yet.
+        if execute_data.get("workflow_run_url") and not results_loaded:
             st.markdown(f"[View CI run on GitHub]({execute_data['workflow_run_url']})")
         if review_auto_refresh:
             st.caption(
