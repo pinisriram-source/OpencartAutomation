@@ -932,25 +932,38 @@ with tab_execreport:
         st.divider()
         chart_col1, chart_col2, chart_col3 = st.columns(3)
         with chart_col1:
-            fig = go.Figure(
-                data=[go.Pie(
-                    labels=list(_report_payload["defect_status_counts"].keys()),
-                    values=list(_report_payload["defect_status_counts"].values()),
-                    marker=dict(colors=CATEGORICAL),
-                )]
-            )
-            fig.update_layout(title="Defect Density", margin=dict(l=10, r=10, t=40, b=10))
-            st.plotly_chart(fig, use_container_width=True)
+            st.markdown("**Defect Density**")
+            _status_counts = _report_payload["defect_status_counts"]
+            if sum(_status_counts.values()) == 0:
+                # A Plotly pie with every value at 0 has no total to compute
+                # slices from and renders as blank space -- show a clean
+                # placeholder instead for suites with zero defects.
+                st.caption("No defects recorded for this suite -- nothing to chart.")
+            else:
+                fig = go.Figure(
+                    data=[go.Pie(
+                        labels=list(_status_counts.keys()),
+                        values=list(_status_counts.values()),
+                        marker=dict(colors=CATEGORICAL),
+                    )]
+                )
+                fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
+                st.plotly_chart(fig, use_container_width=True)
         with chart_col2:
-            fig = go.Figure(
-                data=[go.Pie(
-                    labels=list(_report_payload["defect_severity_counts"].keys()),
-                    values=list(_report_payload["defect_severity_counts"].values()),
-                    marker=dict(colors=CATEGORICAL),
-                )]
-            )
-            fig.update_layout(title="Defect Distribution", margin=dict(l=10, r=10, t=40, b=10))
-            st.plotly_chart(fig, use_container_width=True)
+            st.markdown("**Defect Distribution**")
+            _severity_counts = _report_payload["defect_severity_counts"]
+            if sum(_severity_counts.values()) == 0:
+                st.caption("No defects recorded for this suite -- nothing to chart.")
+            else:
+                fig = go.Figure(
+                    data=[go.Pie(
+                        labels=list(_severity_counts.keys()),
+                        values=list(_severity_counts.values()),
+                        marker=dict(colors=CATEGORICAL),
+                    )]
+                )
+                fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
+                st.plotly_chart(fig, use_container_width=True)
         with chart_col3:
             _exec_counts = _report_payload["test_execution_counts"]
             fig = go.Figure(
