@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "app_under_test": "Practice Test Automation - Login Page",
+    "app_url": "https://practicetestautomation.com/practice-test-login/",
+    "report_date": "2026-07-29",
+    "test_account": "student / Password123",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/login-page-smoke-test --project=chromium",
+    "duration_minutes": 0.2,
+    "test_plan_path": "specs/login-page-smoke-test-test-plan.md",
+    "suite_path": "tests/login-page-smoke-test/",
+    "story": "",
+    "report_generated_at": "2026-07-29T04:34:58.841Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30422583548"
+  },
+  "summary": {
+    "test_cases": 15,
+    "browsers": 1,
+    "executions": 15,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "healing_actions": 0,
+    "status": "PASS"
+  },
+  "suites": [
+    {
+      "name": "Initial Page Load",
+      "use_case": "UC1",
+      "file": "page-load.spec.ts",
+      "tests": 1
+    },
+    {
+      "name": "Successful Login",
+      "use_case": "UC2",
+      "file": "valid-login.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Invalid Credentials",
+      "use_case": "UC3",
+      "file": "invalid-username.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Empty Field Validation",
+      "use_case": "UC4",
+      "file": "empty-fields.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Logout and Session",
+      "use_case": "UC5",
+      "file": "logout.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Form Interaction and Edge Cases",
+      "use_case": "UC6",
+      "file": "username-case-sensitivity.spec.ts",
+      "tests": 5
+    }
+  ],
+  "use_cases": {
+    "UC1": "Initial Page Load — page loads with login form elements visible and no errors",
+    "UC2": "Successful Login — valid credentials authenticate and display success page",
+    "UC3": "Invalid Credentials — invalid username or password shows appropriate error message",
+    "UC4": "Empty Field Validation — empty fields trigger username-invalid error message",
+    "UC5": "Logout and Session — logout navigates back to login, direct access behavior verified",
+    "UC6": "Form Interaction and Edge Cases — case sensitivity, password masking, Enter key, multiple attempts"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-LOGIN-001",
+      "tier": "Smoke",
+      "title": "Verify initial page load and form elements",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-002",
+      "tier": "Smoke",
+      "title": "Successful login with valid credentials",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "tier": "Sanity",
+      "title": "Invalid username with valid password shows error",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "tier": "Sanity",
+      "title": "Valid username with invalid password shows error",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "tier": "Functional",
+      "title": "Empty credentials submission shows error",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-006",
+      "tier": "Functional",
+      "title": "Empty username with valid password shows error",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-007",
+      "tier": "Functional",
+      "title": "Valid username with empty password shows error",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-008",
+      "tier": "Sanity",
+      "title": "Log out link navigates back to login page",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-009",
+      "tier": "Functional",
+      "title": "Username field is case-sensitive",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-010",
+      "tier": "Functional",
+      "title": "Password field is case-sensitive",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-011",
+      "tier": "Functional",
+      "title": "Password field masks input characters",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-012",
+      "tier": "Functional",
+      "title": "Submit button can be triggered with Enter key",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-013",
+      "tier": "Functional",
+      "title": "Multiple failed login attempts display error each time",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-014",
+      "tier": "Functional",
+      "title": "Success page displays personalized message with username",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-015",
+      "tier": "Functional",
+      "title": "Direct navigation to success page without login",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": []
+}
