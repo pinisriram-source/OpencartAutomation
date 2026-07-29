@@ -2,7 +2,7 @@
   "slug": "login-page-smoke-test",
   "request_file": "user-stories/request-login-page-smoke-test-20260729-041521.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/login-page-smoke-test-test-plan.md",
     "revision": 1,
     "feedback": ""
