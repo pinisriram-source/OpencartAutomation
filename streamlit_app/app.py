@@ -991,14 +991,56 @@ with tab_execreport:
             st.caption("No defects recorded for this suite.")
 
         st.subheader("Test Execution Data")
-        _test_df = pd.DataFrame(_report_payload["test_execution_rows"]).rename(columns={
-            "id": "Test Case ID", "date": "Date", "description": "Description", "steps": "Test Steps",
-            "expected": "Expected Result", "actual": "Actual Result", "status": "Execution Status",
-            "tested_by": "Tested By", "remarks": "Remarks",
-        })
-        st.dataframe(
-            _test_df, use_container_width=True, hide_index=True,
-            height=min(38 * (len(_test_df) + 1) + 3, 400),
+        # st.dataframe renders every cell on a single line, so multi-step
+        # "Test Steps" text collapsed into one run-on sentence. Same fix as
+        # the Defects Log tab: hand-built HTML with an <ol> per row instead
+        # of going through st.dataframe, wrapped in a bounded scroll box so
+        # the scrollbar sits right at the top rows instead of below all of
+        # them.
+        def _exec_cell(val) -> str:
+            return html.escape(str(val))
+
+        _exec_rows_html = []
+        for _row in _report_payload["test_execution_rows"]:
+            _steps = [s for s in _row["steps"].split("\n") if s.strip()]
+            # Steps already come prefixed "N. text" (for the .xlsx cell) --
+            # strip that since the <ol> below supplies its own numbering.
+            _steps = [re.sub(r"^\d+\.\s*", "", s) for s in _steps]
+            _steps_html = "<ol style='margin:0; padding-left:1.1em;'>" + "".join(
+                f"<li>{_exec_cell(s)}</li>" for s in _steps
+            ) + "</ol>" if _steps else ""
+            _cell = "padding:6px 8px; border-bottom:1px solid #ddd; vertical-align:top; white-space:nowrap;"
+            _wrap_cell = _cell.replace("white-space:nowrap;", "white-space:normal; min-width:220px;")
+            _exec_rows_html.append(
+                "<tr>"
+                f"<td style='{_cell}'>{_exec_cell(_row['id'])}</td>"
+                f"<td style='{_cell}'>{_exec_cell(_row['date'])}</td>"
+                f"<td style='{_wrap_cell}'>{_exec_cell(_row['description'])}</td>"
+                f"<td style='{_wrap_cell}'>{_steps_html}</td>"
+                f"<td style='{_wrap_cell}'>{_exec_cell(_row['expected'])}</td>"
+                f"<td style='{_wrap_cell}'>{_exec_cell(_row['actual'])}</td>"
+                f"<td style='{_cell}'>{_exec_cell(_row['status'])}</td>"
+                f"<td style='{_cell}'>{_exec_cell(_row['tested_by'])}</td>"
+                f"<td style='{_wrap_cell}'>{_exec_cell(_row['remarks'])}</td>"
+                "</tr>"
+            )
+
+        _exec_header_cell = f"text-align:left; padding:6px 8px; border-bottom:2px solid {SECONDARY_INK}; position:sticky; top:0; background:white;"
+        st.markdown(
+            "<div style='overflow:auto; max-height:480px; border:1px solid #ddd;'>"
+            "<table style='width:100%; border-collapse:collapse;'>"
+            "<tr>"
+            + "".join(
+                f"<th style='{_exec_header_cell}'>{h}</th>"
+                for h in [
+                    "Test Case ID", "Date", "Description", "Test Steps", "Expected Result",
+                    "Actual Result", "Execution Status", "Tested By", "Remarks",
+                ]
+            )
+            + "</tr>"
+            + "".join(_exec_rows_html)
+            + "</table></div>",
+            unsafe_allow_html=True,
         )
 
         st.divider()
