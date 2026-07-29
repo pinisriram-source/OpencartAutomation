@@ -983,7 +983,10 @@ with tab_execreport:
                 "id": "Defect ID", "date_detected": "Date Detected", "description": "Description",
                 "status": "Status", "severity": "Severity", "owner": "Owner", "remarks": "Remarks",
             })
-            st.dataframe(_defect_df, use_container_width=True, hide_index=True)
+            st.dataframe(
+                _defect_df, use_container_width=True, hide_index=True,
+                height=min(38 * (len(_defect_df) + 1) + 3, 400),
+            )
         else:
             st.caption("No defects recorded for this suite.")
 
@@ -993,7 +996,10 @@ with tab_execreport:
             "expected": "Expected Result", "actual": "Actual Result", "status": "Execution Status",
             "tested_by": "Tested By", "remarks": "Remarks",
         })
-        st.dataframe(_test_df, use_container_width=True, hide_index=True)
+        st.dataframe(
+            _test_df, use_container_width=True, hide_index=True,
+            height=min(38 * (len(_test_df) + 1) + 3, 400),
+        )
 
         st.divider()
         action_col1, action_col2 = st.columns(2)
