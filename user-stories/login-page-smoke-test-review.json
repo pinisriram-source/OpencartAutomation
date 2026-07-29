@@ -8,14 +8,14 @@
     "feedback": ""
   },
   "automation": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "tests/login-page-smoke-test/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-29T04:21:30.749Z"
+  "updated_at": "2026-07-29T04:28:10.410Z"
 }
