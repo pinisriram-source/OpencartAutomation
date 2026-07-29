@@ -526,6 +526,47 @@ scope-of-adoption caveat as the sections above — this wiring applies to
 every suite executed going forward; older suites' reports are generated the
 next time their pipeline (re-)executes, not retroactively.
 
+## Per-test-case screenshots
+
+Every test case, pass or fail, captures a screenshot at the end of its run
+(`screenshot: 'on'` in `playwright.config.ts` — deliberately not
+`'only-on-failure'`, so reviewers get visual proof of the assertion outcome
+either way, not just for failures). This is a project-wide Playwright config
+setting, not scoped to the pipeline suites.
+
+`reporters/screenshot-collector.ts` is a custom Playwright reporter
+(registered alongside `list`/`html` in `playwright.config.ts`'s `reporter`
+array) that copies each test's screenshot attachment into a stable,
+TC-ID-keyed path: `reports/screenshots/<slug>/<TC-ID>.png`. Playwright's own
+screenshot path is per-run and non-deterministic (hashed folder names), so
+without this the dashboard would have no reliable way to look one up by test
+case ID. The reporter matches the TC-ID via the same `TC-[A-Z0-9]+-\d+`
+convention used everywhere else in this pipeline (test titles are always
+`"TC-<MODULE>-<NNN>: <Title>"`); tests without a TC-ID in the title (e.g.
+non-pipeline suites) are silently skipped, not an error. `<slug>` comes from
+the `SLUG` env var when set (every pipeline run exports it), falling back to
+the suite's folder name under `tests/` for local/manual runs.
+
+The Streamlit dashboard's Test Case Detail tab reads
+`reports/screenshots/<slug>/<TC-ID>.png` straight off the local checked-out
+repo (same pattern as reading spec files — no GitHub API call needed) and
+renders it inline via `st.image()` for whichever test case is selected, for
+both PASS and FAIL outcomes. No screenshot on disk (older suites that ran
+before this feature, or a suite whose pipeline hasn't re-run since) shows a
+plain caption instead of an error.
+
+**Trigger:** automatic — every `pipeline-execute.yml` run's `Set final
+status` step commits `reports/screenshots/<slug>/` alongside the results
+JSON, narrative, and `.xlsx`, if the pipeline run produced any (skipped
+cleanly if the directory doesn't exist, e.g. a suite with zero pipeline
+test cases). No separate on-demand trigger — screenshots are a byproduct of
+running the suite itself, not something to regenerate independently.
+
+Committing PNGs per test case per run does grow the repo over time; this
+was a deliberate trade-off (chosen over leaving screenshots in the CI
+artifact zip only) so the dashboard can show them truly inline rather than
+linking out.
+
 ## Assertion rules
 
 - Web-first assertions only (`expect(locator).toBeVisible()`)

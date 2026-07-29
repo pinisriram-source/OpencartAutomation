@@ -156,6 +156,9 @@ jobs:
           if [ -f "reports/${SLUG}-test-execution-report.xlsx" ]; then
             git add "reports/${SLUG}-test-execution-report.xlsx"
           fi
+          if [ -d "reports/screenshots/${SLUG}" ]; then
+            git add "reports/screenshots/${SLUG}"
+          fi
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage execute --status completed --run-url "$RUN_URL"
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "Completed -- ${RESULT_LINE}. See Actions run and playwright-report artifact for details."

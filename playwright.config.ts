@@ -11,11 +11,11 @@ export default defineConfig({
   fullyParallel: false,
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [['list'], ['html', { open: 'never' }], ['./reporters/screenshot-collector.ts']],
   use: {
     baseURL: process.env.STOREFRONT_BASE_URL ?? 'http://localhost/opencart/upload/',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    screenshot: 'on',
     video: 'retain-on-failure',
     actionTimeout: 10_000,
   },

@@ -1282,6 +1282,18 @@ with tab_details:
             else:
                 st.info(row.get("chromium", "n/a"))
 
+        _detail_slug = DATA_PATH.stem.removesuffix("-test-results")
+        screenshot_path = REPO_ROOT / "reports" / "screenshots" / _detail_slug / f"{picked_id}.png"
+        st.markdown("**Screenshot at test end (visual proof of the assertion outcome)**")
+        if screenshot_path.exists():
+            st.image(str(screenshot_path), use_container_width=True)
+        else:
+            st.caption(
+                "No screenshot on file for this test case -- either the suite ran before this "
+                "feature was added, or the app's checkout hasn't picked up the latest pipeline "
+                "run yet (try rebooting the app)."
+            )
+
         suite_dir = REPO_ROOT / meta["suite_path"]
         spec_path, block = find_test_block(str(suite_dir), picked_id)
 
@@ -1386,14 +1398,15 @@ with tab_details:
                 run_url = meta.get("workflow_run_url")
                 if run_url:
                     st.markdown(
-                        f"[View failure screenshot, trace & video for this run]({run_url}) "
+                        f"[View trace & video for this run]({run_url}) "
                         "-- in the `playwright-report` artifact at the bottom of the run page "
-                        "(Playwright captures a screenshot automatically for every failed test)."
+                        "(the screenshot above is embedded directly; trace/video are larger "
+                        "and stay in the CI artifact)."
                     )
                 else:
                     st.caption(
                         "No linked Actions run recorded for this suite (generated before this "
-                        "feature was added) -- screenshot unavailable."
+                        "feature was added) -- trace/video unavailable."
                     )
 
 # --- Defects Log tab -------------------------------------------------------------
