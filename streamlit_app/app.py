@@ -174,6 +174,7 @@ GITHUB_WORKFLOW_FILE = "saucedemo-checkout.yml"
 GITHUB_PIPELINE_PLAN_WORKFLOW_FILE = "pipeline-plan.yml"
 GITHUB_PIPELINE_AUTOMATION_WORKFLOW_FILE = "pipeline-automation.yml"
 GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE = "pipeline-execute.yml"
+GITHUB_GENERATE_REPORT_WORKFLOW_FILE = "generate-test-report.yml"
 
 
 def github_url(repo_path: str) -> str:
@@ -789,6 +790,7 @@ st.divider()
     tab_review,
     tab_artifacts,
     tab_overview,
+    tab_execreport,
     tab_matrix,
     tab_usecase,
     tab_rules,
@@ -800,6 +802,7 @@ st.divider()
         "Review Pipeline Artifacts",
         "Approved Test Artifacts",
         "Overview",
+        "Test Execution Report",
         "Test Execution Matrix",
         "Coverage by Use Case",
         "Coverage by Business Rule",
@@ -862,6 +865,162 @@ with tab_overview:
 
     st.subheader("Business Rules")
     st.table(pd.DataFrame(business_rules.items(), columns=["Code", "Description"]).set_index("Code"))
+
+# --- Test Execution Report tab -------------------------------------------------
+with tab_execreport:
+    st.subheader("Test Execution Report")
+    st.caption(
+        "An Agile-style Test Execution Report for the currently selected suite (see the "
+        "'Test suite' picker above) -- defect density/distribution, execution status, and "
+        "full defect/test tracking tables, matching this project's adopted report template."
+    )
+
+    _report_slug = DATA_PATH.stem.removesuffix("-test-results")
+    try:
+        from report_builder import build_report_payload
+
+        _report_payload = build_report_payload(_report_slug)
+    except Exception as exc:
+        _report_payload = None
+        st.error(f"Couldn't build the report for `{_report_slug}`: {exc}")
+
+    if _report_payload:
+        narrative_path = REPO_ROOT / "streamlit_app" / "data" / f"{_report_slug}-test-report.json"
+        xlsx_path = REPO_ROOT / "reports" / f"{_report_slug}-test-execution-report.xlsx"
+
+        st.markdown(f"### {_report_payload['title']}")
+        meta_col1, meta_col2 = st.columns(2)
+        with meta_col1:
+            st.markdown(f"**Project Name:** {_report_payload['project_name']}")
+            st.markdown(f"**Total Defects:** {_report_payload['total_defects']}")
+            st.markdown(f"**Total Tests:** {_report_payload['total_tests']}")
+        with meta_col2:
+            st.markdown(f"**Report Prepared By:** {_report_payload['prepared_by']}")
+            st.markdown(f"**Report Date:** {_report_payload['report_date']}")
+            st.markdown(
+                f"**Testing Period:** {_report_payload['testing_period_start']} "
+                f"– {_report_payload['testing_period_end']}"
+            )
+
+        if not narrative_path.exists():
+            st.info(
+                "AI-authored narrative (Test Objectives / Key Findings / Recommendations / "
+                "Conclusion) hasn't been generated for this suite yet -- showing a plain "
+                "data-derived summary below. Click Regenerate Report to have Claude Code "
+                "author it properly."
+            )
+
+        for section_title, key in [
+            ("Test Objectives", "test_objectives"),
+            ("Key Findings", "key_findings"),
+            ("Recommendations", "recommendations"),
+            ("Conclusion", "conclusion"),
+        ]:
+            st.markdown(f"**{section_title}**")
+            st.markdown(_report_payload["narrative"].get(key, ""))
+
+        st.divider()
+        chart_col1, chart_col2, chart_col3 = st.columns(3)
+        with chart_col1:
+            fig = go.Figure(
+                data=[go.Pie(
+                    labels=list(_report_payload["defect_status_counts"].keys()),
+                    values=list(_report_payload["defect_status_counts"].values()),
+                    marker=dict(colors=CATEGORICAL),
+                )]
+            )
+            fig.update_layout(title="Defect Density", margin=dict(l=10, r=10, t=40, b=10))
+            st.plotly_chart(fig, use_container_width=True)
+        with chart_col2:
+            fig = go.Figure(
+                data=[go.Pie(
+                    labels=list(_report_payload["defect_severity_counts"].keys()),
+                    values=list(_report_payload["defect_severity_counts"].values()),
+                    marker=dict(colors=CATEGORICAL),
+                )]
+            )
+            fig.update_layout(title="Defect Distribution", margin=dict(l=10, r=10, t=40, b=10))
+            st.plotly_chart(fig, use_container_width=True)
+        with chart_col3:
+            _exec_counts = _report_payload["test_execution_counts"]
+            fig = go.Figure(
+                data=[go.Bar(
+                    x=list(_exec_counts.keys()),
+                    y=list(_exec_counts.values()),
+                    marker=dict(color=[STATUS_GOOD, "#d64545", STATUS_WARNING, MUTED_BG]),
+                )]
+            )
+            fig.update_layout(title="Test Execution Status", margin=dict(l=10, r=10, t=40, b=10))
+            st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("Dashboard Data")
+        dd1, dd2, dd3 = st.columns(3)
+        with dd1:
+            st.markdown("**Defect Summary (Status)**")
+            st.table(
+                pd.DataFrame(
+                    list(_report_payload["defect_status_counts"].items()), columns=["Status", "Count"]
+                ).set_index("Status")
+            )
+        with dd2:
+            st.markdown("**Defect Summary (Severity)**")
+            st.table(
+                pd.DataFrame(
+                    list(_report_payload["defect_severity_counts"].items()), columns=["Severity", "Count"]
+                ).set_index("Severity")
+            )
+        with dd3:
+            st.markdown("**Test Execution Summary**")
+            st.table(
+                pd.DataFrame(
+                    list(_report_payload["test_execution_counts"].items()), columns=["Status", "Count"]
+                ).set_index("Status")
+            )
+
+        st.subheader("Defect Tracking Data")
+        if _report_payload["defect_tracking_rows"]:
+            _defect_df = pd.DataFrame(_report_payload["defect_tracking_rows"]).rename(columns={
+                "id": "Defect ID", "date_detected": "Date Detected", "description": "Description",
+                "status": "Status", "severity": "Severity", "owner": "Owner", "remarks": "Remarks",
+            })
+            st.dataframe(_defect_df, use_container_width=True, hide_index=True)
+        else:
+            st.caption("No defects recorded for this suite.")
+
+        st.subheader("Test Execution Data")
+        _test_df = pd.DataFrame(_report_payload["test_execution_rows"]).rename(columns={
+            "id": "Test Case ID", "date": "Date", "description": "Description", "steps": "Test Steps",
+            "expected": "Expected Result", "actual": "Actual Result", "status": "Execution Status",
+            "tested_by": "Tested By", "remarks": "Remarks",
+        })
+        st.dataframe(_test_df, use_container_width=True, hide_index=True)
+
+        st.divider()
+        action_col1, action_col2 = st.columns(2)
+        with action_col1:
+            if st.button("🔁 Regenerate Report", key=f"regen_report_{_report_slug}"):
+                run_result = trigger_workflow(
+                    owner=GITHUB_OWNER, repo=GITHUB_REPO, workflow_file=GITHUB_GENERATE_REPORT_WORKFLOW_FILE,
+                    ref=GITHUB_BRANCH, token=get_github_token(), inputs={"slug": _report_slug},
+                )
+                if run_result.success:
+                    st.success("Regeneration triggered -- refresh in a minute or two once the workflow completes.")
+                else:
+                    st.warning(f"Couldn't trigger regeneration: {run_result.message}")
+        with action_col2:
+            if xlsx_path.exists():
+                st.download_button(
+                    "⬇️ Download .xlsx",
+                    data=xlsx_path.read_bytes(),
+                    file_name=xlsx_path.name,
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key=f"download_report_{_report_slug}",
+                )
+            else:
+                st.caption(
+                    "No .xlsx generated yet for this suite -- click Regenerate Report, or wait "
+                    "for the next pipeline execution."
+                )
 
 # --- Test Execution Matrix tab -------------------------------------------------
 with tab_matrix:

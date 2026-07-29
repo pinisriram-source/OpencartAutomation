@@ -117,6 +117,30 @@ jobs:
             node .github/scripts/stamp-report-timestamp.js "streamlit_app/data/${SLUG}-test-results.json"
           fi
 
+      - name: Claude Code -- author Test Execution Report narrative
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
+            npx claude -p "Read streamlit_app/data/${SLUG}-test-results.json (this run's results) and specs/${SLUG}-test-plan.md (particularly Section 1.1 Test Plan Objectives). Write streamlit_app/data/${SLUG}-test-report.json containing exactly four string fields: test_objectives (summarize Section 1.1 in your own words, 1-2 sentences), key_findings (2-4 sentences on what this specific run actually showed -- pass/fail counts, which test cases failed and why, referencing real defects from the results file's defects array, not generic filler), recommendations (2-4 sentences of concrete next steps grounded in the actual failures/defects found, or a short note that no action is needed if everything passed), conclusion (1-2 sentences overall assessment). Do not invent defects, test cases, or outcomes that aren't in the results file. Only write this one JSON file -- do not modify streamlit_app/data/${SLUG}-test-results.json or any other file." \
+              --dangerously-skip-permissions
+          fi
+
+      - name: Set up Python for the report builder
+        if: ${{ !cancelled() }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build the Test Execution Report workbook
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
+            pip install --quiet openpyxl
+            python streamlit_app/report_builder.py "${SLUG}"
+          fi
+
       - name: Set final status
         run: |
           RESULT_LINE=$(grep -E "[0-9]+ (passed|failed|skipped)" test-output.log | tail -3 | tr '\n' ' ')
@@ -125,6 +149,12 @@ jobs:
           fi
           if [ -f "streamlit_app/data/${SLUG}-test-results.json" ]; then
             git add "streamlit_app/data/${SLUG}-test-results.json"
+          fi
+          if [ -f "streamlit_app/data/${SLUG}-test-report.json" ]; then
+            git add "streamlit_app/data/${SLUG}-test-report.json"
+          fi
+          if [ -f "reports/${SLUG}-test-execution-report.xlsx" ]; then
+            git add "reports/${SLUG}-test-execution-report.xlsx"
           fi
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage execute --status completed --run-url "$RUN_URL"

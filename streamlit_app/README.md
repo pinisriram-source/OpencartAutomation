@@ -187,6 +187,27 @@ directly, though the workflow run link is also shown after triggering. The
 same stages are also reflected, per-artifact, in `user-stories/<slug>-review.json`
 for the Review tab.
 
+## Test Execution Report
+
+Every suite execution produces an Agile-style Test Execution Report — a
+downloadable `reports/<slug>-test-execution-report.xlsx` (native Excel
+charts) plus an in-app **Test Execution Report** tab showing the same data
+(Plotly charts) for whichever suite is selected in the "Test suite" picker.
+No new secrets required — it reuses `GITHUB_TOKEN` (dashboard trigger) and
+`AWS_BEARER_TOKEN_BEDROCK` (Claude Code authoring the narrative text in CI,
+same as the rest of the pipeline).
+
+Generated automatically at the end of every `pipeline-execute.yml` run, and
+on-demand via the tab's **"🔁 Regenerate Report"** button (dispatches
+`.github/workflows/generate-test-report.yml` without re-running the suite
+itself) — useful if the automatic run failed or you just want a fresh copy.
+
+See `CLAUDE.md`'s "Test Execution Report" section for the full field
+mapping, including which fields are real measured data versus fixed
+defaults (this pipeline doesn't track defect lifecycle status, owners, or
+a "Blocked" test outcome, so those are deliberately defaulted rather than
+invented per-run).
+
 ## Review tab artifacts as Google Docs (optional)
 
 By default, the Review tab links each artifact straight to its GitHub blob

@@ -1,0 +1,76 @@
+name: Generate Test Execution Report
+
+# Standalone, on-demand regeneration of one suite's Agile-style Test
+# Execution Report (streamlit_app/data/<slug>-test-report.json narrative +
+# reports/<slug>-test-execution-report.xlsx), without re-running the suite
+# itself. pipeline-execute.yml already does this automatically as part of
+# every execution -- this exists for the dashboard's "Regenerate Report"
+# button, e.g. after editing narrative text or if the automatic run failed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Suite slug (must already have streamlit_app/data/<slug>-test-results.json)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-pipeline-${{ inputs.slug }}
+  cancel-in-progress: false
+
+jobs:
+  generate-report:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    env:
+      CLAUDE_CODE_USE_BEDROCK: "1"
+      AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.AWS_BEARER_TOKEN_BEDROCK }}
+      AWS_REGION: eu-north-1
+      SLUG: ${{ inputs.slug }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync to latest main
+        run: |
+          git fetch origin main --quiet
+          git reset --hard origin/main
+
+      - name: Verify results exist for this slug
+        run: test -f "streamlit_app/data/${SLUG}-test-results.json"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure git identity for automated commits
+        run: |
+          git config user.name "qa-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Claude Code -- author Test Execution Report narrative
+        run: |
+          npx claude -p "Read streamlit_app/data/${SLUG}-test-results.json (this run's results) and specs/${SLUG}-test-plan.md (particularly Section 1.1 Test Plan Objectives). Write streamlit_app/data/${SLUG}-test-report.json containing exactly four string fields: test_objectives (summarize Section 1.1 in your own words, 1-2 sentences), key_findings (2-4 sentences on what this specific run actually showed -- pass/fail counts, which test cases failed and why, referencing real defects from the results file's defects array, not generic filler), recommendations (2-4 sentences of concrete next steps grounded in the actual failures/defects found, or a short note that no action is needed if everything passed), conclusion (1-2 sentences overall assessment). Do not invent defects, test cases, or outcomes that aren't in the results file. Only write this one JSON file -- do not modify streamlit_app/data/${SLUG}-test-results.json or any other file." \
+            --dangerously-skip-permissions
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build the Test Execution Report workbook
+        run: |
+          pip install --quiet openpyxl
+          python streamlit_app/report_builder.py "${SLUG}"
+
+      - name: Commit report artifacts
+        run: |
+          git add "streamlit_app/data/${SLUG}-test-report.json" "reports/${SLUG}-test-execution-report.xlsx"
+          git commit -m "chore(report): regenerate test execution report for ${SLUG}"
+          bash .github/scripts/git-push-retry.sh

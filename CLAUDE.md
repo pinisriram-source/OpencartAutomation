@@ -470,6 +470,62 @@ as the Page Object contract and Test tiers sections above — applies to every
 suite generated going forward, older pipeline suites have not been
 retrofitted (aside from these two worked examples).
 
+## Test Execution Report — "Submit New Request" pipeline suites
+
+Every suite execution produces an Agile-style Test Execution Report, both as
+a downloadable `reports/<slug>-test-execution-report.xlsx` (native Excel
+charts, built with openpyxl) and as an in-app "Test Execution Report" tab in
+the Streamlit dashboard (Plotly charts, same underlying data) — modeled on
+this project's adopted report template (title/metadata block, Test
+Objectives/Key Findings/Recommendations/Conclusion narrative, Defect
+Density/Distribution pie charts, Test Execution Status bar chart, Defect
+Tracking Data and Test Execution Data tables).
+
+`streamlit_app/report_builder.py` is the shared, Streamlit-independent
+implementation (`compute_report_tables()` for the deterministic tables,
+`build_workbook()` for the `.xlsx`, `build_report_payload()` assembling
+both plus narrative) — imported directly by `app.py` for the in-app tab, and
+run standalone in CI as `python streamlit_app/report_builder.py <slug>`.
+
+**Narrative text** (Test Objectives/Key Findings/Recommendations/Conclusion)
+is authored by Claude Code as a pipeline step, reading that run's
+`streamlit_app/data/<slug>-test-results.json` and the test plan's Section
+1.1 objective, and writing `streamlit_app/data/<slug>-test-report.json`
+(four string fields, no other content) — see `streamlit_app/data/hovers-test-report.json`
+for the worked example. If that file doesn't exist yet (narrative
+generation hasn't run for this suite), the report falls back to a plain
+data-derived summary rather than blank sections.
+
+**Fields this pipeline doesn't actually track** are filled with fixed
+defaults rather than omitted, so the report keeps the template's full
+shape — this is a deliberate choice, not an oversight:
+- Defect lifecycle status (Open/In Progress/Closed): every defect defaults
+  to **Open**, since this pipeline runs once and doesn't track resolution
+  over time.
+- Defect severity buckets (Minor/Major/Critical): mapped from this
+  project's actual severity vocabulary (Info/Low → Minor, Medium/High →
+  Major, Critical → Critical).
+- Defect Owner: fixed to **"QA Automation"**.
+- Test execution outcomes (Passed/Failed/Blocked/Not Executed): Blocked is
+  always **0** (no such concept in this pipeline's results); Not Executed
+  maps from Playwright's `skipped` count.
+- Tested By: fixed to **"Playwright Automation"**.
+- Date Detected / Date columns: the run's own report date, since neither
+  defects nor individual tests carry their own timestamps.
+
+**Trigger:** automatic as part of every `pipeline-execute.yml` run (narrative
+authored, then `report_builder.py` invoked, both committed alongside
+`streamlit_app/data/<slug>-test-results.json`), and on-demand via the
+dashboard's "🔁 Regenerate Report" button (dispatches
+`.github/workflows/generate-test-report.yml`, the same two steps as a
+standalone workflow, for regenerating without re-running the suite itself).
+
+Worked example: `streamlit_app/data/hovers-test-report.json` (narrative) and
+`reports/hovers-test-execution-report.xlsx` (the built workbook). Same
+scope-of-adoption caveat as the sections above — this wiring applies to
+every suite executed going forward; older suites' reports are generated the
+next time their pipeline (re-)executes, not retroactively.
+
 ## Assertion rules
 
 - Web-first assertions only (`expect(locator).toBeVisible()`)
