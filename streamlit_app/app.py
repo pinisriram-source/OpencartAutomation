@@ -766,24 +766,30 @@ defects = pd.DataFrame(data["defects"])
 use_cases = data["use_cases"]
 business_rules = data["business_rules"]
 
-# --- Header -----------------------------------------------------------------
-st.title(f"Test Execution Report — {meta.get('story', DATA_PATH.stem)}: {meta['app_under_test']}")
-st.caption(
-    f"**Application:** {meta['app_under_test']} ([{meta['app_url']}]({meta['app_url']}))  |  "
-    f"**Test account:** `{meta['test_account']}`  |  **Report date:** {meta['report_date']}"
-)
-st.caption("🔄 Watching for new pipeline results every 15s -- new suites appear here automatically.")
+def render_execution_status_header() -> None:
+    """Title + KPI summary for the currently selected suite.
 
-# --- KPI row ------------------------------------------------------------------
-k1, k2, k3, k4, k5, k6 = st.columns(6)
-k1.metric("Success Rate", f"{summary['success_rate']}%")
-k2.metric("Test Cases", summary["test_cases"])
-k3.metric("Browsers", summary["browsers"])
-k4.metric("Executions", summary["executions"])
-k5.metric("Passed", summary["passed"])
-k6.metric("Failed", summary["failed"], delta=None)
+    Scoped to the Overview and Test Execution Report tabs only -- other tabs
+    (Submit New Request, Review Pipeline Artifacts, etc.) have their own
+    focus and don't need this repeated on every screen.
+    """
+    st.title(f"Test Execution Report — {meta.get('story', DATA_PATH.stem)}: {meta['app_under_test']}")
+    st.caption(
+        f"**Application:** {meta['app_under_test']} ([{meta['app_url']}]({meta['app_url']}))  |  "
+        f"**Test account:** `{meta['test_account']}`  |  **Report date:** {meta['report_date']}"
+    )
+    st.caption("🔄 Watching for new pipeline results every 15s -- new suites appear here automatically.")
 
-st.divider()
+    k1, k2, k3, k4, k5, k6 = st.columns(6)
+    k1.metric("Success Rate", f"{summary['success_rate']}%")
+    k2.metric("Test Cases", summary["test_cases"])
+    k3.metric("Browsers", summary["browsers"])
+    k4.metric("Executions", summary["executions"])
+    k5.metric("Passed", summary["passed"])
+    k6.metric("Failed", summary["failed"], delta=None)
+
+    st.divider()
+
 
 (
     tab_submit,
@@ -813,6 +819,8 @@ st.divider()
 
 # --- Overview tab -------------------------------------------------------------
 with tab_overview:
+    render_execution_status_header()
+
     st.subheader("Suite Summary")
     left, right = st.columns([3, 2])
 
@@ -868,6 +876,8 @@ with tab_overview:
 
 # --- Test Execution Report tab -------------------------------------------------
 with tab_execreport:
+    render_execution_status_header()
+
     st.subheader("Test Execution Report")
     st.caption(
         "An Agile-style Test Execution Report for the currently selected suite (see the "
