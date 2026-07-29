@@ -1,0 +1,21 @@
+{
+  "slug": "login-page-smoke-test",
+  "request_file": "user-stories/request-login-page-smoke-test-20260729-041521.md",
+  "plan": {
+    "status": "approved",
+    "path": "specs/login-page-smoke-test-test-plan.md",
+    "revision": 1,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "approved",
+    "path": "tests/login-page-smoke-test/",
+    "revision": 1,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "completed",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30422583548"
+  },
+  "updated_at": "2026-07-29T04:34:58.890Z"
+}

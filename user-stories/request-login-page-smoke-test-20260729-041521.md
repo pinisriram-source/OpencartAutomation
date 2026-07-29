@@ -1,0 +1,25 @@
+# Testing Request: Login Page Smoke Test
+
+**Submitted via:** Streamlit dashboard
+**Submitted date (UTC):** 2026-07-29 04:15:21
+**Status:** Completed --   15 passed (12.5s) . See Actions run and playwright-report artifact for details.
+
+## Application URL
+https://practicetestautomation.com/practice-test-login/
+
+## Requirements / Acceptance Criteria
+
+Acceptance Criteria:
+- AC1: Entering a valid username and password and clicking Submit logs
+  the user in and navigates to a page showing "Logged In Successfully"
+  with a link back to the practice page.
+- AC2: Entering an invalid username shows an error message indicating
+  the username is not found, and the user remains on the login page.
+- AC3: Entering a valid username with an incorrect password shows an
+  error message indicating the password is invalid, and the user
+  remains on the login page.
+
+---
+*Next step: run the plan → generate → execute workflow (e.g. via Claude Code /
+the qa-endtoend-promptFile pattern) referencing this file to produce a test plan
+and automation suite.*
