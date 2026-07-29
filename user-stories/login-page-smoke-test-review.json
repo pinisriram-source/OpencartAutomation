@@ -2,9 +2,9 @@
   "slug": "login-page-smoke-test",
   "request_file": "user-stories/request-login-page-smoke-test-20260729-041521.md",
   "plan": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "specs/login-page-smoke-test-test-plan.md",
+    "revision": 1,
     "feedback": ""
   },
   "automation": {
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-29T04:15:41.553Z"
+  "updated_at": "2026-07-29T04:20:43.471Z"
 }
