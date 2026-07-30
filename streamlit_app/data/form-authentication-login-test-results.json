@@ -1,0 +1,377 @@
+{
+  "meta": {
+    "app_under_test": "The Internet - Form Authentication Login",
+    "app_url": "https://the-internet.herokuapp.com/login",
+    "report_date": "2026-07-30",
+    "test_account": "tomsmith / SuperSecretPassword!",
+    "browsers": [
+      "Chromium (Desktop Chrome)"
+    ],
+    "run_command": "npx playwright test tests/form-authentication-login --project=chromium",
+    "duration_minutes": 0.3,
+    "test_plan_path": "specs/form-authentication-login-test-plan.md",
+    "suite_path": "tests/form-authentication-login/",
+    "story": "",
+    "report_generated_at": "2026-07-30T09:13:21.317Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30529695225"
+  },
+  "summary": {
+    "test_cases": 30,
+    "browsers": 1,
+    "executions": 30,
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "healing_actions": 0,
+    "status": "PASS"
+  },
+  "suites": [
+    {
+      "name": "Initial Page State",
+      "use_case": "UC1",
+      "file": "initial-page-state.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Valid Login Flow",
+      "use_case": "UC2",
+      "file": "valid-login-flow.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Invalid Username",
+      "use_case": "UC3",
+      "file": "invalid-username.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Invalid Password",
+      "use_case": "UC4",
+      "file": "invalid-password.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Empty Fields Validation",
+      "use_case": "UC5",
+      "file": "empty-fields-validation.spec.ts",
+      "tests": 4
+    },
+    {
+      "name": "Flash Message Behavior",
+      "use_case": "UC6",
+      "file": "flash-message-behavior.spec.ts",
+      "tests": 3
+    },
+    {
+      "name": "Logout Flow",
+      "use_case": "UC7",
+      "file": "logout-flow.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Unauthorized Access",
+      "use_case": "UC8",
+      "file": "unauthorized-access.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "Security and Input Validation",
+      "use_case": "UC9",
+      "file": "security-input-validation.spec.ts",
+      "tests": 5
+    },
+    {
+      "name": "Browser Navigation Behavior",
+      "use_case": "UC10",
+      "file": "browser-navigation.spec.ts",
+      "tests": 3
+    }
+  ],
+  "use_cases": {
+    "UC1": "Initial Page State — login page loads with form elements and no flash message",
+    "UC2": "Valid Login Flow — valid credentials navigate to secure area with success message",
+    "UC3": "Invalid Username — wrong or mismatched usernames show error and remain on login",
+    "UC4": "Invalid Password — wrong or mismatched passwords show error and remain on login",
+    "UC5": "Empty Fields Validation — empty or whitespace-only fields show appropriate error",
+    "UC6": "Flash Message Behavior — flash messages display and dismiss correctly",
+    "UC7": "Logout Flow — logout returns to login page and terminates session",
+    "UC8": "Unauthorized Access — direct /secure access without login redirects to login",
+    "UC9": "Security and Input Validation — injection and special characters handled safely",
+    "UC10": "Browser Navigation Behavior — back/forward/refresh around login flow"
+  },
+  "business_rules": {},
+  "tests": [
+    {
+      "id": "TC-LOGIN-001",
+      "tier": "Smoke",
+      "title": "Verify login page loads with all required elements",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-002",
+      "tier": "Sanity",
+      "title": "Verify instruction text is displayed on page load",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "tier": "Sanity",
+      "title": "Verify input fields are empty on initial page load",
+      "use_case": "UC1",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "tier": "Smoke",
+      "title": "Successful login with valid credentials navigates to secure area",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "tier": "Sanity",
+      "title": "Secure area displays welcome message and logout button",
+      "use_case": "UC2",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-006",
+      "tier": "Sanity",
+      "title": "Login with invalid username shows error message",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-007",
+      "tier": "Functional",
+      "title": "Login with invalid username case variation shows error",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-008",
+      "tier": "Functional",
+      "title": "Login with whitespace-padded username shows error",
+      "use_case": "UC3",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-009",
+      "tier": "Sanity",
+      "title": "Login with valid username but invalid password shows error",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-010",
+      "tier": "Functional",
+      "title": "Login with valid username and incorrect password case shows error",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-011",
+      "tier": "Functional",
+      "title": "Login with valid username and whitespace-padded password shows error",
+      "use_case": "UC4",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-012",
+      "tier": "Sanity",
+      "title": "Submitting form with both fields empty shows username error",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-013",
+      "tier": "Functional",
+      "title": "Submitting form with empty username and valid password shows error",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-014",
+      "tier": "Functional",
+      "title": "Submitting form with valid username and empty password shows error",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-015",
+      "tier": "Functional",
+      "title": "Submitting form with whitespace-only username shows error",
+      "use_case": "UC5",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-016",
+      "tier": "Sanity",
+      "title": "Flash message close button dismisses success message",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-017",
+      "tier": "Sanity",
+      "title": "Flash message close button dismisses error message",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-018",
+      "tier": "Functional",
+      "title": "Flash message persists until dismissed or page navigates",
+      "use_case": "UC6",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-019",
+      "tier": "Smoke",
+      "title": "Clicking Logout navigates back to login page with flash message",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-020",
+      "tier": "Functional",
+      "title": "After logout, attempting to navigate back to secure area redirects to login",
+      "use_case": "UC7",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-021",
+      "tier": "Sanity",
+      "title": "Direct navigation to secure area without login redirects to login page",
+      "use_case": "UC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-022",
+      "tier": "Functional",
+      "title": "Multiple failed login attempts still allow successful login",
+      "use_case": "UC8",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-023",
+      "tier": "Functional",
+      "title": "SQL injection attempt in username field is handled safely",
+      "use_case": "UC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-024",
+      "tier": "Functional",
+      "title": "XSS attempt in username field is sanitized",
+      "use_case": "UC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-025",
+      "tier": "Functional",
+      "title": "Special characters in username are handled correctly",
+      "use_case": "UC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-026",
+      "tier": "Functional",
+      "title": "Very long username input is handled correctly",
+      "use_case": "UC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-027",
+      "tier": "Functional",
+      "title": "Unicode characters in credentials are handled correctly",
+      "use_case": "UC9",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-028",
+      "tier": "Functional",
+      "title": "Browser back button after successful login returns to login page",
+      "use_case": "UC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-029",
+      "tier": "Functional",
+      "title": "Browser forward button after logout navigates forward",
+      "use_case": "UC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    },
+    {
+      "id": "TC-LOGIN-030",
+      "tier": "Functional",
+      "title": "Page refresh on login page clears form state",
+      "use_case": "UC10",
+      "business_rule": "",
+      "chromium": "Pass",
+      "note": ""
+    }
+  ],
+  "defects": []
+}
