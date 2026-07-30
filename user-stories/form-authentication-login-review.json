@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "pending_review",
+    "status": "in_progress",
     "path": "tests/form-authentication-login/",
     "revision": 1,
     "feedback": ""
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-30T08:54:14.041Z"
+  "updated_at": "2026-07-30T09:04:13.473Z"
 }
