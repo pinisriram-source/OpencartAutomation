@@ -2,9 +2,9 @@
   "slug": "form-authentication-login",
   "request_file": "user-stories/request-form-authentication-login-20260730-083154.md",
   "plan": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "specs/form-authentication-login-test-plan.md",
+    "revision": 1,
     "feedback": ""
   },
   "automation": {
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-30T08:32:18.447Z"
+  "updated_at": "2026-07-30T08:38:48.835Z"
 }
