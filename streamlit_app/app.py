@@ -8,6 +8,7 @@ matrix, coverage by business use case, coverage by business rule, and the
 defects log. A suite picker lets the viewer switch between suites.
 """
 
+import base64
 import hashlib
 import hmac
 import html
@@ -1023,6 +1024,21 @@ with tab_execreport:
         def _exec_cell(val) -> str:
             return html.escape(str(val))
 
+        def _exec_screenshot_cell(tc_id: str) -> str:
+            # Same reports/screenshots/<slug>/<TC-ID>.png the Test Case Detail
+            # tab reads -- embedded here as a base64 data URI (not a relative
+            # <img src> path, since Streamlit doesn't serve arbitrary repo
+            # files as static assets) so it's a real thumbnail, not a link.
+            shot_path = REPO_ROOT / "reports" / "screenshots" / _report_slug / f"{tc_id}.png"
+            if not shot_path.exists():
+                return "<span style='color:#999;'>No screenshot</span>"
+            data_uri = "data:image/png;base64," + base64.b64encode(shot_path.read_bytes()).decode("ascii")
+            return (
+                f"<a href='{data_uri}' target='_blank' title='Open full-size screenshot'>"
+                f"<img src='{data_uri}' style='width:100px; border:1px solid #ccc; border-radius:3px;' />"
+                f"</a>"
+            )
+
         _exec_rows_html = []
         for _row in _report_payload["test_execution_rows"]:
             _steps = [s for s in _row["steps"].split("\n") if s.strip()]
@@ -1045,6 +1061,7 @@ with tab_execreport:
                 f"<td style='{_cell}'>{_exec_cell(_row['status'])}</td>"
                 f"<td style='{_cell}'>{_exec_cell(_row['tested_by'])}</td>"
                 f"<td style='{_wrap_cell}'>{_exec_cell(_row['remarks'])}</td>"
+                f"<td style='{_cell}'>{_exec_screenshot_cell(_row['id'])}</td>"
                 "</tr>"
             )
 
@@ -1057,7 +1074,7 @@ with tab_execreport:
                 f"<th style='{_exec_header_cell}'>{h}</th>"
                 for h in [
                     "Test Case ID", "Date", "Description", "Test Steps", "Expected Result",
-                    "Actual Result", "Execution Status", "Tested By", "Remarks",
+                    "Actual Result", "Execution Status", "Tested By", "Remarks", "Screenshot",
                 ]
             )
             + "</tr>"
