@@ -8,14 +8,14 @@
     "feedback": ""
   },
   "automation": {
-    "status": "in_progress",
-    "path": "",
-    "revision": 0,
+    "status": "pending_review",
+    "path": "tests/form-authentication-login/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-30T08:42:07.951Z"
+  "updated_at": "2026-07-30T08:49:54.217Z"
 }
