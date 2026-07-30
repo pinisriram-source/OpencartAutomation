@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "not_started",
+    "status": "in_progress",
     "path": "",
     "revision": 0,
     "feedback": ""
@@ -17,5 +17,5 @@
     "status": "not_started",
     "workflow_run_url": ""
   },
-  "updated_at": "2026-07-30T08:38:48.835Z"
+  "updated_at": "2026-07-30T08:42:07.951Z"
 }
