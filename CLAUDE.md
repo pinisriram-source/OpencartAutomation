@@ -555,6 +555,22 @@ both PASS and FAIL outcomes. No screenshot on disk (older suites that ran
 before this feature, or a suite whose pipeline hasn't re-run since) shows a
 plain caption instead of an error.
 
+The Test Execution Report tab's Test Execution Data table (the hand-built
+HTML table, see the "Test steps as numbered lists" note below) also shows a
+per-row "Screenshot" thumbnail from the same path, embedded as a base64
+`data:` URI (not a relative `<img src>` — Streamlit doesn't serve arbitrary
+repo files as static assets) and clickable to open full-size in a new tab.
+
+**Gotcha:** any `npx playwright test` invocation that passes its own
+`--reporter=...` flag *overrides* `playwright.config.ts`'s entire `reporter`
+array instead of merging with it — that silently drops the screenshot
+collector (and `html`) while tests still run and report pass/fail
+normally, making the bug easy to miss. `pipeline-execute.yml` hit exactly
+this (hardcoded `--reporter=list,html` on the CLI) before it was fixed;
+don't add `--reporter` to any pipeline `playwright test` command going
+forward — the config's `reporter` array already defines everything needed
+(`list`, `html`, `screenshot-collector`).
+
 **Trigger:** automatic — every `pipeline-execute.yml` run's `Set final
 status` step commits `reports/screenshots/<slug>/` alongside the results
 JSON, narrative, and `.xlsx`, if the pipeline run produced any (skipped
