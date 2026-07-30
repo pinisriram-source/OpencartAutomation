@@ -101,7 +101,12 @@ jobs:
         id: run_tests
         continue-on-error: true
         run: |
-          npx playwright test "tests/${SLUG}" --project=chromium --reporter=list,html 2>&1 | tee test-output.log
+          # Deliberately no --reporter flag here: that would override the
+          # full reporter array in playwright.config.ts (list + html +
+          # reporters/screenshot-collector.ts), silently dropping the
+          # screenshot-collector and producing zero screenshots even though
+          # every test still passes/fails normally.
+          npx playwright test "tests/${SLUG}" --project=chromium 2>&1 | tee test-output.log
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Claude Code -- generate dashboard data
