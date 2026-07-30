@@ -2,7 +2,7 @@
   "slug": "form-authentication-login",
   "request_file": "user-stories/request-form-authentication-login-20260730-083154.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/form-authentication-login-test-plan.md",
     "revision": 1,
     "feedback": ""
