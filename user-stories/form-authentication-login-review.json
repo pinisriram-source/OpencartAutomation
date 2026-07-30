@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "tests/form-authentication-login/",
     "revision": 2,
     "feedback": ""
