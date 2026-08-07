@@ -4,7 +4,9 @@ import { UploadPage } from './page-objects/upload.page';
 import { UploadSuccessPage } from './page-objects/upload-success.page';
 
 const FIXTURES_DIR = path.resolve(__dirname, '../../');
-const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'upload-sample.txt');
+// upload-sample.txt lives under src/data/fixtures/, unlike the other two
+// fixtures below which really are at the repo root.
+const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'src', 'data', 'fixtures', 'upload-sample.txt');
 const CLAUDE_MD = path.join(FIXTURES_DIR, 'CLAUDE.md');
 
 test.describe('File Name Integrity', () => {

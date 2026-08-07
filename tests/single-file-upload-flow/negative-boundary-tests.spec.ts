@@ -4,7 +4,9 @@ import { UploadPage } from './page-objects/upload.page';
 import { UploadSuccessPage } from './page-objects/upload-success.page';
 
 const FIXTURES_DIR = path.resolve(__dirname, '../../');
-const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'upload-sample.txt');
+// upload-sample.txt lives under src/data/fixtures/, unlike PACKAGE_JSON
+// below which really is at the repo root.
+const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'src', 'data', 'fixtures', 'upload-sample.txt');
 const PACKAGE_JSON = path.join(FIXTURES_DIR, 'package.json');
 
 test.describe('Negative and Boundary Tests', () => {
