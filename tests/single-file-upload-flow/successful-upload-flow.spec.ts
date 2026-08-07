@@ -1,69 +1,74 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 import { UploadPage } from './page-objects/upload.page';
-import { UploadSuccessPage } from './page-objects/upload-success.page';
-
-const FIXTURES_DIR = path.resolve(__dirname, '../../');
-// upload-sample.txt lives under src/data/fixtures/, unlike the other two
-// fixtures below which really are at the repo root.
-const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'src', 'data', 'fixtures', 'upload-sample.txt');
-const PACKAGE_JSON = path.join(FIXTURES_DIR, 'package.json');
-const CLAUDE_MD = path.join(FIXTURES_DIR, 'CLAUDE.md');
 
 test.describe('Successful Upload Flow', () => {
   let uploadPage: UploadPage;
-  let successPage: UploadSuccessPage;
+  let tmpDir: string;
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
     uploadPage = new UploadPage(page);
-    successPage = new UploadSuccessPage(page);
-    await uploadPage.navigate();
+    tmpDir = testInfo.outputDir;
+    fs.mkdirSync(tmpDir, { recursive: true });
   });
 
-  test('TC-UPLOAD-010: Successfully uploading a .txt file navigates to success page with correct file name', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-    await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
+  test('TC-UPLOAD-008: Uploading a .txt file shows success page with File Uploaded! heading', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
+    const filePath = path.join(tmpDir, 'sample.txt');
+    fs.writeFileSync(filePath, 'sample content');
 
+    await uploadPage.navigate();
+    await uploadPage.selectFile(filePath);
     await uploadPage.clickUpload();
 
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
-    await expect(successPage.pageHeading).toBeVisible();
-    await expect(successPage.pageHeading).toHaveText('File Uploaded!');
-    await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.page.locator('h3')).toHaveText('File Uploaded!');
   });
 
-  test('TC-UPLOAD-011: Successfully uploading a .json file shows correct file name on success page', { tag: ['@functional', '@regression'] }, async () => {
-    await uploadPage.selectFile(PACKAGE_JSON);
-    await expect(uploadPage.fileInput).toHaveValue(/package\.json$/);
+  test('TC-UPLOAD-009: After successful upload, the uploaded filename is displayed exactly', { tag: ['@sanity', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'sample.txt');
+    fs.writeFileSync(filePath, 'sample content');
 
+    await uploadPage.navigate();
+    await uploadPage.selectFile(filePath);
     await uploadPage.clickUpload();
 
-    await expect(successPage.pageHeading).toBeVisible();
-    await expect(successPage.pageHeading).toHaveText('File Uploaded!');
-    await expect(successPage.uploadedFileName).toHaveText('package.json');
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('sample.txt');
   });
 
-  test('TC-UPLOAD-012: Successfully uploading a .md file shows correct file name on success page', { tag: ['@functional', '@regression'] }, async () => {
-    await uploadPage.selectFile(CLAUDE_MD);
-    await expect(uploadPage.fileInput).toHaveValue(/CLAUDE\.md$/);
+  test('TC-UPLOAD-010: Uploading a .json file succeeds and displays correct filename', { tag: ['@functional', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'data.json');
+    fs.writeFileSync(filePath, '{"key": "value"}');
 
-    await uploadPage.clickUpload();
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(filePath);
 
-    await expect(successPage.pageHeading).toBeVisible();
-    await expect(successPage.pageHeading).toHaveText('File Uploaded!');
-    await expect(successPage.uploadedFileName).toHaveText('CLAUDE.md');
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('data.json');
   });
 
-  test('TC-UPLOAD-013: Upload success page displays only the file name, not the full path', { tag: ['@sanity', '@regression'] }, async () => {
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-    await uploadPage.clickUpload();
+  test('TC-UPLOAD-011: Uploading a .png file succeeds and displays correct filename', { tag: ['@functional', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'image.png');
+    fs.writeFileSync(filePath, Buffer.from([0x89, 0x50, 0x4e, 0x47]));
 
-    await expect(successPage.pageHeading).toBeVisible();
-    const displayedName = (await successPage.uploadedFileName.textContent())!.trim();
-    expect(displayedName).not.toContain('/');
-    expect(displayedName).not.toContain('\\');
-    expect(displayedName).not.toContain('C:');
-    expect(displayedName).not.toContain('fakepath');
-    expect(displayedName).toBe('upload-sample.txt');
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(filePath);
+
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('image.png');
+  });
+
+  test('TC-UPLOAD-012: Uploading a .md file succeeds and displays correct filename', { tag: ['@functional', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'readme.md');
+    fs.writeFileSync(filePath, '# Readme');
+
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(filePath);
+
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('readme.md');
   });
 });

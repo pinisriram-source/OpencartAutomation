@@ -1,50 +1,57 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 import { UploadPage } from './page-objects/upload.page';
-import { UploadSuccessPage } from './page-objects/upload-success.page';
-
-const FIXTURES_DIR = path.resolve(__dirname, '../../');
-// upload-sample.txt lives under src/data/fixtures/, unlike the other two
-// fixtures below which really are at the repo root.
-const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'src', 'data', 'fixtures', 'upload-sample.txt');
-const PACKAGE_JSON = path.join(FIXTURES_DIR, 'package.json');
-const CLAUDE_MD = path.join(FIXTURES_DIR, 'CLAUDE.md');
 
 test.describe('Sequential Uploads', () => {
   let uploadPage: UploadPage;
-  let successPage: UploadSuccessPage;
+  let tmpDir: string;
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
     uploadPage = new UploadPage(page);
-    successPage = new UploadSuccessPage(page);
+    tmpDir = testInfo.outputDir;
+    fs.mkdirSync(tmpDir, { recursive: true });
+  });
+
+  test('TC-UPLOAD-015: Uploading first.txt then navigating back and uploading second.txt shows correct names', { tag: ['@sanity', '@regression'] }, async () => {
+    const firstPath = path.join(tmpDir, 'first.txt');
+    const secondPath = path.join(tmpDir, 'second.txt');
+    fs.writeFileSync(firstPath, 'first');
+    fs.writeFileSync(secondPath, 'second');
+
     await uploadPage.navigate();
+    await uploadPage.uploadFile(firstPath);
+
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('first.txt');
+
+    await uploadPage.navigate();
+    await expect(uploadPage.fileInput).toHaveValue('');
+
+    await uploadPage.uploadFile(secondPath);
+
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('second.txt');
   });
 
-  test('TC-UPLOAD-017: Uploading a second file after a successful upload displays the new file name', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
-    await uploadPage.uploadFile(UPLOAD_SAMPLE);
-    await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
+  test('TC-UPLOAD-016: Uploading three different files sequentially shows correct name each time', { tag: ['@functional', '@regression'] }, async () => {
+    const file1 = path.join(tmpDir, 'file1.txt');
+    const file2 = path.join(tmpDir, 'file2.json');
+    const file3 = path.join(tmpDir, 'file3.png');
+    fs.writeFileSync(file1, 'content1');
+    fs.writeFileSync(file2, '{}');
+    fs.writeFileSync(file3, Buffer.from([0x89, 0x50, 0x4e, 0x47]));
 
-    await page.goBack();
-    await expect(uploadPage.pageHeading).toBeVisible();
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(file1);
+    await expect(uploadPage.uploadedFiles).toHaveText('file1.txt');
 
-    await uploadPage.selectFile(PACKAGE_JSON);
-    await expect(uploadPage.fileInput).toHaveValue(/package\.json$/);
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(file2);
+    await expect(uploadPage.uploadedFiles).toHaveText('file2.json');
 
-    await uploadPage.clickUpload();
-    await expect(successPage.uploadedFileName).toHaveText('package.json');
-    await expect(successPage.uploadedFileName).not.toHaveText('upload-sample.txt');
-  });
-
-  test('TC-UPLOAD-018: Three sequential uploads each display the correct current file name', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    await uploadPage.uploadFile(UPLOAD_SAMPLE);
-    await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
-
-    await page.goBack();
-    await uploadPage.uploadFile(PACKAGE_JSON);
-    await expect(successPage.uploadedFileName).toHaveText('package.json');
-
-    await page.goBack();
-    await uploadPage.uploadFile(CLAUDE_MD);
-    await expect(successPage.uploadedFileName).toHaveText('CLAUDE.md');
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(file3);
+    await expect(uploadPage.uploadedFiles).toHaveText('file3.png');
   });
 });

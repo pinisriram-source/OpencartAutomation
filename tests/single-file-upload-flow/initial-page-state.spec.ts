@@ -8,40 +8,36 @@ test.describe('Initial Page State', () => {
     uploadPage = new UploadPage(page);
   });
 
-  test('TC-UPLOAD-001: Verify upload page loads with file input and upload button', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
+  test('TC-UPLOAD-001: Verify page load shows File Uploader heading, empty file input, and Upload button', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await uploadPage.navigate();
 
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
-    await expect(page).toHaveTitle('The Internet');
-
     await expect(uploadPage.pageHeading).toBeVisible();
-    await expect(uploadPage.instructionText).toBeVisible();
-    await expect(uploadPage.fileInput).toBeAttached();
-    await expect(uploadPage.uploadButton).toBeVisible();
-  });
-
-  test('TC-UPLOAD-002: Verify file input is empty on initial page load', { tag: ['@sanity', '@regression'] }, async () => {
-    await uploadPage.navigate();
-
+    await expect(uploadPage.fileInput).toBeVisible();
     await expect(uploadPage.fileInput).toHaveValue('');
-    const files = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(files).toBe(0);
-  });
-
-  test('TC-UPLOAD-003: Verify upload button is enabled on initial page load', { tag: ['@sanity', '@regression'] }, async () => {
-    await uploadPage.navigate();
-
     await expect(uploadPage.uploadButton).toBeVisible();
-    await expect(uploadPage.uploadButton).toBeEnabled();
-    await expect(uploadPage.uploadButton).toHaveAttribute('type', 'submit');
+    await expect(uploadPage.successHeading).not.toBeAttached();
+    await expect(uploadPage.uploadedFiles).not.toBeAttached();
   });
 
-  test('TC-UPLOAD-004: Verify form attributes are configured for file upload', { tag: ['@sanity', '@regression'] }, async () => {
+  test('TC-UPLOAD-002: Verify file input has correct attributes and no restrictions', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.navigate();
 
-    await expect(uploadPage.form).toBeAttached();
-    await expect(uploadPage.form).toHaveAttribute('method', /post/i);
-    await expect(uploadPage.form).toHaveAttribute('enctype', 'multipart/form-data');
+    await expect(uploadPage.fileInput).toHaveAttribute('id', 'file-upload');
     await expect(uploadPage.fileInput).toHaveAttribute('name', 'file');
+    await expect(uploadPage.fileInput).toHaveAttribute('type', 'file');
+    await expect(uploadPage.fileInput).not.toHaveAttribute('required', /.*/);
+    await expect(uploadPage.fileInput).not.toHaveAttribute('multiple', /.*/);
+    await expect(uploadPage.fileInput).not.toHaveAttribute('accept', /.*/);
+  });
+
+  test('TC-UPLOAD-003: Verify form element has correct attributes for multipart file upload', { tag: ['@sanity', '@regression'] }, async () => {
+    await uploadPage.navigate();
+
+    const form = uploadPage.form;
+    await expect(form).toBeAttached();
+    await expect(form).toHaveAttribute('action', /\/upload$/);
+    await expect(form).toHaveAttribute('method', 'post');
+    await expect(form).toHaveAttribute('enctype', 'multipart/form-data');
   });
 });

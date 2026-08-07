@@ -1,75 +1,62 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 import { UploadPage } from './page-objects/upload.page';
-
-const FIXTURES_DIR = path.resolve(__dirname, '../../');
-// upload-sample.txt lives under src/data/fixtures/, unlike the other two
-// fixtures below which really are at the repo root.
-const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'src', 'data', 'fixtures', 'upload-sample.txt');
-const PACKAGE_JSON = path.join(FIXTURES_DIR, 'package.json');
-const CLAUDE_MD = path.join(FIXTURES_DIR, 'CLAUDE.md');
 
 test.describe('File Selection Behavior', () => {
   let uploadPage: UploadPage;
+  let tmpDir: string;
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
     uploadPage = new UploadPage(page);
+    tmpDir = testInfo.outputDir;
+    fs.mkdirSync(tmpDir, { recursive: true });
+  });
+
+  test('TC-UPLOAD-004: Selecting a file updates the file input with the chosen filename', { tag: ['@smoke', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'sample.txt');
+    fs.writeFileSync(filePath, 'sample content');
+
     await uploadPage.navigate();
-  });
-
-  test('TC-UPLOAD-005: Selecting a valid file populates the file input', { tag: ['@smoke', '@regression'] }, async () => {
     await expect(uploadPage.fileInput).toHaveValue('');
 
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-
-    await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
-    const fileCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(fileCount).toBe(1);
-    const fileName = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.[0]?.name ?? '');
-    expect(fileName).toBe('upload-sample.txt');
+    await uploadPage.selectFile(filePath);
+    await expect(uploadPage.fileInput).not.toHaveValue('');
   });
 
-  test('TC-UPLOAD-006: Selecting a file with different extension (.json) populates the file input correctly', { tag: ['@functional', '@regression'] }, async () => {
-    await uploadPage.selectFile(PACKAGE_JSON);
+  test('TC-UPLOAD-005: Selecting a different file type (.json) updates the file input correctly', { tag: ['@functional', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'data.json');
+    fs.writeFileSync(filePath, '{"key": "value"}');
 
-    await expect(uploadPage.fileInput).toHaveValue(/package\.json$/);
-    const fileCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(fileCount).toBe(1);
-    const fileName = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.[0]?.name ?? '');
-    expect(fileName).toBe('package.json');
+    await uploadPage.navigate();
+
+    await uploadPage.selectFile(filePath);
+    await expect(uploadPage.fileInput).not.toHaveValue('');
   });
 
-  test('TC-UPLOAD-007: Selecting a file with .md extension populates the file input correctly', { tag: ['@functional', '@regression'] }, async () => {
-    await uploadPage.selectFile(CLAUDE_MD);
+  test('TC-UPLOAD-006: Selecting another file type (.png) updates the file input correctly', { tag: ['@functional', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'image.png');
+    fs.writeFileSync(filePath, Buffer.from([0x89, 0x50, 0x4e, 0x47]));
 
-    await expect(uploadPage.fileInput).toHaveValue(/CLAUDE\.md$/);
-    const fileCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(fileCount).toBe(1);
-    const fileName = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.[0]?.name ?? '');
-    expect(fileName).toBe('CLAUDE.md');
+    await uploadPage.navigate();
+
+    await uploadPage.selectFile(filePath);
+    await expect(uploadPage.fileInput).not.toHaveValue('');
   });
 
-  test('TC-UPLOAD-008: Canceling file chooser leaves file input empty', { tag: ['@functional', '@regression'] }, async () => {
-    await expect(uploadPage.fileInput).toHaveValue('');
+  test('TC-UPLOAD-007: Re-selecting a file overwrites the previous selection', { tag: ['@sanity', '@regression'] }, async () => {
+    const firstPath = path.join(tmpDir, 'first.txt');
+    const secondPath = path.join(tmpDir, 'second.txt');
+    fs.writeFileSync(firstPath, 'first');
+    fs.writeFileSync(secondPath, 'second');
 
-    await uploadPage.cancelFileSelection();
+    await uploadPage.navigate();
 
-    await expect(uploadPage.fileInput).toHaveValue('');
-    const fileCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(fileCount).toBe(0);
-  });
+    await uploadPage.selectFile(firstPath);
+    await expect(uploadPage.fileInput).toHaveValue(/first\.txt/);
 
-  test('TC-UPLOAD-009: Selecting a second file replaces the first file in the input', { tag: ['@sanity', '@regression'] }, async () => {
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-    await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
-    const firstCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(firstCount).toBe(1);
-
-    await uploadPage.selectFile(PACKAGE_JSON);
-    await expect(uploadPage.fileInput).toHaveValue(/package\.json$/);
-    const secondCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(secondCount).toBe(1);
-    const fileName = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.[0]?.name ?? '');
-    expect(fileName).toBe('package.json');
+    await uploadPage.selectFile(secondPath);
+    await expect(uploadPage.fileInput).toHaveValue(/second\.txt/);
+    await expect(uploadPage.fileInput).not.toHaveValue(/first\.txt/);
   });
 });

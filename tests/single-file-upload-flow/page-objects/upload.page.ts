@@ -1,4 +1,4 @@
-import { Locator, Page } from '@playwright/test';
+import { Locator } from '@playwright/test';
 import { BasePage } from '../../_shared/base-page';
 
 export class UploadPage extends BasePage {
@@ -8,22 +8,27 @@ export class UploadPage extends BasePage {
     return this.page.getByRole('heading', { name: 'File Uploader' });
   }
 
-  get instructionText(): Locator {
-    return this.page.getByText('Choose a file on your system and then click upload');
-  }
-
+  // CSS locator: file inputs have no accessible role that distinguishes them
+  // from other inputs, and this element has no label — only an id.
   get fileInput(): Locator {
     return this.page.locator('#file-upload');
   }
 
   get uploadButton(): Locator {
-    return this.page.locator('#file-submit');
+    return this.page.getByRole('button', { name: 'Upload' });
   }
 
-  // The form wrapping the file input has no id/role/testid — CSS is the only
-  // way to target it for attribute assertions (structural scoping exception).
   get form(): Locator {
-    return this.page.locator('form[enctype="multipart/form-data"]');
+    return this.page.locator('#file-upload').locator('..');
+  }
+
+  get successHeading(): Locator {
+    return this.page.getByRole('heading', { name: 'File Uploaded!' });
+  }
+
+  // CSS locator: div#uploaded-files has no role/label — only an id.
+  get uploadedFiles(): Locator {
+    return this.page.locator('#uploaded-files');
   }
 
   async navigate(): Promise<void> {
@@ -34,8 +39,8 @@ export class UploadPage extends BasePage {
     await this.fileInput.setInputFiles(filePath);
   }
 
-  async cancelFileSelection(): Promise<void> {
-    await this.fileInput.setInputFiles([]);
+  async selectFiles(filePaths: string[]): Promise<void> {
+    await this.fileInput.setInputFiles(filePaths);
   }
 
   async clickUpload(): Promise<void> {
@@ -45,5 +50,9 @@ export class UploadPage extends BasePage {
   async uploadFile(filePath: string): Promise<void> {
     await this.selectFile(filePath);
     await this.clickUpload();
+  }
+
+  async goBack(): Promise<void> {
+    await this.page.goBack();
   }
 }

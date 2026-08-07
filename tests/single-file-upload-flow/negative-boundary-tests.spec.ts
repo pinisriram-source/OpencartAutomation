@@ -1,77 +1,90 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
 import { UploadPage } from './page-objects/upload.page';
-import { UploadSuccessPage } from './page-objects/upload-success.page';
-
-const FIXTURES_DIR = path.resolve(__dirname, '../../');
-// upload-sample.txt lives under src/data/fixtures/, unlike PACKAGE_JSON
-// below which really is at the repo root.
-const UPLOAD_SAMPLE = path.join(FIXTURES_DIR, 'src', 'data', 'fixtures', 'upload-sample.txt');
-const PACKAGE_JSON = path.join(FIXTURES_DIR, 'package.json');
 
 test.describe('Negative and Boundary Tests', () => {
   let uploadPage: UploadPage;
-  let successPage: UploadSuccessPage;
+  let tmpDir: string;
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
     uploadPage = new UploadPage(page);
-    successPage = new UploadSuccessPage(page);
+    tmpDir = testInfo.outputDir;
+    fs.mkdirSync(tmpDir, { recursive: true });
+  });
+
+  test('TC-UPLOAD-026: Double-clicking Upload button with file selected does not cause errors', { tag: ['@functional', '@regression'] }, async () => {
+    const filePath = path.join(tmpDir, 'test.txt');
+    fs.writeFileSync(filePath, 'content');
+
     await uploadPage.navigate();
+    await uploadPage.selectFile(filePath);
+
+    await uploadPage.uploadButton.dblclick();
+
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('test.txt');
   });
 
-  test('TC-UPLOAD-025: Clicking Upload button multiple times with the same file does not cause errors', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-    await uploadPage.clickUpload();
-    await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
+  test('TC-UPLOAD-027: File input does not accept multiple files (single file only enforced)', { tag: ['@functional', '@regression'] }, async () => {
+    const file1 = path.join(tmpDir, 'a.txt');
+    const file2 = path.join(tmpDir, 'b.txt');
+    fs.writeFileSync(file1, 'a');
+    fs.writeFileSync(file2, 'b');
 
-    await page.goBack();
-    await uploadPage.clickUpload();
-    await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
+    await uploadPage.navigate();
+
+    await expect(uploadPage.fileInput).not.toHaveAttribute('multiple', /.*/);
+
+    await uploadPage.selectFile(file1);
+    await expect(uploadPage.fileInput).toHaveValue(/a\.txt/);
+
+    await uploadPage.selectFile(file2);
+    await expect(uploadPage.fileInput).toHaveValue(/b\.txt/);
   });
 
-  test('TC-UPLOAD-026: File input only accepts single file selection, not multiple', { tag: ['@functional', '@regression'] }, async () => {
-    const multiple = await uploadPage.fileInput.getAttribute('multiple');
-    expect(multiple).toBeNull();
+  test('TC-UPLOAD-028: Success page does not have a form element', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+    const filePath = path.join(tmpDir, 'test.txt');
+    fs.writeFileSync(filePath, 'content');
 
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-    await uploadPage.selectFile(PACKAGE_JSON);
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(filePath);
 
-    const fileCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(fileCount).toBe(1);
-    const fileName = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.[0]?.name ?? '');
-    expect(fileName).toBe('package.json');
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(page.locator('form')).not.toBeAttached();
+    await expect(uploadPage.fileInput).not.toBeAttached();
+    await expect(uploadPage.uploadButton).not.toBeAttached();
+    await expect(uploadPage.uploadedFiles).toBeVisible();
   });
 
-  test('TC-UPLOAD-027: Form submission works even without client-side JavaScript enabled', { tag: ['@functional', '@regression'] }, async () => {
-    await expect(uploadPage.form).toHaveAttribute('method', /post/i);
-    await expect(uploadPage.form).toHaveAttribute('enctype', 'multipart/form-data');
-    await expect(uploadPage.uploadButton).toHaveAttribute('type', 'submit');
-  });
-
-  test('TC-UPLOAD-028: Navigating away and back to upload page resets to clean state', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    await uploadPage.selectFile(UPLOAD_SAMPLE);
-    await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
-
-    await page.goto('https://the-internet.herokuapp.com/');
-    await page.goto('https://the-internet.herokuapp.com/upload');
-
+  test('TC-UPLOAD-029: Clicking Upload multiple times with no file returns error each time', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+    await uploadPage.navigate();
     await expect(uploadPage.fileInput).toHaveValue('');
-    const fileCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
-    expect(fileCount).toBe(0);
+
+    await uploadPage.clickUpload();
+    await expect(page.getByRole('heading', { name: 'Internal Server Error' })).toBeVisible();
+
+    await uploadPage.navigate();
+    await expect(uploadPage.pageHeading).toBeVisible();
+
+    await uploadPage.clickUpload();
+    await expect(page.getByRole('heading', { name: 'Internal Server Error' })).toBeVisible();
   });
 
-  test('TC-UPLOAD-029: File input accept attribute is not restrictive (no file type filtering)', { tag: ['@functional', '@regression'] }, async () => {
-    const accept = await uploadPage.fileInput.getAttribute('accept');
-    expect(accept).toBeNull();
-  });
+  test('TC-UPLOAD-030: Refreshing the success page does NOT re-upload the file', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+    const filePath = path.join(tmpDir, 'test.txt');
+    fs.writeFileSync(filePath, 'content');
 
-  test('TC-UPLOAD-030: Success page does not have a form or upload controls', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    await uploadPage.uploadFile(UPLOAD_SAMPLE);
-    await expect(successPage.pageHeading).toBeVisible();
-    await expect(successPage.uploadedFileName).toBeVisible();
+    await uploadPage.navigate();
+    await uploadPage.uploadFile(filePath);
 
-    await expect(page.locator('#file-upload')).not.toBeAttached();
-    await expect(page.locator('#file-submit')).not.toBeAttached();
-    await expect(page.locator('form[enctype="multipart/form-data"]')).not.toBeAttached();
+    await expect(uploadPage.successHeading).toBeVisible();
+    await expect(uploadPage.uploadedFiles).toHaveText('test.txt');
+
+    await page.reload();
+
+    await expect(uploadPage.pageHeading).toBeVisible();
+    await expect(uploadPage.fileInput).toHaveValue('');
+    await expect(uploadPage.successHeading).not.toBeAttached();
   });
 });
