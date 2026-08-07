@@ -2,9 +2,9 @@
   "slug": "single-file-upload-flow",
   "request_file": "user-stories/request-single-file-upload-flow-20260807-094148.md",
   "plan": {
-    "status": "in_progress",
+    "status": "pending_review",
     "path": "specs/single-file-upload-flow-test-plan.md",
-    "revision": 6,
+    "revision": 7,
     "feedback": ""
   },
   "automation": {
@@ -17,5 +17,5 @@
     "status": "completed",
     "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30381502045"
   },
-  "updated_at": "2026-08-07T09:42:15.292Z"
+  "updated_at": "2026-08-07T09:42:16.840Z"
 }
