@@ -8,7 +8,7 @@
     "feedback": ""
   },
   "automation": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "tests/single-file-upload-flow/",
     "revision": 1,
     "feedback": ""
