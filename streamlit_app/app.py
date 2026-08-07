@@ -2218,6 +2218,37 @@ with tab_review:
         # only keep it as a fallback when there's nothing else to show yet.
         if execute_data.get("workflow_run_url") and not results_loaded:
             st.markdown(f"[View CI run on GitHub]({execute_data['workflow_run_url']})")
+
+        # Re-running execution only needs the suite that's already approved, so
+        # this re-dispatches pipeline-execute.yml directly rather than sending
+        # the reviewer back through plan/automation approval. Useful when the
+        # results on file predate a fix to the suite or the target app, which
+        # the pipeline's own stage tracking can't detect -- from its point of
+        # view that cycle completed and is current.
+        if execute_status in ("completed", "failed"):
+            if st.button("🔁 Re-run Execution", key=f"rerun_execute_{review_slug}"):
+                rerun_result = trigger_workflow(
+                    owner=GITHUB_OWNER,
+                    repo=GITHUB_REPO,
+                    workflow_file=GITHUB_PIPELINE_EXECUTE_WORKFLOW_FILE,
+                    ref=GITHUB_BRANCH,
+                    token=get_github_token(),
+                    inputs={
+                        "request_file": review_data.get("request_file", ""),
+                        "slug": review_slug,
+                    },
+                )
+                if rerun_result.success:
+                    st.success(
+                        "Execution re-triggered -- this run's results, screenshots, report "
+                        "and narrative will replace the ones above once it completes."
+                    )
+                else:
+                    st.warning(f"Couldn't re-trigger execution: {rerun_result.message}")
+            st.caption(
+                "Runs the approved suite again against the target app, without redoing "
+                "plan/automation review. Overwrites this suite's stored results."
+            )
         if review_auto_refresh:
             st.caption(
                 f"Last checked {datetime.now(timezone.utc).strftime('%H:%M:%S')} UTC -- "
