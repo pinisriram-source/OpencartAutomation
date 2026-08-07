@@ -767,6 +767,48 @@ defects = pd.DataFrame(data["defects"])
 use_cases = data["use_cases"]
 business_rules = data["business_rules"]
 
+
+def stale_results_warning(slug: str) -> str:
+    """Message to show when the loaded results predate the suite's current cycle.
+
+    `<slug>-test-results.json` is only rewritten by an actual execution, so a
+    slug that's been re-submitted (new plan/automation cycle, not executed
+    yet) keeps serving the *previous* cycle's pass/fail numbers to every
+    data-driven tab, with nothing on screen saying so. Returns "" when the
+    results are current, or when the suite has no review file at all --
+    those aren't pipeline-tracked, so there's no cycle to be stale against.
+    """
+    review_file = REPO_ROOT / "user-stories" / f"{slug}-review.json"
+    if not review_file.exists():
+        return ""
+    try:
+        review = json.loads(review_file.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return ""
+
+    execute_status = review.get("execute", {}).get("status", "not_started")
+    if execute_status == "completed":
+        return ""
+
+    in_flight = {
+        "not_started": "hasn't run yet",
+        "in_progress": "is running now",
+        "failed": "failed -- see the Actions run log",
+    }.get(execute_status, f"is `{execute_status}`")
+    return (
+        f"**These results are from a previous execution of this suite.** Its current "
+        f"pipeline cycle {in_flight}, so every number, chart and table below (success "
+        f"rate, pass/fail counts, coverage, defects) still describes the *earlier* run "
+        f"— not the plan and automation suite currently under review. They'll be "
+        f"replaced once the current cycle executes."
+    )
+
+
+_stale_warning = stale_results_warning(DATA_PATH.stem.removesuffix("-test-results"))
+if _stale_warning:
+    st.warning(_stale_warning, icon="⚠️")
+
+
 def render_execution_status_header() -> None:
     """Title + KPI summary for the currently selected suite.
 
