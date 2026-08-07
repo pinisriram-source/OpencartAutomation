@@ -8,12 +8,25 @@
 // Usage:
 //   node set-review-status.js <file> --stage <plan|automation|execute> \
 //     [--slug <slug>] [--request-file <path>] [--status <status>] \
-//     [--path <artifactPath>] [--bump-revision] [--clear-feedback] [--run-url <url>]
+//     [--path <artifactPath>] [--bump-revision] [--clear-feedback] [--run-url <url>] \
+//     [--reset-downstream]
+//
+// --reset-downstream clears every stage *after* --stage back to its
+// not_started default. Use it when a stage starts a fresh cycle, because
+// everything downstream is invalidated by it: re-planning a slug that was
+// already run through the pipeline otherwise leaves the previous cycle's
+// automation/execute state in place, and the dashboard then shows a
+// "Completed" execution (with the old run's pass/fail numbers) above a
+// test plan that hasn't even been approved yet.
 
 const fs = require("fs");
 
-function defaultStage() {
-  return { status: "not_started", path: "", revision: 0, feedback: "" };
+const STAGE_ORDER = ["plan", "automation", "execute"];
+
+function defaultStage(name) {
+  return name === "execute"
+    ? { status: "not_started", workflow_run_url: "" }
+    : { status: "not_started", path: "", revision: 0, feedback: "" };
 }
 
 function parseArgs(argv) {
@@ -23,7 +36,7 @@ function parseArgs(argv) {
     const key = rest[i];
     if (!key.startsWith("--")) continue;
     const name = key.slice(2);
-    if (name === "bump-revision" || name === "clear-feedback") {
+    if (name === "bump-revision" || name === "clear-feedback" || name === "reset-downstream") {
       opts[name] = true;
     } else {
       opts[name] = rest[++i];
@@ -45,9 +58,9 @@ if (fs.existsSync(opts.file)) {
   data = {
     slug: opts.slug || "",
     request_file: opts["request-file"] || "",
-    plan: defaultStage(),
-    automation: defaultStage(),
-    execute: { status: "not_started", workflow_run_url: "" },
+    plan: defaultStage("plan"),
+    automation: defaultStage("automation"),
+    execute: defaultStage("execute"),
   };
 }
 
@@ -55,9 +68,16 @@ if (opts.slug) data.slug = opts.slug;
 if (opts["request-file"]) data.request_file = opts["request-file"];
 
 if (!data[opts.stage]) {
-  data[opts.stage] = opts.stage === "execute" ? { status: "not_started", workflow_run_url: "" } : defaultStage();
+  data[opts.stage] = defaultStage(opts.stage);
 }
 const stage = data[opts.stage];
+
+if (opts["reset-downstream"]) {
+  const from = STAGE_ORDER.indexOf(opts.stage);
+  for (const name of STAGE_ORDER.slice(from + 1)) {
+    data[name] = defaultStage(name);
+  }
+}
 
 if (opts.status) stage.status = opts.status;
 if (opts.path) stage.path = opts.path;

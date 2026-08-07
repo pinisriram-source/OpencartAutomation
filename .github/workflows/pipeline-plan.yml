@@ -93,7 +93,7 @@ jobs:
 
       - name: Set status -- planning
         run: |
-          node .github/scripts/set-review-status.js "$REVIEW_FILE" --slug "$SLUG" --request-file "$REQUEST_FILE" --stage plan --status in_progress
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --slug "$SLUG" --request-file "$REQUEST_FILE" --stage plan --status in_progress --reset-downstream
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- generating test plan"
           git add "$REVIEW_FILE" "$REQUEST_FILE"
           git commit -m "chore(pipeline): start test plan generation for $SLUG" || true

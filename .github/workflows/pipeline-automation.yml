@@ -93,7 +93,7 @@ jobs:
 
       - name: Set status -- generating automation
         run: |
-          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status in_progress
+          node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status in_progress --reset-downstream
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- generating automation suite"
           git add "$REVIEW_FILE" "$REQUEST_FILE"
           git commit -m "chore(pipeline): start automation generation for $SLUG" || true
