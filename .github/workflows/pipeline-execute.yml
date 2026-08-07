@@ -118,6 +118,14 @@ jobs:
           fi
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
+      - name: Regenerate aggregator inventory in the test plan
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          if [ -f "tests/${SLUG}/suite.config.ts" ]; then
+            node .github/scripts/sync-regression-inventory.js "$SLUG"
+          fi
+
       - name: Claude Code -- generate dashboard data
         continue-on-error: true
         run: |
@@ -182,6 +190,11 @@ jobs:
           fi
           if [ -d "reports/screenshots/${SLUG}" ]; then
             git add "reports/screenshots/${SLUG}"
+          fi
+          # An aggregator suite's plan has a generated inventory section that
+          # the run above refreshes from what the config actually selected.
+          if [ -f "tests/${SLUG}/suite.config.ts" ]; then
+            git add "specs/${SLUG}-test-plan.md"
           fi
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage execute --status completed --run-url "$RUN_URL"
