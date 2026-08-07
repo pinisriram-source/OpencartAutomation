@@ -2,20 +2,20 @@
   "slug": "single-file-upload-flow",
   "request_file": "user-stories/request-single-file-upload-flow-20260807-094148.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/single-file-upload-flow-test-plan.md",
     "revision": 7,
     "feedback": ""
   },
   "automation": {
-    "status": "not_started",
-    "path": "",
-    "revision": 0,
+    "status": "approved",
+    "path": "tests/single-file-upload-flow/",
+    "revision": 1,
     "feedback": ""
   },
   "execute": {
-    "status": "not_started",
-    "workflow_run_url": ""
+    "status": "completed",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/31170390414"
   },
-  "updated_at": "2026-08-07T09:55:23.215Z"
+  "updated_at": "2026-08-07T10:35:26.697Z"
 }

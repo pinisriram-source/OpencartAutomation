@@ -2,27 +2,27 @@
   "meta": {
     "app_under_test": "The Internet - File Upload",
     "app_url": "https://the-internet.herokuapp.com/upload",
-    "report_date": "2026-07-28",
+    "report_date": "2026-08-07",
     "test_account": "",
     "browsers": [
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/single-file-upload-flow --project=chromium",
-    "duration_minutes": 19.2,
+    "duration_minutes": 0.9,
     "test_plan_path": "specs/single-file-upload-flow-test-plan.md",
     "suite_path": "tests/single-file-upload-flow/",
     "story": "",
-    "report_generated_at": "2026-07-28T17:30:32.107Z",
-    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30381502045"
+    "report_generated_at": "2026-08-07T10:34:49.796Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/31170390414"
   },
   "summary": {
     "test_cases": 30,
     "browsers": 1,
     "executions": 30,
-    "passed": 13,
-    "failed": 17,
+    "passed": 15,
+    "failed": 15,
     "skipped": 0,
-    "success_rate": 43.33,
+    "success_rate": 50,
     "healing_actions": 0,
     "status": "FAIL"
   },
@@ -77,7 +77,7 @@
     }
   ],
   "use_cases": {
-    "UC1": "Initial Page State — page loads with file input and upload button in correct default state",
+    "UC1": "Initial Page State — page loads with file input control and upload button in correct default state",
     "UC2": "File Selection Behavior — selecting files populates input, cancel leaves it empty, re-selection replaces",
     "UC3": "Successful Upload Flow — uploading a file navigates to success page showing correct file name",
     "UC4": "No File Selected Validation — submitting without a file triggers server error, no client-side required attribute",
@@ -239,7 +239,7 @@
       "use_case": "UC5",
       "business_rule": "",
       "chromium": "Fail",
-      "note": "BUG-002"
+      "note": "BUG-001"
     },
     {
       "id": "TC-UPLOAD-018",
@@ -311,7 +311,7 @@
       "use_case": "UC8",
       "business_rule": "",
       "chromium": "Fail",
-      "note": "BUG-002"
+      "note": "BUG-001"
     },
     {
       "id": "TC-UPLOAD-026",
@@ -328,8 +328,8 @@
       "title": "Form submission works even without client-side JavaScript enabled",
       "use_case": "UC8",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-002"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-028",
@@ -346,8 +346,8 @@
       "title": "File input accept attribute is not restrictive (no file type filtering)",
       "use_case": "UC8",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-002"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-030",
@@ -363,28 +363,15 @@
     {
       "id": "BUG-001",
       "severity": "Critical",
-      "title": "Missing upload-sample.txt test fixture file causes ENOENT failures",
+      "title": "Missing upload-sample.txt test fixture file causes ENOENT failures across 15 tests",
       "steps": [
         "Run any test that calls uploadPage.selectFile('upload-sample.txt') or uploadPage.uploadFile('upload-sample.txt').",
         "Playwright attempts to resolve the file path relative to the project root.",
         "File does not exist at /home/runner/work/OpencartAutomation/OpencartAutomation/upload-sample.txt."
       ],
       "expected": "The file 'upload-sample.txt' exists in the project root and is successfully attached to the file input via setInputFiles.",
-      "actual": "ENOENT: no such file or directory, stat '/home/runner/work/OpencartAutomation/OpencartAutomation/upload-sample.txt' — test fails immediately at the selectFile step.",
-      "test_ref": "TC-UPLOAD-005, TC-UPLOAD-009, TC-UPLOAD-010, TC-UPLOAD-013, TC-UPLOAD-018, TC-UPLOAD-019, TC-UPLOAD-021, TC-UPLOAD-022, TC-UPLOAD-023, TC-UPLOAD-024, TC-UPLOAD-026, TC-UPLOAD-028, TC-UPLOAD-030"
-    },
-    {
-      "id": "BUG-002",
-      "severity": "Medium",
-      "title": "Intermittent navigation timeouts — page.goto fails with net::ERR_ABORTED or timeout",
-      "steps": [
-        "Run tests that navigate to https://the-internet.herokuapp.com/upload.",
-        "Playwright calls page.goto(url) in the beforeEach hook.",
-        "Navigation either aborts (net::ERR_ABORTED) or exceeds the 45s test timeout."
-      ],
-      "expected": "Page navigates to the upload URL and loads within the configured timeout.",
-      "actual": "page.goto fails with 'net::ERR_ABORTED; maybe frame was detached?' or 'Test timeout of 45000ms exceeded' — the target application is intermittently unresponsive during the test run.",
-      "test_ref": "TC-UPLOAD-017, TC-UPLOAD-025, TC-UPLOAD-027, TC-UPLOAD-029"
+      "actual": "ENOENT: no such file or directory, stat '/home/runner/work/OpencartAutomation/OpencartAutomation/upload-sample.txt' — test fails immediately at the selectFile step before any browser interaction occurs.",
+      "test_ref": "TC-UPLOAD-005, TC-UPLOAD-009, TC-UPLOAD-010, TC-UPLOAD-013, TC-UPLOAD-017, TC-UPLOAD-018, TC-UPLOAD-019, TC-UPLOAD-021, TC-UPLOAD-022, TC-UPLOAD-023, TC-UPLOAD-024, TC-UPLOAD-025, TC-UPLOAD-026, TC-UPLOAD-028, TC-UPLOAD-030"
     }
   ]
 }
