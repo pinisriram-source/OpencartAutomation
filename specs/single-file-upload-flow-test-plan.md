@@ -21,6 +21,7 @@ Validate the single-file upload flow on the-internet.herokuapp.com/upload end-to
 - Visual/pixel-level styling of the upload form or success page
 - Cross-browser matrix beyond Chromium (this repo's `playwright.config.ts` runs Chromium only)
 - Actual file content/virus-scanning validation — only the file *name* round-trip is in scope, per the acceptance criteria
+- Performance/load testing of the upload endpoint
 
 ## 3. Test Strategy
 
@@ -28,7 +29,7 @@ Validate the single-file upload flow on the-internet.herokuapp.com/upload end-to
 Functional/system-level UI testing of the file upload flow via Playwright, covering file selection through to the success page end-to-end in the browser.
 
 ### 3.2 Performance Test
-Not applicable — performance/load testing is explicitly out of scope for this project (see CLAUDE.md's "Testing Objective").
+Not applicable — performance/load testing is out of scope for this suite (see Section 2.2).
 
 ### 3.3 Security Test
 Not applicable — security penetration testing is explicitly out of scope for this project.

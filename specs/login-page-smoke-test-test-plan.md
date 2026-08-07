@@ -33,7 +33,7 @@ Validate login page authentication behavior (successful login with valid credent
 Functional/system-level UI testing of the login authentication flow via Playwright, covering form input, submission, error handling, and post-login navigation end-to-end in the browser.
 
 ### 3.2 Performance Test
-Not applicable — performance/load testing is explicitly out of scope for this project (see CLAUDE.md's "Testing Objective").
+Not applicable — performance/load testing is out of scope for this suite (see Section 2.2).
 
 ### 3.3 Security Test
 Not applicable — security penetration testing is explicitly out of scope for this project.

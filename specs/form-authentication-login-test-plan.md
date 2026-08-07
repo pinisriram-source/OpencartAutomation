@@ -35,7 +35,7 @@ Validate the Form Authentication Login flow on the-internet.herokuapp.com/login 
 Functional/system-level UI testing of the Form Authentication Login feature via Playwright, covering credential validation, session-gated navigation, flash messaging, and logout end-to-end in the browser.
 
 ### 3.2 Performance Test
-Not applicable — performance/load testing is explicitly out of scope for this project (see CLAUDE.md's "Testing Objective").
+Not applicable — performance/load testing is out of scope for this suite (see Section 2.2).
 
 ### 3.3 Security Test
 Not applicable — security penetration testing is explicitly out of scope for this project. The suite does include basic input-validation smoke checks (SQL injection, XSS payloads rendered as literal text) as functional assertions, not as a security audit.

@@ -27,7 +27,7 @@ Validate hover-triggered UI behavior (caption reveal/hide per avatar, profile-li
 Functional/system-level UI testing of the Hovers feature via Playwright, covering hover-triggered caption behavior and profile navigation end-to-end in the browser.
 
 ### 3.2 Performance Test
-Not applicable — performance/load testing is explicitly out of scope for this project (see CLAUDE.md's "Testing Objective").
+Not applicable — performance/load testing is out of scope for this suite (see Section 2.2).
 
 ### 3.3 Security Test
 Not applicable — security penetration testing is explicitly out of scope for this project.

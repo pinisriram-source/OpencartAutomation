@@ -413,13 +413,22 @@ content, in this fixed order (this project's adopted template):
 3. **Test Strategy** — `3.1`-`3.9`: System / Performance / Security /
    Automated / Stress and Volume / Recovery / Documentation / Beta / User
    Acceptance Test. Most subsections don't apply to this pipeline (browser-
-   only UI automation — no mainframe, perf, or security testing per
-   CLAUDE.md's "Testing Objective" scope) — mark those **"Not applicable"**
-   with a one-line reason rather than omitting the heading, so every
-   generated plan stays structurally identical to the template. `3.1 System
-   Test`, `3.4 Automated Test`, `3.7 Documentation Test`, and `3.9 User
-   Acceptance Test` are the ones that genuinely apply and should have real
-   content.
+   only UI automation — no mainframe, perf, or security testing) — mark
+   those **"Not applicable"** with a one-line reason rather than omitting
+   the heading, so every generated plan stays structurally identical to the
+   template. `3.1 System Test`, `3.4 Automated Test`, `3.7 Documentation
+   Test`, and `3.9 User Acceptance Test` are the ones that genuinely apply
+   and should have real content.
+
+   The generated plan is a **standalone document for human reviewers and
+   stakeholders** — it must never cite `CLAUDE.md` (or any other internal
+   agent-instruction file) as the authority for a decision, because readers
+   of the plan don't have that context and shouldn't need it. State the
+   reason plainly in the plan's own words, and cross-reference the plan's
+   own sections (e.g. "see Section 2.2") when the rationale already lives
+   there. Whatever is out of scope must be listed in `2.2 Out of Scope`
+   first, so the `3.x` "Not applicable" lines have something in-document to
+   point at.
 4. **Environment Requirements** — `4.1 Data Entry Workstations`,
    `4.2 Mainframe` (both "Not applicable" — legacy fields from the
    mainframe-era source template), followed by this suite's actual
