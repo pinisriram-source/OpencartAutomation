@@ -1,0 +1,21 @@
+{
+  "slug": "practice-login-page-smoke-test",
+  "request_file": "user-stories/request-practice-login-page-smoke-test-20260807-084636.md",
+  "plan": {
+    "status": "in_progress",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "not_started",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "not_started",
+    "workflow_run_url": ""
+  },
+  "updated_at": "2026-08-07T08:47:00.693Z"
+}
