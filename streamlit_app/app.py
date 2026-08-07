@@ -2114,6 +2114,7 @@ with tab_review:
     # reviewer mid-decision, so the option is withdrawn until they approve or
     # request changes.
     awaiting_approval = False
+    awaiting_stage = None
     if review_slug:
         status_probe = get_file(
             owner=GITHUB_OWNER,
@@ -2125,10 +2126,15 @@ with tab_review:
         if status_probe.success:
             try:
                 probe_data = json.loads(status_probe.content)
-                awaiting_approval = any(
-                    (probe_data.get(stage) or {}).get("status") == "pending_review"
-                    for stage in ("plan", "automation")
+                awaiting_stage = next(
+                    (
+                        label
+                        for stage, label in (("plan", "Test Plan"), ("automation", "Automation Suite"))
+                        if (probe_data.get(stage) or {}).get("status") == "pending_review"
+                    ),
+                    None,
                 )
+                awaiting_approval = awaiting_stage is not None
             except (json.JSONDecodeError, TypeError):
                 awaiting_approval = False
 
@@ -2138,8 +2144,8 @@ with tab_review:
         st.session_state["review_auto_refresh"] = False
         review_auto_refresh = False
         st.caption(
-            "⏸️ Auto-refresh is off while an artifact below waits on your review -- "
-            "it comes back once you approve or request changes."
+            f"⏸️ Auto-refresh is off while the **{awaiting_stage}** below waits on your "
+            "review -- it comes back once you approve or request changes."
         )
     else:
         review_auto_refresh = st.checkbox(

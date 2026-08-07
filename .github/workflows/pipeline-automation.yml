@@ -116,11 +116,26 @@ jobs:
             echo "fresh_generation=false" >> "$GITHUB_OUTPUT"
             npx claude -p "Read the existing automation suite under tests/${SLUG}/ and the test plan at specs/${SLUG}-test-plan.md for context. A stakeholder reviewed the suite and requested changes: ${FEEDBACK}. Revise the suite under tests/${SLUG}/ to address every point raised, using the playwright-test-generator subagent as needed. Keep the existing Page Object Model structure, TC-ID-named tests, and { tag: ['@smoke' | '@sanity' | '@functional', '@regression'] } tags where still applicable, adding tags to any test that's missing them per its plan Tier (always the tier tag plus '@regression'). Do not modify anything outside tests/${SLUG}/." \
               --dangerously-skip-permissions
-          elif [ -n "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
-            echo "tests/${SLUG}/ already has spec files and no feedback is pending -- skipping regeneration (idempotent re-run for this slug)."
-            echo "fresh_generation=false" >> "$GITHUB_OUTPUT"
           else
             echo "fresh_generation=true" >> "$GITHUB_OUTPUT"
+            # Always regenerate when no reviewer feedback is pending. This
+            # branch used to be guarded by "spec files already exist -> skip",
+            # which meant re-submitting a slug with NEW requirements left the
+            # OLD suite in place and asked the reviewer to approve it.
+            #
+            # Clear the directory first: the generator writes only the files
+            # the new plan calls for, so spec files belonging to a previous
+            # plan would otherwise survive and keep running alongside them.
+            # Guarded because this is an rm -rf on an interpolated input.
+            case "$SLUG" in
+              ""|*[!a-z0-9-]*)
+                echo "Refusing to clear tests/${SLUG} -- unexpected slug format."
+                exit 1
+                ;;
+              *)
+                rm -rf "tests/${SLUG}"
+                ;;
+            esac
             npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md. Use the playwright-test-generator subagent to create a Playwright TypeScript automation suite implementing every test case in that plan, one test() per test case named with its Test Case ID. Build a Page Object Model framework following CLAUDE.md's 'Page Object contract -- Submit New Request pipeline suites' section exactly: one class per page/feature area under tests/${SLUG}/page-objects/, each extending the shared BasePage already committed at tests/_shared/base-page.ts, with locators exposed as get accessor methods (not readonly constructor properties) and this project's getByRole/getByLabel/getByTestId/getByText-before-CSS locator priority. See tests/hovers/page-objects/hovers.page.ts for a worked example, including its two documented CSS exceptions (structural scoping of repeated identical elements, and attached-but-hidden assertions that getByRole locators can't represent). Every test case in the plan has a '**Tier:** Smoke/Sanity/Functional' line -- carry it onto the matching test() using the object-option form (not a string suffix on the title), paired with '@regression' so the test joins the cross-suite regression set: { tag: ['@smoke', '@regression'] } / { tag: ['@sanity', '@regression'] } / { tag: ['@functional', '@regression'] }, per CLAUDE.md's 'Test tiers' and 'Regression tag' sections; see tests/hovers/*.spec.ts for a worked example. Every test gets exactly one tier tag plus '@regression'. Write all files under tests/${SLUG}/ only -- do not write outside that directory (other than reading, never modifying, tests/_shared/base-page.ts), and do not modify your own agent definition or any .claude/ file." \
               --dangerously-skip-permissions
           fi
@@ -156,7 +171,9 @@ jobs:
 
       - name: Commit automation suite, mark pending review
         run: |
-          git add "tests/${SLUG}/"
+          # -A so spec files the previous plan produced, but the new one no
+          # longer calls for, are staged as deletions rather than left behind.
+          git add -A "tests/${SLUG}"
           node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status pending_review --path "tests/${SLUG}/" --bump-revision --clear-feedback
           node .github/scripts/set-request-status.js "$REQUEST_FILE" "In progress -- automation suite generated, awaiting stakeholder review"
           git add "$REVIEW_FILE" "$REQUEST_FILE"
