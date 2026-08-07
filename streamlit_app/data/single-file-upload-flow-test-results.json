@@ -8,21 +8,21 @@
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/single-file-upload-flow --project=chromium",
-    "duration_minutes": 0.9,
+    "duration_minutes": 1,
     "test_plan_path": "specs/single-file-upload-flow-test-plan.md",
     "suite_path": "tests/single-file-upload-flow/",
     "story": "",
-    "report_generated_at": "2026-08-07T10:34:49.796Z",
-    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/31170390414"
+    "report_generated_at": "2026-08-07T18:09:02.014Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/31205330427"
   },
   "summary": {
     "test_cases": 30,
     "browsers": 1,
     "executions": 30,
-    "passed": 15,
-    "failed": 15,
+    "passed": 28,
+    "failed": 2,
     "skipped": 0,
-    "success_rate": 50,
+    "success_rate": 93.3,
     "healing_actions": 0,
     "status": "FAIL"
   },
@@ -31,25 +31,25 @@
       "name": "Initial Page State",
       "use_case": "UC1",
       "file": "initial-page-state.spec.ts",
-      "tests": 4
+      "tests": 3
     },
     {
       "name": "File Selection Behavior",
       "use_case": "UC2",
       "file": "file-selection-behavior.spec.ts",
-      "tests": 5
+      "tests": 4
     },
     {
       "name": "Successful Upload Flow",
       "use_case": "UC3",
       "file": "successful-upload-flow.spec.ts",
-      "tests": 4
+      "tests": 5
     },
     {
       "name": "No File Selected Validation",
       "use_case": "UC4",
-      "file": "no-file-validation.spec.ts",
-      "tests": 3
+      "file": "no-file-selected-validation.spec.ts",
+      "tests": 2
     },
     {
       "name": "Sequential Uploads",
@@ -61,37 +61,37 @@
       "name": "File Name Integrity",
       "use_case": "UC6",
       "file": "file-name-integrity.spec.ts",
-      "tests": 3
+      "tests": 7
     },
     {
       "name": "Navigation Back from Success Page",
       "use_case": "UC7",
-      "file": "navigation-back.spec.ts",
-      "tests": 3
+      "file": "navigation-back-from-success.spec.ts",
+      "tests": 2
     },
     {
       "name": "Negative and Boundary Tests",
       "use_case": "UC8",
       "file": "negative-boundary-tests.spec.ts",
-      "tests": 6
+      "tests": 5
     }
   ],
   "use_cases": {
-    "UC1": "Initial Page State — page loads with file input control and upload button in correct default state",
-    "UC2": "File Selection Behavior — selecting files populates input, cancel leaves it empty, re-selection replaces",
-    "UC3": "Successful Upload Flow — uploading a file navigates to success page showing correct file name",
-    "UC4": "No File Selected Validation — submitting without a file triggers server error, no client-side required attribute",
-    "UC5": "Sequential Uploads — uploading multiple files in sequence shows only the current file name each time",
-    "UC6": "File Name Integrity — uploaded file name on success page exactly matches selected name including case and punctuation",
-    "UC7": "Navigation Back from Success Page — browser back returns to upload form, fresh load clears selection",
-    "UC8": "Negative and Boundary Tests — boundary conditions, form attributes, and clean state after navigation"
+    "UC1": "Initial Page State — page loads with heading, empty file input, and upload button with correct attributes",
+    "UC2": "File Selection Behavior — selecting files updates the input correctly, re-selection overwrites",
+    "UC3": "Successful Upload Flow — uploading different file types shows success page with correct filename",
+    "UC4": "No File Selected Validation — clicking Upload with no file returns HTTP 500, back button recovers",
+    "UC5": "Sequential Uploads — uploading multiple files in sequence shows correct filename each time",
+    "UC6": "File Name Integrity — special characters, spaces, parentheses, hyphens, underscores, mixed case, and multiple dots are preserved",
+    "UC7": "Navigation Back from Success Page — browser back retains file, fresh navigation resets state",
+    "UC8": "Negative and Boundary Tests — double-click, single-file enforcement, success page DOM, repeated errors, refresh behavior"
   },
   "business_rules": {},
   "tests": [
     {
       "id": "TC-UPLOAD-001",
       "tier": "Smoke",
-      "title": "Verify upload page loads with file input and upload button",
+      "title": "Verify page load shows File Uploader heading, empty file input, and Upload button",
       "use_case": "UC1",
       "business_rule": "",
       "chromium": "Pass",
@@ -100,7 +100,7 @@
     {
       "id": "TC-UPLOAD-002",
       "tier": "Sanity",
-      "title": "Verify file input is empty on initial page load",
+      "title": "Verify file input has correct attributes and no restrictions",
       "use_case": "UC1",
       "business_rule": "",
       "chromium": "Pass",
@@ -109,34 +109,34 @@
     {
       "id": "TC-UPLOAD-003",
       "tier": "Sanity",
-      "title": "Verify upload button is enabled on initial page load",
+      "title": "Verify form element has correct attributes for multipart file upload",
       "use_case": "UC1",
       "business_rule": "",
-      "chromium": "Pass",
-      "note": ""
+      "chromium": "Fail",
+      "note": "BUG-001"
     },
     {
       "id": "TC-UPLOAD-004",
-      "tier": "Sanity",
-      "title": "Verify form attributes are configured for file upload",
-      "use_case": "UC1",
+      "tier": "Smoke",
+      "title": "Selecting a file updates the file input with the chosen filename",
+      "use_case": "UC2",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
     },
     {
       "id": "TC-UPLOAD-005",
-      "tier": "Smoke",
-      "title": "Selecting a valid file populates the file input",
+      "tier": "Functional",
+      "title": "Selecting a different file type (.json) updates the file input correctly",
       "use_case": "UC2",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-006",
       "tier": "Functional",
-      "title": "Selecting a file with different extension (.json) populates the file input correctly",
+      "title": "Selecting another file type (.png) updates the file input correctly",
       "use_case": "UC2",
       "business_rule": "",
       "chromium": "Pass",
@@ -144,8 +144,8 @@
     },
     {
       "id": "TC-UPLOAD-007",
-      "tier": "Functional",
-      "title": "Selecting a file with .md extension populates the file input correctly",
+      "tier": "Sanity",
+      "title": "Re-selecting a file overwrites the previous selection",
       "use_case": "UC2",
       "business_rule": "",
       "chromium": "Pass",
@@ -153,9 +153,9 @@
     },
     {
       "id": "TC-UPLOAD-008",
-      "tier": "Functional",
-      "title": "Canceling file chooser leaves file input empty",
-      "use_case": "UC2",
+      "tier": "Smoke",
+      "title": "Uploading a .txt file shows success page with File Uploaded! heading",
+      "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -163,25 +163,25 @@
     {
       "id": "TC-UPLOAD-009",
       "tier": "Sanity",
-      "title": "Selecting a second file replaces the first file in the input",
-      "use_case": "UC2",
+      "title": "After successful upload, the uploaded filename is displayed exactly",
+      "use_case": "UC3",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-010",
-      "tier": "Smoke",
-      "title": "Successfully uploading a .txt file navigates to success page with correct file name",
+      "tier": "Functional",
+      "title": "Uploading a .json file succeeds and displays correct filename",
       "use_case": "UC3",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-011",
       "tier": "Functional",
-      "title": "Successfully uploading a .json file shows correct file name on success page",
+      "title": "Uploading a .png file succeeds and displays correct filename",
       "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
@@ -190,7 +190,7 @@
     {
       "id": "TC-UPLOAD-012",
       "tier": "Functional",
-      "title": "Successfully uploading a .md file shows correct file name on success page",
+      "title": "Uploading a .md file succeeds and displays correct filename",
       "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
@@ -199,16 +199,16 @@
     {
       "id": "TC-UPLOAD-013",
       "tier": "Sanity",
-      "title": "Upload success page displays only the file name, not the full path",
-      "use_case": "UC3",
+      "title": "Clicking Upload with no file selected returns HTTP 500 error",
+      "use_case": "UC4",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-014",
-      "tier": "Sanity",
-      "title": "Clicking Upload without selecting a file shows server error",
+      "tier": "Functional",
+      "title": "After receiving 500 error, navigating back returns to upload form",
       "use_case": "UC4",
       "business_rule": "",
       "chromium": "Pass",
@@ -216,9 +216,9 @@
     },
     {
       "id": "TC-UPLOAD-015",
-      "tier": "Functional",
-      "title": "File input does not have HTML5 required attribute",
-      "use_case": "UC4",
+      "tier": "Sanity",
+      "title": "Uploading first.txt then navigating back and uploading second.txt shows correct names",
+      "use_case": "UC5",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -226,8 +226,8 @@
     {
       "id": "TC-UPLOAD-016",
       "tier": "Functional",
-      "title": "Upload button remains enabled when no file is selected",
-      "use_case": "UC4",
+      "title": "Uploading three different files sequentially shows correct name each time",
+      "use_case": "UC5",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -235,34 +235,34 @@
     {
       "id": "TC-UPLOAD-017",
       "tier": "Sanity",
-      "title": "Uploading a second file after a successful upload displays the new file name",
-      "use_case": "UC5",
+      "title": "Uploading a file with spaces in the name preserves the exact filename",
+      "use_case": "UC6",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-018",
       "tier": "Functional",
-      "title": "Three sequential uploads each display the correct current file name",
-      "use_case": "UC5",
+      "title": "Uploading a file with parentheses preserves the exact filename",
+      "use_case": "UC6",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-019",
-      "tier": "Sanity",
-      "title": "File name on success page exactly matches selected file name including extension",
+      "tier": "Functional",
+      "title": "Uploading a file with hyphens preserves the exact filename",
       "use_case": "UC6",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-020",
       "tier": "Functional",
-      "title": "File name with uppercase letters is preserved on success page",
+      "title": "Uploading a file with underscores preserves the exact filename",
       "use_case": "UC6",
       "business_rule": "",
       "chromium": "Pass",
@@ -271,61 +271,61 @@
     {
       "id": "TC-UPLOAD-021",
       "tier": "Functional",
-      "title": "File name with dots and hyphens is preserved on success page",
+      "title": "Uploading a file with mixed case preserves the exact case",
       "use_case": "UC6",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-022",
-      "tier": "Sanity",
-      "title": "Navigating back from success page returns to upload form",
-      "use_case": "UC7",
+      "tier": "Functional",
+      "title": "Uploading a file with multiple dots preserves all dots",
+      "use_case": "UC6",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-023",
-      "tier": "Functional",
-      "title": "File input retains selected file after navigating back from success page",
-      "use_case": "UC7",
+      "tier": "Sanity",
+      "title": "Uploading a file with special characters and spaces preserves everything",
+      "use_case": "UC6",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-024",
-      "tier": "Functional",
-      "title": "Fresh page load after navigation back clears file selection",
+      "tier": "Sanity",
+      "title": "After successful upload, browser back button retains file in input",
       "use_case": "UC7",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-025",
-      "tier": "Functional",
-      "title": "Clicking Upload button multiple times with the same file does not cause errors",
-      "use_case": "UC8",
+      "tier": "Sanity",
+      "title": "Fresh navigation to /upload after successful upload resets the page completely",
+      "use_case": "UC7",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-026",
       "tier": "Functional",
-      "title": "File input only accepts single file selection, not multiple",
+      "title": "Double-clicking Upload button with file selected does not cause errors",
       "use_case": "UC8",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-027",
       "tier": "Functional",
-      "title": "Form submission works even without client-side JavaScript enabled",
+      "title": "File input does not accept multiple files (single file only enforced)",
       "use_case": "UC8",
       "business_rule": "",
       "chromium": "Pass",
@@ -334,16 +334,16 @@
     {
       "id": "TC-UPLOAD-028",
       "tier": "Functional",
-      "title": "Navigating away and back to upload page resets to clean state",
+      "title": "Success page does not have a form element",
       "use_case": "UC8",
       "business_rule": "",
-      "chromium": "Fail",
-      "note": "BUG-001"
+      "chromium": "Pass",
+      "note": ""
     },
     {
       "id": "TC-UPLOAD-029",
       "tier": "Functional",
-      "title": "File input accept attribute is not restrictive (no file type filtering)",
+      "title": "Clicking Upload multiple times with no file returns error each time",
       "use_case": "UC8",
       "business_rule": "",
       "chromium": "Pass",
@@ -352,26 +352,38 @@
     {
       "id": "TC-UPLOAD-030",
       "tier": "Functional",
-      "title": "Success page does not have a form or upload controls",
+      "title": "Refreshing the success page does NOT re-upload the file",
       "use_case": "UC8",
       "business_rule": "",
       "chromium": "Fail",
-      "note": "BUG-001"
+      "note": "BUG-002"
     }
   ],
   "defects": [
     {
       "id": "BUG-001",
-      "severity": "Critical",
-      "title": "Missing upload-sample.txt test fixture file causes ENOENT failures across 15 tests",
+      "severity": "Medium",
+      "title": "Form element has no action attribute — expected action ending with /upload",
       "steps": [
-        "Run any test that calls uploadPage.selectFile('upload-sample.txt') or uploadPage.uploadFile('upload-sample.txt').",
-        "Playwright attempts to resolve the file path relative to the project root.",
-        "File does not exist at /home/runner/work/OpencartAutomation/OpencartAutomation/upload-sample.txt."
+        "Navigate to https://the-internet.herokuapp.com/upload.",
+        "Inspect the form element wrapping the file input."
       ],
-      "expected": "The file 'upload-sample.txt' exists in the project root and is successfully attached to the file input via setInputFiles.",
-      "actual": "ENOENT: no such file or directory, stat '/home/runner/work/OpencartAutomation/OpencartAutomation/upload-sample.txt' — test fails immediately at the selectFile step before any browser interaction occurs.",
-      "test_ref": "TC-UPLOAD-005, TC-UPLOAD-009, TC-UPLOAD-010, TC-UPLOAD-013, TC-UPLOAD-017, TC-UPLOAD-018, TC-UPLOAD-019, TC-UPLOAD-021, TC-UPLOAD-022, TC-UPLOAD-023, TC-UPLOAD-024, TC-UPLOAD-025, TC-UPLOAD-026, TC-UPLOAD-028, TC-UPLOAD-030"
+      "expected": "Form element has action attribute matching /\\/upload$/ (e.g. '/upload' or the full URL).",
+      "actual": "Form element's action attribute is empty (null/empty string); toHaveAttribute('action', /\\/upload$/) times out after 10 seconds.",
+      "test_ref": "TC-UPLOAD-003"
+    },
+    {
+      "id": "BUG-002",
+      "severity": "Medium",
+      "title": "Refreshing the success page does not return to the upload form",
+      "steps": [
+        "Navigate to https://the-internet.herokuapp.com/upload.",
+        "Select a file and click Upload.",
+        "On the success page, reload the page (page.reload())."
+      ],
+      "expected": "After reload, the page shows the 'File Uploader' heading and empty file input (initial upload form state).",
+      "actual": "After reload, the 'File Uploader' heading is not found; toBeVisible() times out after 10 seconds — the page does not revert to the upload form.",
+      "test_ref": "TC-UPLOAD-030"
     }
   ]
 }
