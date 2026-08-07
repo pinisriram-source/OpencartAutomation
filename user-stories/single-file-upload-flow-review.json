@@ -8,14 +8,14 @@
     "feedback": ""
   },
   "automation": {
-    "status": "approved",
-    "path": "tests/single-file-upload-flow/",
-    "revision": 2,
+    "status": "not_started",
+    "path": "",
+    "revision": 0,
     "feedback": ""
   },
   "execute": {
-    "status": "completed",
-    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/30381502045"
+    "status": "not_started",
+    "workflow_run_url": ""
   },
-  "updated_at": "2026-08-07T09:42:16.840Z"
+  "updated_at": "2026-08-07T09:55:23.215Z"
 }
