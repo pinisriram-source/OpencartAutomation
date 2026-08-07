@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from './page-objects/login-page';
 
 test.describe('Practice Login Page Tests', () => {
-  test('TC-LOGIN-009 Login Form Elements Are Visible On Page Load', async ({ page }) => {
+  test('TC-LOGIN-009 Login Form Elements Are Visible On Page Load', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     // 1. Navigate to https://practicetestautomation.com/practice-test-login/

@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-022: No JavaScript Errors in Console', async ({ page }) => {
+  test('TC-ADDREMOVE-022: No JavaScript Errors in Console', { tag: '@regression' }, async ({ page }) => {
     const errors: string[] = [];
 
     // 1. Navigate to the application URL with console monitoring enabled

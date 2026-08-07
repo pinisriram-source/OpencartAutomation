@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Page Reload and Persistence', () => {
-  test('TC-DROPDOWN-008: Verify selected value does NOT persist after page reload and resets to default placeholder', async ({ page }) => {
+  test('TC-DROPDOWN-008: Verify selected value does NOT persist after page reload and resets to default placeholder', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

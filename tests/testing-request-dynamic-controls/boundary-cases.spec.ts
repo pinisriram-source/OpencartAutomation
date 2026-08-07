@@ -9,7 +9,7 @@ test.describe('Dynamic Controls - Boundary and Edge Cases', () => {
     await dynamicControlsPage.navigate();
   });
 
-  test('TC-DYNCTRL-020-RapidClickingRemoveButton', async ({ page }) => {
+  test('TC-DYNCTRL-020-RapidClickingRemoveButton', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Checkbox visible with 'Remove' button
     await expect(page.locator('input[type="checkbox"]')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible();
@@ -26,7 +26,7 @@ test.describe('Dynamic Controls - Boundary and Edge Cases', () => {
     await expect(page.getByRole('button', { name: 'Add' })).toBeVisible();
   });
 
-  test('TC-DYNCTRL-021-RapidClickingEnableButton', async ({ page }) => {
+  test('TC-DYNCTRL-021-RapidClickingEnableButton', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input disabled with 'Enable' button
     await expect(page.locator('input[type="text"]')).toBeDisabled();
     await expect(page.getByRole('button', { name: 'Enable' })).toBeVisible();
@@ -44,7 +44,7 @@ test.describe('Dynamic Controls - Boundary and Edge Cases', () => {
     await expect(page.getByRole('button', { name: 'Disable' })).toBeVisible();
   });
 
-  test('TC-DYNCTRL-022-CheckboxInteractionDuringRemoval', async ({ page }) => {
+  test('TC-DYNCTRL-022-CheckboxInteractionDuringRemoval', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Checkbox visible and unchecked
     await expect(page.locator('input[type="checkbox"]')).toBeVisible();
     await expect(page.locator('input[type="checkbox"]')).not.toBeChecked();
@@ -64,7 +64,7 @@ test.describe('Dynamic Controls - Boundary and Edge Cases', () => {
     await expect(dynamicControlsPage.checkbox).toHaveCount(0);
   });
 
-  test('TC-DYNCTRL-023-TypeInTextInputDuringDisable', async ({ page }) => {
+  test('TC-DYNCTRL-023-TypeInTextInputDuringDisable', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate and enable the text input (click Enable, wait for completion)
     await page.locator('button[onclick*="swapInput"]').click();
     await page.getByText("It's enabled!").first().waitFor({ state: 'visible' });
@@ -89,7 +89,7 @@ test.describe('Dynamic Controls - Boundary and Edge Cases', () => {
     await expect(page.locator('input[type="text"]')).toBeDisabled();
   });
 
-  test('TC-DYNCTRL-024-PageRefreshPreservesNoState', async ({ page }) => {
+  test('TC-DYNCTRL-024-PageRefreshPreservesNoState', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Initial state loaded
     await expect(page.locator('input[type="checkbox"]')).toBeVisible();
     await expect(page.locator('input[type="text"]')).toBeDisabled();
@@ -114,7 +114,7 @@ test.describe('Dynamic Controls - Boundary and Edge Cases', () => {
     await expect(page.locator('input[type="text"]')).toHaveValue('');
   });
 
-  test('TC-DYNCTRL-025-VerifyNoJavaScriptErrors', async ({ page }) => {
+  test('TC-DYNCTRL-025-VerifyNoJavaScriptErrors', { tag: '@regression' }, async ({ page }) => {
     // 1. Set up console error listener before navigation
     const jsErrors: string[] = [];
     page.on('pageerror', error => {

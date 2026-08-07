@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Boundary and Negative Cases', () => {
-  test('TC-DROPDOWN-010: Verify dropdown behavior when attempting rapid successive selections', async ({ page }) => {
+  test('TC-DROPDOWN-010: Verify dropdown behavior when attempting rapid successive selections', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // Setup listener for JavaScript errors

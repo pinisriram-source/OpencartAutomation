@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('URL Stability', () => {
-  test('TC-DROPDOWN-009: Verify no dropdown interaction triggers page navigation or URL change', async ({ page }) => {
+  test('TC-DROPDOWN-009: Verify no dropdown interaction triggers page navigation or URL change', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
     const expectedUrl = 'https://the-internet.herokuapp.com/dropdown';
 

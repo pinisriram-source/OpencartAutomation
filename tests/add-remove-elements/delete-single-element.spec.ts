@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { AddRemoveElementsPage } from './page-objects/add-remove-elements.page';
 
 test.describe('Add/Remove Elements Core Functionality', () => {
-  test('TC-ADDREMOVE-004: Delete Single Element from Middle Position', async ({ page }) => {
+  test('TC-ADDREMOVE-004: Delete Single Element from Middle Position', { tag: '@regression' }, async ({ page }) => {
     const addRemovePage = new AddRemoveElementsPage(page);
 
     // 1. Navigate to the application URL and add 5 Delete buttons

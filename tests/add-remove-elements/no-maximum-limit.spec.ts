@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { AddRemoveElementsPage } from './page-objects/add-remove-elements.page';
 
 test.describe('Add/Remove Elements Negative and Validation Tests', () => {
-  test('TC-ADDREMOVE-019: Verify No Maximum Limit on Add Operations', async ({ page }) => {
+  test('TC-ADDREMOVE-019: Verify No Maximum Limit on Add Operations', { tag: '@regression' }, async ({ page }) => {
     const addRemovePage = new AddRemoveElementsPage(page);
 
     // 1. Navigate to the application URL

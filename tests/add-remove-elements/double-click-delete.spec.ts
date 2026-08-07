@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-016: Double-Click Delete Button', async ({ page }) => {
+  test('TC-ADDREMOVE-016: Double-Click Delete Button', { tag: '@regression' }, async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(err.message));
 

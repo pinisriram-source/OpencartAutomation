@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Edge Cases and Boundary Conditions', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-015: Delete All Then Verify Clean State', async ({ page }) => {
+  test('TC-ADDREMOVE-015: Delete All Then Verify Clean State', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL and add 20 Delete buttons
     await addRemoveElementsPage.navigate();
     await addRemoveElementsPage.addElements(20);

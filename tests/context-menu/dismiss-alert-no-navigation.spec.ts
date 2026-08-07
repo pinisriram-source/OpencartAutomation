@@ -13,7 +13,7 @@ test.describe('Right-Click Alert Behavior - Happy Path', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-003: Dismissing the alert leaves page in normal state with no navigation', async ({ page }) => {
+  test('TC-CONTEXTMENU-003: Dismissing the alert leaves page in normal state with no navigation', { tag: '@regression' }, async ({ page }) => {
     // 2. Right-click inside the hot spot box to trigger the alert
     // 3. Accept/dismiss the alert dialog
     page.once('dialog', async (dialog: Dialog) => {

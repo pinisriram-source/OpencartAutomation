@@ -6,7 +6,7 @@ import { LoginPage } from './page-objects/login-page';
 import { SuccessPage } from './page-objects/success-page';
 
 test.describe('Practice Login Page Tests', () => {
-  test('TC-LOGIN-001 Valid Login Redirects To Success Page', async ({ page }) => {
+  test('TC-LOGIN-001 Valid Login Redirects To Success Page', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const successPage = new SuccessPage(page);
 

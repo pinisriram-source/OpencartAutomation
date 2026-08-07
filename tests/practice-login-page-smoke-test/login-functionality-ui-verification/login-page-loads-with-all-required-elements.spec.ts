@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/login-page';
 
 test.describe('Login Functionality - UI Verification', () => {
-  test('TC-LOGIN-008 Login page loads with all required elements', async ({ page }) => {
+  test('TC-LOGIN-008 Login page loads with all required elements', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     
     // 1. Navigate to https://practicetestautomation.com/practice-test-login/

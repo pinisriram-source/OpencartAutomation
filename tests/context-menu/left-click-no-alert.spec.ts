@@ -13,7 +13,7 @@ test.describe('Negative Cases and Boundary Conditions', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-007: Left-clicking inside the hot spot does NOT trigger the alert', async ({ page }) => {
+  test('TC-CONTEXTMENU-007: Left-clicking inside the hot spot does NOT trigger the alert', { tag: '@regression' }, async ({ page }) => {
     let dialogAppeared = false;
 
     // Set up dialog handler to track if any dialog appears

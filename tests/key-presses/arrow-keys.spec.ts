@@ -8,7 +8,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     keyPressesPage = new KeyPressesPage(page);
   });
 
-  test('TC-KEYPRESS-012: Arrow keys detection - Up arrow displays UP', async ({ page }) => {
+  test('TC-KEYPRESS-012: Arrow keys detection - Up arrow displays UP', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -33,7 +33,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-013: All arrow keys are detected correctly', async ({ page }) => {
+  test('TC-KEYPRESS-013: All arrow keys are detected correctly', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page and focus the input
     await keyPressesPage.navigate();
     await keyPressesPage.clickInput();

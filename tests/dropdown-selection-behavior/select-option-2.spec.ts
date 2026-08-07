@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Single Option Selection', () => {
-  test('TC-DROPDOWN-005: Verify selecting Option 2 updates the dropdown\'s selected value to Option 2', async ({ page }) => {
+  test('TC-DROPDOWN-005: Verify selecting Option 2 updates the dropdown\'s selected value to Option 2', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

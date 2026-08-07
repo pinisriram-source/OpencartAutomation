@@ -12,7 +12,7 @@ test.describe('Negative Cases and Boundary Conditions', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-005: Right-clicking outside the hot spot does NOT trigger the alert', async ({ page }) => {
+  test('TC-CONTEXTMENU-005: Right-clicking outside the hot spot does NOT trigger the alert', { tag: '@regression' }, async ({ page }) => {
     // Setup dialog listener to detect any alerts
     let dialogAppeared = false;
     page.on('dialog', async (dialog) => {

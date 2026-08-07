@@ -9,7 +9,7 @@ test.describe('Dynamic Controls - Initial State', () => {
     await dynamicControlsPage.navigate();
   });
 
-  test('TC-DYNCTRL-001-VerifyCheckboxWidgetInitialState', async ({ page }) => {
+  test('TC-DYNCTRL-001-VerifyCheckboxWidgetInitialState', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/dynamic_controls
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/dynamic_controls');
@@ -41,7 +41,7 @@ test.describe('Dynamic Controls - Initial State', () => {
     await expect(dynamicControlsPage.checkboxLoadingIndicator).not.toBeVisible();
   });
 
-  test('TC-DYNCTRL-002-VerifyTextInputWidgetInitialState', async ({ page }) => {
+  test('TC-DYNCTRL-002-VerifyTextInputWidgetInitialState', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/dynamic_controls
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/dynamic_controls');

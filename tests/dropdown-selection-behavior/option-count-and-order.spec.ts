@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Initial State and Visibility', () => {
-  test('TC-DROPDOWN-002: Verify the dropdown contains exactly 3 options in the correct order', async ({ page }) => {
+  test('TC-DROPDOWN-002: Verify the dropdown contains exactly 3 options in the correct order', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

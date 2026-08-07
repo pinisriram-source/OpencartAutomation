@@ -12,7 +12,7 @@ test.describe('Dynamic Controls - Text Input Widget Functionality', () => {
     await dynamicControlsPage.navigate();
   });
 
-  test('TC-DYNCTRL-008-EnableTextInputSuccessfully', async ({ page }) => {
+  test('TC-DYNCTRL-008-EnableTextInputSuccessfully', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input visible and disabled, 'Enable' button visible
     await expect(dynamicControlsPage.textInput).toBeVisible();
     await expect(dynamicControlsPage.textInput).toBeDisabled();
@@ -33,7 +33,7 @@ test.describe('Dynamic Controls - Text Input Widget Functionality', () => {
     await expect(dynamicControlsPage.textInput).toHaveValue('Test input text');
   });
 
-  test('TC-DYNCTRL-009-DisableTextInputSuccessfully', async ({ page }) => {
+  test('TC-DYNCTRL-009-DisableTextInputSuccessfully', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input disabled
     await expect(dynamicControlsPage.textInput).toBeDisabled();
 
@@ -58,7 +58,7 @@ test.describe('Dynamic Controls - Text Input Widget Functionality', () => {
     await expect(dynamicControlsPage.textInput).toHaveValue('Test content');
   });
 
-  test('TC-DYNCTRL-010-EnableDisableCycleMultipleTimes', async ({ page }) => {
+  test('TC-DYNCTRL-010-EnableDisableCycleMultipleTimes', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input disabled
     await expect(dynamicControlsPage.textInput).toBeDisabled();
 
@@ -83,7 +83,7 @@ test.describe('Dynamic Controls - Text Input Widget Functionality', () => {
     await expect(dynamicControlsPage.enableDisableButton).toHaveText('Enable');
   });
 
-  test('TC-DYNCTRL-011-TextInputContentPersistsAcrossEnableDisable', async ({ page }) => {
+  test('TC-DYNCTRL-011-TextInputContentPersistsAcrossEnableDisable', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input disabled and empty
     await expect(dynamicControlsPage.textInput).toBeDisabled();
     await expect(dynamicControlsPage.textInput).toHaveValue('');
@@ -107,7 +107,7 @@ test.describe('Dynamic Controls - Text Input Widget Functionality', () => {
     await expect(dynamicControlsPage.textInput).toHaveValue('Test content');
   });
 
-  test('TC-DYNCTRL-012-CannotTypeWhenDisabled', async ({ page }) => {
+  test('TC-DYNCTRL-012-CannotTypeWhenDisabled', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input disabled
     await expect(dynamicControlsPage.textInput).toBeDisabled();
 

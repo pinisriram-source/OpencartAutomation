@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../page-objects/login-page';
 
 test.describe('Login Functionality - Boundary and Edge Cases', () => {
-  test('TC-LOGIN-016 Special characters in username and password', async ({ page }) => {
+  test('TC-LOGIN-016 Special characters in username and password', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     // 1. Navigate to https://practicetestautomation.com/practice-test-login/

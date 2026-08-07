@@ -12,7 +12,7 @@ test.describe('Negative Cases and Boundary Conditions', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-008: Page content remains intact after multiple alert dismiss cycles', async ({ page }) => {
+  test('TC-CONTEXTMENU-008: Page content remains intact after multiple alert dismiss cycles', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/context_menu and capture initial page state
     // Verify: The page heading is 'Context Menu'
     await expect(contextMenuPage.pageHeading).toBeVisible();

@@ -9,7 +9,7 @@ test.describe('Modifier Keys and Function Keys', () => {
     await keyPressesPage.navigate();
   });
 
-  test('TC-KEYPRESS-021: Function key F1 detection displays F1', async ({ page }) => {
+  test('TC-KEYPRESS-021: Function key F1 detection displays F1', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     // expect: Page loads successfully
     await expect(page).toHaveTitle('The Internet');
@@ -32,7 +32,7 @@ test.describe('Modifier Keys and Function Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-022: Multiple function keys are detected correctly', async ({ page }) => {
+  test('TC-KEYPRESS-022: Multiple function keys are detected correctly', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page and focus the input
     await expect(page).toHaveTitle('The Internet');
     await keyPressesPage.clickInput();

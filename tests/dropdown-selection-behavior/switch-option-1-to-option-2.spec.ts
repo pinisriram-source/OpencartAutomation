@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Switching Between Options', () => {
-  test('TC-DROPDOWN-006: Verify switching directly from Option 1 to Option 2 updates the value correctly with no intermediate state', async ({ page }) => {
+  test('TC-DROPDOWN-006: Verify switching directly from Option 1 to Option 2 updates the value correctly with no intermediate state', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

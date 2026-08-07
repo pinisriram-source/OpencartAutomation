@@ -9,7 +9,7 @@ test.describe('Edge Cases and Additional Validation', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-009: Right-click on the edge/border of the hot spot triggers the alert', async ({ page }) => {
+  test('TC-CONTEXTMENU-009: Right-click on the edge/border of the hot spot triggers the alert', { tag: '@regression' }, async ({ page }) => {
     let dialogCount = 0;
     const dialogMessages: string[] = [];
 

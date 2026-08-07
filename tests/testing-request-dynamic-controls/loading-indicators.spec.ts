@@ -9,7 +9,7 @@ test.describe('Dynamic Controls - Loading Indicators', () => {
     await dynamicControlsPage.navigate();
   });
 
-  test('TC-DYNCTRL-016-LoadingSpinnerAppearsOnCheckboxRemove', async ({ page }) => {
+  test('TC-DYNCTRL-016-LoadingSpinnerAppearsOnCheckboxRemove', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: No loading spinner visible
     await expect(dynamicControlsPage.checkboxLoadingIndicator).not.toBeVisible();
 
@@ -24,7 +24,7 @@ test.describe('Dynamic Controls - Loading Indicators', () => {
     await expect(loadingEl).not.toBeVisible();
   });
 
-  test('TC-DYNCTRL-017-LoadingSpinnerAppearsOnCheckboxAdd', async ({ page }) => {
+  test('TC-DYNCTRL-017-LoadingSpinnerAppearsOnCheckboxAdd', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Checkbox visible
     await expect(dynamicControlsPage.checkbox).toBeVisible();
 
@@ -42,7 +42,7 @@ test.describe('Dynamic Controls - Loading Indicators', () => {
     await expect(dynamicControlsPage.checkboxMessage).toHaveText("It's back!");
   });
 
-  test('TC-DYNCTRL-018-LoadingSpinnerAppearsOnTextInputEnable', async ({ page }) => {
+  test('TC-DYNCTRL-018-LoadingSpinnerAppearsOnTextInputEnable', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: No loading spinner visible in text input section
     await expect(dynamicControlsPage.inputLoadingIndicator).not.toBeVisible();
 
@@ -57,7 +57,7 @@ test.describe('Dynamic Controls - Loading Indicators', () => {
     await expect(loadingEl).not.toBeVisible();
   });
 
-  test('TC-DYNCTRL-019-LoadingSpinnerAppearsOnTextInputDisable', async ({ page }) => {
+  test('TC-DYNCTRL-019-LoadingSpinnerAppearsOnTextInputDisable', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Text input disabled
     await expect(dynamicControlsPage.textInput).toBeDisabled();
 

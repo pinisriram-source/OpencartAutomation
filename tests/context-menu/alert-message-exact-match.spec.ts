@@ -9,7 +9,7 @@ test.describe('Edge Cases and Additional Validation', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-010: Alert message is exact and case-sensitive', async ({ page }) => {
+  test('TC-CONTEXTMENU-010: Alert message is exact and case-sensitive', { tag: '@regression' }, async ({ page }) => {
     // Capture alert message
     let alertMessage = '';
     page.on('dialog', async (dialog) => {

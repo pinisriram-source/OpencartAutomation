@@ -3,7 +3,7 @@ import { LoginPage } from './page-objects/login-page';
 import { SuccessPage } from './page-objects/success-page';
 
 test.describe('Practice Login Page Tests', () => {
-  test('TC-LOGIN-010 Success Page Has Link Back To Practice Page', async ({ page }) => {
+  test('TC-LOGIN-010 Success Page Has Link Back To Practice Page', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const successPage = new SuccessPage(page);
 

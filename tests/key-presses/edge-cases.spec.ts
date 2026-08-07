@@ -8,7 +8,7 @@ test.describe('Edge Cases and Boundary Conditions', () => {
     keyPressesPage = new KeyPressesPage(page);
   });
 
-  test('TC-KEYPRESS-030 Rapid successive key presses update message correctly', async ({ page }) => {
+  test('TC-KEYPRESS-030 Rapid successive key presses update message correctly', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page
     await page.goto('https://the-internet.herokuapp.com/key_presses');
 
@@ -24,7 +24,7 @@ test.describe('Edge Cases and Boundary Conditions', () => {
     await expect(page.getByText('You entered: C')).toBeVisible();
   });
 
-  test('TC-KEYPRESS-031 Holding down a key continuously updates the message', async ({ page }) => {
+  test('TC-KEYPRESS-031 Holding down a key continuously updates the message', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page
     await page.goto('https://the-internet.herokuapp.com/key_presses');
 
@@ -40,7 +40,7 @@ test.describe('Edge Cases and Boundary Conditions', () => {
     await expect(page.getByText('You entered: A')).toBeVisible();
   });
 
-  test('TC-KEYPRESS-032 Mixed case letters all display as uppercase', async ({ page }) => {
+  test('TC-KEYPRESS-032 Mixed case letters all display as uppercase', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page and focus the input
     await page.goto('https://the-internet.herokuapp.com/key_presses');
     await page.locator('#target').click();
@@ -58,7 +58,7 @@ test.describe('Edge Cases and Boundary Conditions', () => {
     await expect(page.getByText('You entered: A')).toBeVisible();
   });
 
-  test('TC-KEYPRESS-033 Special characters and symbols detection', async ({ page }) => {
+  test('TC-KEYPRESS-033 Special characters and symbols detection', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page and focus the input
     await page.goto('https://the-internet.herokuapp.com/key_presses');
     await page.locator('#target').click();
@@ -80,7 +80,7 @@ test.describe('Edge Cases and Boundary Conditions', () => {
     await expect(page.locator('#result')).toContainText('You entered:');
   });
 
-  test('TC-KEYPRESS-034 Empty input field after form submission via Enter', async ({ page }) => {
+  test('TC-KEYPRESS-034 Empty input field after form submission via Enter', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page
     await page.goto('https://the-internet.herokuapp.com/key_presses');
 
@@ -97,7 +97,7 @@ test.describe('Edge Cases and Boundary Conditions', () => {
     await expect(page.locator('#target')).toHaveValue('');
   });
 
-  test('TC-KEYPRESS-035 Keyboard shortcut combinations are detected as individual keys', async ({ page }) => {
+  test('TC-KEYPRESS-035 Keyboard shortcut combinations are detected as individual keys', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page and focus the input
     await page.goto('https://the-internet.herokuapp.com/key_presses');
     await page.locator('#target').click();

@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-017: Click Delete Button Container Instead of Button', async ({ page }) => {
+  test('TC-ADDREMOVE-017: Click Delete Button Container Instead of Button', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL and add 3 Delete buttons
     await addRemoveElementsPage.navigate();
     await addRemoveElementsPage.addElements(3);

@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { KeyPressesPage } from './pages/key-presses.page';
 
 test.describe('Initial Page State and Basic Key Detection', () => {
-  test('TC-KEYPRESS-004 Number key press displays the number', async ({ page }) => {
+  test('TC-KEYPRESS-004 Number key press displays the number', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to the Key Presses page
@@ -29,7 +29,7 @@ test.describe('Initial Page State and Basic Key Detection', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-005 All number keys are detected correctly', async ({ page }) => {
+  test('TC-KEYPRESS-005 All number keys are detected correctly', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to the Key Presses page and focus the input

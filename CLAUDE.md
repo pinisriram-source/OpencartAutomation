@@ -415,16 +415,40 @@ is this test", `@regression` answers "is this part of the cross-suite
 regression set". They compose — `--grep "@regression"` for everything,
 `--grep @smoke` for the fast signal across those same suites.
 
-Scope of adoption, as of writing: the five tier-tagged suites
-(`dynamic-loading-hidden-and-rendered-elements`, `form-authentication-login`,
-`hovers`, `login-page-smoke-test`, `single-file-upload-flow` — 131 tests),
-plus every suite generated going forward. The older untiered pipeline
-suites (`add-remove-elements`, `context-menu`, `dropdown-*`, `key-presses`,
-`practice-login-page-smoke-test`, `testing-request-dynamic-controls`) have
-**not** been retrofitted, matching how the tier convention itself was
-adopted — they have neither tier nor regression tags. `tests/storefront`,
-`tests/admin` and `tests/saucedemo-checkout` are not pipeline suites and
-are intentionally excluded.
+Scope of adoption: **every** pipeline suite, 269 tests in 146 files, plus
+every suite generated going forward. `tests/storefront`, `tests/admin` and
+`tests/saucedemo-checkout` are not pipeline suites and are intentionally
+excluded.
+
+`@regression` and the tier tags do **not** cover the same set, and that
+asymmetry is deliberate:
+
+- The five tier-tagged suites (`dynamic-loading-hidden-and-rendered-elements`,
+  `form-authentication-login`, `hovers`, `login-page-smoke-test`,
+  `single-file-upload-flow` — 131 tests) carry a tier tag **and**
+  `@regression`.
+- The seven older suites (`add-remove-elements`, `context-menu`,
+  `dropdown-selection-behavior`, `dropdown-smoke-test`, `key-presses`,
+  `practice-login-page-smoke-test`, `testing-request-dynamic-controls` —
+  138 tests) carry **only** `@regression`, no tier tag.
+
+The reason is that the two tags have different sources of truth. A tier is
+assigned in `specs/<slug>-test-plan.md` via a `**Tier:**` line and is part
+of what a stakeholder approves in the Review tab; those seven plans have no
+`**Tier:**` lines at all, so tagging their tests with a tier would mean
+inventing a classification no approved plan backs. `@regression` carries no
+such claim — it is pure set membership ("is this part of the cross-suite
+regression set"), so it can be applied to an existing suite without
+rewriting or re-approving its plan. Retrofitting tiers to those seven
+suites means first adding `**Tier:**` lines to their plans and putting them
+back through review; until then, `--grep @regression` covers all 269 while
+`--grep @smoke` covers only the 131 tiered ones.
+
+This does not weaken the CI tier gate: `check-test-tiers.js` matches only
+`@smoke`/`@sanity`/`@functional`, so a lone `@regression` tag still counts
+as missing a tier. The gate is scoped to fresh generations
+(`fresh_generation == 'true'`) and so never runs against these seven
+pre-existing suites.
 
 The tag on each `test()` is necessary but not sufficient for the tier to be
 *visible* anywhere: the Streamlit dashboard reads

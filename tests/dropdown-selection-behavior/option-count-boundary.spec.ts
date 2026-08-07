@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Boundary and Negative Cases', () => {
-  test('TC-DROPDOWN-012: Verify dropdown contains no extra or missing options beyond the expected 3', async ({ page }) => {
+  test('TC-DROPDOWN-012: Verify dropdown contains no extra or missing options beyond the expected 3', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

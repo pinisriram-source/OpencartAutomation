@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Boundary and Negative Cases', () => {
-  test('TC-DROPDOWN-011: Verify dropdown does not accept invalid or out-of-range option values', async ({ page }) => {
+  test('TC-DROPDOWN-011: Verify dropdown does not accept invalid or out-of-range option values', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
     let jsErrors: Error[] = [];
 

@@ -9,7 +9,7 @@ test.describe('Dynamic Controls - Widget Independence', () => {
     await dynamicControlsPage.navigate();
   });
 
-  test('TC-DYNCTRL-013-CheckboxWidgetDoesNotAffectTextInput', async ({ page }) => {
+  test('TC-DYNCTRL-013-CheckboxWidgetDoesNotAffectTextInput', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Both widgets in initial state
     // Verified in beforeEach
 
@@ -34,7 +34,7 @@ test.describe('Dynamic Controls - Widget Independence', () => {
     await expect(dynamicControlsPage.enableDisableButton).toHaveText('Enable');
   });
 
-  test('TC-DYNCTRL-014-TextInputWidgetDoesNotAffectCheckbox', async ({ page }) => {
+  test('TC-DYNCTRL-014-TextInputWidgetDoesNotAffectCheckbox', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Both widgets in initial state
     // Verified in beforeEach
 
@@ -61,7 +61,7 @@ test.describe('Dynamic Controls - Widget Independence', () => {
     await expect(dynamicControlsPage.removeAddButton).toHaveText('Remove');
   });
 
-  test('TC-DYNCTRL-015-SimultaneousOperationsOnBothWidgets', async ({ page }) => {
+  test('TC-DYNCTRL-015-SimultaneousOperationsOnBothWidgets', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate - expect: Both widgets in initial state
     // Verified in beforeEach
 

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Placeholder Disabled Behavior', () => {
-  test('TC-DROPDOWN-003: Verify the placeholder option is disabled and cannot be selected by user via UI', async ({ page }) => {
+  test('TC-DROPDOWN-003: Verify the placeholder option is disabled and cannot be selected by user via UI', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { AddRemoveElementsPage } from './page-objects/add-remove-elements.page';
 
 test.describe('Add/Remove Elements Negative and Validation Tests', () => {
-  test('TC-ADDREMOVE-023: Verify Button Rendering and CSS', async ({ page }) => {
+  test('TC-ADDREMOVE-023: Verify Button Rendering and CSS', { tag: '@regression' }, async ({ page }) => {
     const addRemovePage = new AddRemoveElementsPage(page);
 
     // 1. Navigate to the application URL and add 3 Delete buttons

@@ -9,7 +9,7 @@ test.describe('Modifier Keys and Function Keys', () => {
     await keyPressesPage.goto();
   });
 
-  test('TC-KEYPRESS-018 Shift modifier key detection displays SHIFT', async ({ page }) => {
+  test('TC-KEYPRESS-018 Shift modifier key detection displays SHIFT', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page
     // (Already navigated in beforeEach hook)
 
@@ -27,7 +27,7 @@ test.describe('Modifier Keys and Function Keys', () => {
     expect(page.url()).toBe('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-019 Control modifier key detection displays CONTROL', async ({ page }) => {
+  test('TC-KEYPRESS-019 Control modifier key detection displays CONTROL', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page
     // (Already navigated in beforeEach hook)
 
@@ -45,7 +45,7 @@ test.describe('Modifier Keys and Function Keys', () => {
     expect(page.url()).toBe('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-020 Alt modifier key detection displays ALT', async ({ page }) => {
+  test('TC-KEYPRESS-020 Alt modifier key detection displays ALT', { tag: '@regression' }, async ({ page }) => {
     // Navigate to the Key Presses page
     // (Already navigated in beforeEach hook)
 

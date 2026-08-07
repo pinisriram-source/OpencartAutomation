@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Edge Cases and Boundary Conditions', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-013: Delete Last Button Multiple Times', async ({ page }) => {
+  test('TC-ADDREMOVE-013: Delete Last Button Multiple Times', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL and add 10 Delete buttons
     await addRemoveElementsPage.navigate();
     await addRemoveElementsPage.addElements(10);

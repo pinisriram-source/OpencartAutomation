@@ -12,7 +12,7 @@ test.describe('Add/Remove Elements Core Functionality', () => {
     await addRemoveElementsPage.navigate();
   });
 
-  test('TC-ADDREMOVE-005: Delete All Elements Sequentially', async ({ page }) => {
+  test('TC-ADDREMOVE-005: Delete All Elements Sequentially', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL and add 5 Delete buttons
     await addRemoveElementsPage.addElements(5);
     

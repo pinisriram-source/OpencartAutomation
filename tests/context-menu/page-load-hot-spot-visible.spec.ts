@@ -12,7 +12,7 @@ test.describe('Initial Page State', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-001: Verify page loads with hot spot box visible and properly styled', async ({ page }) => {
+  test('TC-CONTEXTMENU-001: Verify page loads with hot spot box visible and properly styled', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/context_menu
     // expect: The page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/context_menu');

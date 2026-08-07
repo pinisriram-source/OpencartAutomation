@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { KeyPressesPage } from './pages/key-presses.page';
 
 test.describe('Initial Page State and Basic Key Detection', () => {
-  test('TC-KEYPRESS-001 Verify initial page state on load', async ({ page }) => {
+  test('TC-KEYPRESS-001 Verify initial page state on load', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/key_presses

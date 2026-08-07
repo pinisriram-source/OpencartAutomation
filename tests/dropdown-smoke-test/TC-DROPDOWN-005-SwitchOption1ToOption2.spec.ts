@@ -8,7 +8,7 @@ test.describe('Dropdown Functionality', () => {
     dropdownPage = new DropdownPage(page);
   });
 
-  test('TC-DROPDOWN-005 Switch from Option 1 to Option 2 directly', async ({ page }) => {
+  test('TC-DROPDOWN-005 Switch from Option 1 to Option 2 directly', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown
     await dropdownPage.navigate();
 

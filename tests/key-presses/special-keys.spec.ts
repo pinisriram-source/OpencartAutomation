@@ -8,7 +8,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     keyPressesPage = new KeyPressesPage(page);
   });
 
-  test('TC-KEYPRESS-006: Enter key detection displays ENTER', async ({ page }) => {
+  test('TC-KEYPRESS-006: Enter key detection displays ENTER', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -34,7 +34,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     expect(resultText).toBe('');
   });
 
-  test('TC-KEYPRESS-007: Space key detection displays SPACE', async ({ page }) => {
+  test('TC-KEYPRESS-007: Space key detection displays SPACE', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -63,7 +63,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-008: Escape key detection displays ESCAPE', async ({ page }) => {
+  test('TC-KEYPRESS-008: Escape key detection displays ESCAPE', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -91,7 +91,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(keyPressesPage.heading).toBeVisible();
   });
 
-  test('TC-KEYPRESS-009: Tab key detection displays TAB and moves focus', async ({ page }) => {
+  test('TC-KEYPRESS-009: Tab key detection displays TAB and moves focus', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -119,7 +119,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-010: Backspace key detection displays BACK_SPACE', async ({ page }) => {
+  test('TC-KEYPRESS-010: Backspace key detection displays BACK_SPACE', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -150,7 +150,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-011: Delete key detection displays DELETE', async ({ page }) => {
+  test('TC-KEYPRESS-011: Delete key detection displays DELETE', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 

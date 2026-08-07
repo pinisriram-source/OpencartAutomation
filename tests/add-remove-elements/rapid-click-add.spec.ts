@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Edge Cases and Boundary Conditions', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-007: Rapid Clicking Add Element Button', async ({ page }) => {
+  test('TC-ADDREMOVE-007: Rapid Clicking Add Element Button', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL
     await addRemoveElementsPage.navigate();
 

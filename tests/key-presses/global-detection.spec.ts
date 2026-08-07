@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { KeyPressesPage } from './pages/key-presses.page';
 
 test.describe('Global Key Detection and Focus Behavior', () => {
-  test('TC-KEYPRESS-023 Key press detected without input focus', async ({ page }) => {
+  test('TC-KEYPRESS-023 Key press detected without input focus', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to the Key Presses page
@@ -31,7 +31,7 @@ test.describe('Global Key Detection and Focus Behavior', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-024 Special keys detected globally without focus', async ({ page }) => {
+  test('TC-KEYPRESS-024 Special keys detected globally without focus', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to the Key Presses page
@@ -60,7 +60,7 @@ test.describe('Global Key Detection and Focus Behavior', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-025 Key detection after focus is moved away from input', async ({ page }) => {
+  test('TC-KEYPRESS-025 Key detection after focus is moved away from input', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to the Key Presses page

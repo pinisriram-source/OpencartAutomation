@@ -12,7 +12,7 @@ test.describe('Negative Cases and Boundary Conditions', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-006: URL remains unchanged throughout all interactions', async ({ page }) => {
+  test('TC-CONTEXTMENU-006: URL remains unchanged throughout all interactions', { tag: '@regression' }, async ({ page }) => {
     const expectedURL = 'https://the-internet.herokuapp.com/context_menu';
 
     // 1. Navigate to https://the-internet.herokuapp.com/context_menu

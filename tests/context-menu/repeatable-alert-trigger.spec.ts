@@ -13,7 +13,7 @@ test.describe('Right-Click Alert Behavior - Happy Path', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-004: Right-clicking hot spot repeatedly triggers alert each time (repeatable behavior)', async ({ page }) => {
+  test('TC-CONTEXTMENU-004: Right-clicking hot spot repeatedly triggers alert each time (repeatable behavior)', { tag: '@regression' }, async ({ page }) => {
     const triggerAndCapture = async (): Promise<string | undefined> => {
       let message: string | undefined;
       page.once('dialog', async (dialog: Dialog) => {

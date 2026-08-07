@@ -6,7 +6,7 @@ import { LoginPage } from '../page-objects/login-page';
 import { SuccessPage } from '../page-objects/success-page';
 
 test.describe('Login Functionality - Navigation Tests', () => {
-  test('TC-LOGIN-010 Logout link navigates back to login page', async ({ page }) => {
+  test('TC-LOGIN-010 Logout link navigates back to login page', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const successPage = new SuccessPage(page);
 

@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { AddRemoveElementsPage } from './page-objects/add-remove-elements.page';
 
 test.describe('Add/Remove Elements Negative and Validation Tests', () => {
-  test('TC-ADDREMOVE-025: Keyboard Accessibility for Delete Buttons', async ({ page }) => {
+  test('TC-ADDREMOVE-025: Keyboard Accessibility for Delete Buttons', { tag: '@regression' }, async ({ page }) => {
     const addRemoveElementsPage = new AddRemoveElementsPage(page);
     
     // 1. Navigate to the application URL and add 5 Delete buttons

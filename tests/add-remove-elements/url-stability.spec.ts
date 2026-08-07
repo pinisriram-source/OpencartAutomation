@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Core Functionality', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-006: URL Stability During All Operations', async ({ page }) => {
+  test('TC-ADDREMOVE-006: URL Stability During All Operations', { tag: '@regression' }, async ({ page }) => {
     const expectedUrl = 'https://the-internet.herokuapp.com/add_remove_elements/';
 
     // 1. Navigate to the application URL

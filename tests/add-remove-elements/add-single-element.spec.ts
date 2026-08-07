@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Core Functionality', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-002: Add Single Element', async ({ page }) => {
+  test('TC-ADDREMOVE-002: Add Single Element', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL
     await addRemoveElementsPage.navigate();
 

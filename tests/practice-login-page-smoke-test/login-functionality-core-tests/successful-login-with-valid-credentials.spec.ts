@@ -3,7 +3,7 @@ import { LoginPage } from '../page-objects/login-page';
 import { SuccessPage } from '../page-objects/success-page';
 
 test.describe('Login Functionality - Core Tests', () => {
-  test('TC-LOGIN-001 Successful login with valid credentials', async ({ page }) => {
+  test('TC-LOGIN-001 Successful login with valid credentials', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const successPage = new SuccessPage(page);
 

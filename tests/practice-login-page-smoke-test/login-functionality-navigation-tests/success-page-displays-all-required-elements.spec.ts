@@ -3,7 +3,7 @@ import { LoginPage } from '../page-objects/login-page';
 import { SuccessPage } from '../page-objects/success-page';
 
 test.describe('Login Functionality - Navigation Tests', () => {
-  test('TC-LOGIN-011 Success page displays all required elements', async ({ page }) => {
+  test('TC-LOGIN-011 Success page displays all required elements', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     const successPage = new SuccessPage(page);
 

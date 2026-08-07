@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Core Functionality', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-001: Initial Page Load State', async ({ page }) => {
+  test('TC-ADDREMOVE-001: Initial Page Load State', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/add_remove_elements/
     await addRemoveElementsPage.navigate();
     

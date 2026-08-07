@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { KeyPressesPage } from './pages/key-presses.page';
 
 test.describe('URL Stability and Navigation Safety', () => {
-  test('TC-KEYPRESS-026: URL remains stable for most key presses', async ({ page }) => {
+  test('TC-KEYPRESS-026: URL remains stable for most key presses', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/key_presses
@@ -30,7 +30,7 @@ test.describe('URL Stability and Navigation Safety', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-027: Enter key with focused input submits form and changes URL', async ({ page }) => {
+  test('TC-KEYPRESS-027: Enter key with focused input submits form and changes URL', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/key_presses
@@ -51,7 +51,7 @@ test.describe('URL Stability and Navigation Safety', () => {
     await expect(keyPressesPage.resultText).toBeEmpty();
   });
 
-  test('TC-KEYPRESS-028: Enter key without focused input does not change URL', async ({ page }) => {
+  test('TC-KEYPRESS-028: Enter key without focused input does not change URL', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/key_presses
@@ -68,7 +68,7 @@ test.describe('URL Stability and Navigation Safety', () => {
     await expect(keyPressesPage.resultText).toContainText('You entered: ENTER');
   });
 
-  test('TC-KEYPRESS-029: Function keys do not trigger browser navigation', async ({ page }) => {
+  test('TC-KEYPRESS-029: Function keys do not trigger browser navigation', { tag: '@regression' }, async ({ page }) => {
     const keyPressesPage = new KeyPressesPage(page);
 
     // 1. Navigate to the Key Presses page

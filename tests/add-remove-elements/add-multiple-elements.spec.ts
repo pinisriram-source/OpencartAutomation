@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Core Functionality', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-003: Add Multiple Elements Sequentially', async ({ page }) => {
+  test('TC-ADDREMOVE-003: Add Multiple Elements Sequentially', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL
     await addRemoveElementsPage.navigate();
     

@@ -6,7 +6,7 @@ import { LoginPage } from './page-objects/login-page';
 import { SuccessPage } from './page-objects/success-page';
 
 test.describe('Practice Login Page Tests', () => {
-  test('TC-LOGIN-003 Invalid Password Shows Error Message', async ({ page }) => {
+  test('TC-LOGIN-003 Invalid Password Shows Error Message', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     // 1. Navigate to https://practicetestautomation.com/practice-test-login/

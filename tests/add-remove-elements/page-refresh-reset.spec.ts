@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Negative and Validation Tests', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-021: Page Refresh Resets State', async ({ page }) => {
+  test('TC-ADDREMOVE-021: Page Refresh Resets State', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL and add 10 Delete buttons
     await addRemoveElementsPage.navigate();
     await addRemoveElementsPage.addElements(10);

@@ -8,7 +8,7 @@ test.describe('Add/Remove Elements Edge Cases and Boundary Conditions', () => {
     addRemoveElementsPage = new AddRemoveElementsPage(page);
   });
 
-  test('TC-ADDREMOVE-009: Add Large Number of Elements', async ({ page }) => {
+  test('TC-ADDREMOVE-009: Add Large Number of Elements', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the application URL
     await addRemoveElementsPage.navigate();
 

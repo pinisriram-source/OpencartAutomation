@@ -8,7 +8,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     keyPressesPage = new KeyPressesPage(page);
   });
 
-  test('TC-KEYPRESS-014: Home key detection displays HOME', async ({ page }) => {
+  test('TC-KEYPRESS-014: Home key detection displays HOME', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -27,7 +27,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-015: End key detection displays END', async ({ page }) => {
+  test('TC-KEYPRESS-015: End key detection displays END', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -46,7 +46,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-016: Page Down key detection displays PAGE_DOWN', async ({ page }) => {
+  test('TC-KEYPRESS-016: Page Down key detection displays PAGE_DOWN', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 
@@ -65,7 +65,7 @@ test.describe('Special Keys and Navigation Keys', () => {
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/key_presses');
   });
 
-  test('TC-KEYPRESS-017: Page Up key detection displays PAGE_UP', async ({ page }) => {
+  test('TC-KEYPRESS-017: Page Up key detection displays PAGE_UP', { tag: '@regression' }, async ({ page }) => {
     // 1. Navigate to the Key Presses page
     await keyPressesPage.navigate();
 

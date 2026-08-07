@@ -13,7 +13,7 @@ test.describe('Right-Click Alert Behavior - Happy Path', () => {
     await contextMenuPage.navigate();
   });
 
-  test('TC-CONTEXTMENU-002: Right-click inside hot spot triggers alert with exact message', async ({ page }) => {
+  test('TC-CONTEXTMENU-002: Right-click inside hot spot triggers alert with exact message', { tag: '@regression' }, async ({ page }) => {
     let dialogType: string | undefined;
     let dialogMessage: string | undefined;
     let dialogAppeared = false;

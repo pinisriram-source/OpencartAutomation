@@ -9,7 +9,7 @@ test.describe('Dynamic Controls - Checkbox Widget Functionality', () => {
     await dynamicControlsPage.navigate();
   });
 
-  test('TC-DYNCTRL-003-RemoveCheckboxSuccessfully', async () => {
+  test('TC-DYNCTRL-003-RemoveCheckboxSuccessfully', { tag: '@regression' }, async () => {
     // 1. Navigate to the Dynamic Controls page - expect: Checkbox visible with 'Remove' button
     await expect(dynamicControlsPage.checkbox).toBeVisible();
     await expect(dynamicControlsPage.removeAddButton).toHaveText('Remove');
@@ -30,7 +30,7 @@ test.describe('Dynamic Controls - Checkbox Widget Functionality', () => {
     await expect(dynamicControlsPage.checkbox).toHaveCount(0);
   });
 
-  test('TC-DYNCTRL-004-AddCheckboxBackSuccessfully', async () => {
+  test('TC-DYNCTRL-004-AddCheckboxBackSuccessfully', { tag: '@regression' }, async () => {
     // 1. Navigate to page (done in beforeEach)
 
     // 2. Click 'Remove' and wait for completion - expect: Checkbox removed, 'Add' button visible
@@ -52,7 +52,7 @@ test.describe('Dynamic Controls - Checkbox Widget Functionality', () => {
     await expect(dynamicControlsPage.checkbox).not.toBeChecked();
   });
 
-  test('TC-DYNCTRL-005-CheckboxTogglingWhenPresent', async () => {
+  test('TC-DYNCTRL-005-CheckboxTogglingWhenPresent', { tag: '@regression' }, async () => {
     // 1. Navigate - expect: Checkbox visible and unchecked
     await expect(dynamicControlsPage.checkbox).toBeVisible();
     await expect(dynamicControlsPage.checkbox).not.toBeChecked();
@@ -70,7 +70,7 @@ test.describe('Dynamic Controls - Checkbox Widget Functionality', () => {
     await expect(dynamicControlsPage.removeAddButton).toHaveText('Remove');
   });
 
-  test('TC-DYNCTRL-006-RemoveAddCycleMultipleTimes', async () => {
+  test('TC-DYNCTRL-006-RemoveAddCycleMultipleTimes', { tag: '@regression' }, async () => {
     // 1. Navigate - expect: Checkbox visible
     await expect(dynamicControlsPage.checkbox).toBeVisible();
 
@@ -95,7 +95,7 @@ test.describe('Dynamic Controls - Checkbox Widget Functionality', () => {
     await expect(dynamicControlsPage.removeAddButton).toHaveText('Remove');
   });
 
-  test('TC-DYNCTRL-007-CheckboxStatePersistsAfterRemoveAdd', async () => {
+  test('TC-DYNCTRL-007-CheckboxStatePersistsAfterRemoveAdd', { tag: '@regression' }, async () => {
     // 1. Navigate - expect: Checkbox unchecked
     await expect(dynamicControlsPage.checkbox).toBeVisible();
     await expect(dynamicControlsPage.checkbox).not.toBeChecked();

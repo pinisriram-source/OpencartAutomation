@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Dropdown Functionality', () => {
-  test('TC-DROPDOWN-003 Select Option 1 successfully', async ({ page }) => {
+  test('TC-DROPDOWN-003 Select Option 1 successfully', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

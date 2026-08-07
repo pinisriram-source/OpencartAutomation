@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Dropdown Functionality', () => {
-  test('TC-DROPDOWN-010 Verify dropdown has no form submission behavior', async ({ page }) => {
+  test('TC-DROPDOWN-010 Verify dropdown has no form submission behavior', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // 1. Navigate to https://the-internet.herokuapp.com/dropdown

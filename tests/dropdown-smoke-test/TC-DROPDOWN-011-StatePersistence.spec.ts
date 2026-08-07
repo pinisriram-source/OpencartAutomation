@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 import { DropdownPage } from './page-objects/dropdown-page';
 
 test.describe('Dropdown Functionality', () => {
-  test('TC-DROPDOWN-011 Verify dropdown state persists during same-session navigation', async ({ page }) => {
+  test('TC-DROPDOWN-011 Verify dropdown state persists during same-session navigation', { tag: '@regression' }, async ({ page }) => {
     const dropdownPage = new DropdownPage(page);
 
     // Step 1: Navigate to https://the-internet.herokuapp.com/dropdown
