@@ -8,7 +8,7 @@ test.describe('Initial Page State', () => {
     uploadPage = new UploadPage(page);
   });
 
-  test('TC-UPLOAD-001: Verify upload page loads with file input and upload button', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-UPLOAD-001: Verify upload page loads with file input and upload button', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await uploadPage.navigate();
 
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
@@ -20,7 +20,7 @@ test.describe('Initial Page State', () => {
     await expect(uploadPage.uploadButton).toBeVisible();
   });
 
-  test('TC-UPLOAD-002: Verify file input is empty on initial page load', { tag: '@sanity' }, async () => {
+  test('TC-UPLOAD-002: Verify file input is empty on initial page load', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.navigate();
 
     await expect(uploadPage.fileInput).toHaveValue('');
@@ -28,7 +28,7 @@ test.describe('Initial Page State', () => {
     expect(files).toBe(0);
   });
 
-  test('TC-UPLOAD-003: Verify upload button is enabled on initial page load', { tag: '@sanity' }, async () => {
+  test('TC-UPLOAD-003: Verify upload button is enabled on initial page load', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.navigate();
 
     await expect(uploadPage.uploadButton).toBeVisible();
@@ -36,7 +36,7 @@ test.describe('Initial Page State', () => {
     await expect(uploadPage.uploadButton).toHaveAttribute('type', 'submit');
   });
 
-  test('TC-UPLOAD-004: Verify form attributes are configured for file upload', { tag: '@sanity' }, async () => {
+  test('TC-UPLOAD-004: Verify form attributes are configured for file upload', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.navigate();
 
     await expect(uploadPage.form).toBeAttached();

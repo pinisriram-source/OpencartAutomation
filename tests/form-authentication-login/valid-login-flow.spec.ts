@@ -11,7 +11,7 @@ test.describe('Valid Login Flow', () => {
     securePage = new SecurePage(page);
   });
 
-  test('TC-LOGIN-004: Successful login with valid credentials navigates to secure area', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-LOGIN-004: Successful login with valid credentials navigates to secure area', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
 
     await loginPage.usernameField.fill('tomsmith');
@@ -30,7 +30,7 @@ test.describe('Valid Login Flow', () => {
     await expect(securePage.logoutButton).toBeVisible();
   });
 
-  test('TC-LOGIN-005: Secure area displays welcome message and logout button', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-005: Secure area displays welcome message and logout button', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
 

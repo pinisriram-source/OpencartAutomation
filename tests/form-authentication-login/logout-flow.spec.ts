@@ -11,7 +11,7 @@ test.describe('Logout Flow', () => {
     securePage = new SecurePage(page);
   });
 
-  test('TC-LOGIN-019: Clicking Logout navigates back to login page with flash message', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-LOGIN-019: Clicking Logout navigates back to login page with flash message', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
     await expect(page).toHaveURL(/\/secure/);
@@ -27,7 +27,7 @@ test.describe('Logout Flow', () => {
     await expect(loginPage.passwordField).toHaveValue('');
   });
 
-  test('TC-LOGIN-020: After logout, attempting to navigate back to secure area redirects to login', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-020: After logout, attempting to navigate back to secure area redirects to login', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
     await expect(page).toHaveURL(/\/secure/);

@@ -8,7 +8,7 @@ test.describe('Example 1 - Loading Sequence', () => {
     examplePage = new DynamicLoadingExamplePage(page, 1);
   });
 
-  test('TC-DYNLOAD-004: Example 1 clicking Start shows loading indicator immediately', { tag: '@sanity' }, async () => {
+  test('TC-DYNLOAD-004: Example 1 clicking Start shows loading indicator immediately', { tag: ['@sanity', '@regression'] }, async () => {
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
 
@@ -20,7 +20,7 @@ test.describe('Example 1 - Loading Sequence', () => {
     await expect(examplePage.helloWorldHeading).not.toBeVisible();
   });
 
-  test('TC-DYNLOAD-005: Example 1 displays Hello World message after loading completes', { tag: '@smoke' }, async () => {
+  test('TC-DYNLOAD-005: Example 1 displays Hello World message after loading completes', { tag: ['@smoke', '@regression'] }, async () => {
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
 
@@ -35,7 +35,7 @@ test.describe('Example 1 - Loading Sequence', () => {
     await expect(examplePage.startButton).not.toBeVisible();
   });
 
-  test('TC-DYNLOAD-006: Example 1 complete sequence from start to finish', { tag: '@functional' }, async () => {
+  test('TC-DYNLOAD-006: Example 1 complete sequence from start to finish', { tag: ['@functional', '@regression'] }, async () => {
     await examplePage.navigate();
 
     await expect(examplePage.startButton).toBeVisible();

@@ -9,7 +9,7 @@ test.describe('Login Page - Username Case Sensitivity', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-009: Username case-sensitive ("Student" fails)', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-009: Username case-sensitive ("Student" fails)', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // Perform login with incorrect case username
     await loginPage.login('Student', 'Password123');
 

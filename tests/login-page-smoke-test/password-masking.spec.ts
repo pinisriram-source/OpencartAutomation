@@ -9,7 +9,7 @@ test.describe('Login Page - Password Masking', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-011: Password field has type="password"', { tag: '@functional' }, async () => {
+  test('TC-LOGIN-011: Password field has type="password"', { tag: ['@functional', '@regression'] }, async () => {
     // Verify password field type attribute
     const passwordFieldType = await loginPage.getPasswordFieldType();
     expect(passwordFieldType).toBe('password');

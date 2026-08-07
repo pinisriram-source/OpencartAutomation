@@ -8,6 +8,11 @@
 //
 // Usage: node check-test-tiers.js <tests/slug-dir>
 // Exits 1 (and lists the offending tests) if any test() lacks a tier tag.
+//
+// Accepts both the single-tag form and the array form, since tests carry a
+// second @regression tag alongside their tier:
+//   { tag: '@smoke' }
+//   { tag: ['@smoke', '@regression'] }
 
 const fs = require("fs");
 const path = require("path");
@@ -41,7 +46,9 @@ function findSpecFiles(root) {
 // since "test." immediately followed by a non-"(" character can't match
 // \btest\( at all.
 const TEST_CALL_RE = /\btest\(\s*['"`]/g;
-const TIER_TAG_RE = /tag:\s*['"]@(smoke|sanity|functional)['"]/;
+// The optional [...] prefix allows the array form, and is order-independent
+// -- ['@regression', '@smoke'] matches just as well as ['@smoke', '@regression'].
+const TIER_TAG_RE = /tag:\s*(?:\[[^\]]*)?['"]@(smoke|sanity|functional)['"]/;
 
 const missing = [];
 

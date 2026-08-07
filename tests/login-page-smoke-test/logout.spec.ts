@@ -12,7 +12,7 @@ test.describe('Login Page - Logout', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-008: Log out link navigates back to login page', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-008: Log out link navigates back to login page', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // Perform login with valid credentials
     await loginPage.login('student', 'Password123');
 

@@ -8,7 +8,7 @@ test.describe('Login Page - Direct Success Page Access', () => {
     successPage = new SuccessPage(page);
   });
 
-  test('TC-LOGIN-015: Direct navigation to success page without login', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-015: Direct navigation to success page without login', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // Attempt to navigate directly to success page
     await successPage.navigate();
 

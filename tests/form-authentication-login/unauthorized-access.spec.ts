@@ -11,7 +11,7 @@ test.describe('Unauthorized Access', () => {
     securePage = new SecurePage(page);
   });
 
-  test('TC-LOGIN-021: Direct navigation to secure area without login redirects to login page', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-021: Direct navigation to secure area without login redirects to login page', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await securePage.navigate();
 
     await expect(page).toHaveURL(/\/login/);
@@ -22,7 +22,7 @@ test.describe('Unauthorized Access', () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test('TC-LOGIN-022: Multiple failed login attempts still allow successful login', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-022: Multiple failed login attempts still allow successful login', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
 
     await loginPage.login('wrongUser', 'wrongPass');

@@ -12,7 +12,7 @@ test.describe('Login Page - Success Message Content', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-014: Success page shows personalized message', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-014: Success page shows personalized message', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // Perform login with valid credentials
     await loginPage.login('student', 'Password123');
 

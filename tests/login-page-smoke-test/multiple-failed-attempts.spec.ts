@@ -12,7 +12,7 @@ test.describe('Login Page - Multiple Failed Attempts', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-013: Multiple failed logins, then success works', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-013: Multiple failed logins, then success works', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // First failed attempt - invalid username
     await loginPage.login('wrongUser', 'Password123');
     await expect(loginPage.errorMessage).toBeVisible();

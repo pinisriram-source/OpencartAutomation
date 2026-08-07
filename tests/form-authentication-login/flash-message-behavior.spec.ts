@@ -11,7 +11,7 @@ test.describe('Flash Message Behavior', () => {
     securePage = new SecurePage(page);
   });
 
-  test('TC-LOGIN-016: Flash message close button dismisses success message', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-016: Flash message close button dismisses success message', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
 
@@ -26,7 +26,7 @@ test.describe('Flash Message Behavior', () => {
     await expect(securePage.logoutButton).toBeVisible();
   });
 
-  test('TC-LOGIN-017: Flash message close button dismisses error message', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-017: Flash message close button dismisses error message', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('invalidUser', 'wrongPass');
 
@@ -41,7 +41,7 @@ test.describe('Flash Message Behavior', () => {
     await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test('TC-LOGIN-018: Flash message persists until dismissed or page navigates', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-018: Flash message persists until dismissed or page navigates', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
 

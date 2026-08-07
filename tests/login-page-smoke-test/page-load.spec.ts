@@ -9,7 +9,7 @@ test.describe('Login Page - Initial Load', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-001: Verify initial page load and form elements visible', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-LOGIN-001: Verify initial page load and form elements visible', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     // Verify page loads correctly
     await expect(page).toHaveURL('https://practicetestautomation.com/practice-test-login/');
     await expect(page).toHaveTitle('Test Login | Practice Test Automation');

@@ -12,7 +12,7 @@ test.describe('Login Page - Valid Login', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-002: Successful login with valid credentials', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-LOGIN-002: Successful login with valid credentials', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     // Perform login with valid credentials
     await loginPage.login('student', 'Password123');
 

@@ -9,7 +9,7 @@ test.describe('Login Page - Invalid Password', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-004: Valid username, invalid password shows "Your password is invalid!"', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-004: Valid username, invalid password shows "Your password is invalid!"', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // Perform login with valid username and invalid password
     await loginPage.login('student', 'incorrectPassword');
 

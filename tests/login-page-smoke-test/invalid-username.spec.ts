@@ -9,7 +9,7 @@ test.describe('Login Page - Invalid Username', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-003: Invalid username shows error "Your username is invalid!"', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-003: Invalid username shows error "Your username is invalid!"', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // Perform login with invalid username
     await loginPage.login('incorrectUser', 'Password123');
 

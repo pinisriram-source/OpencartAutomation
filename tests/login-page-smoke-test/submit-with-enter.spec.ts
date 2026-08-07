@@ -12,7 +12,7 @@ test.describe('Login Page - Submit with Enter Key', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-012: Enter key submits the form', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-012: Enter key submits the form', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // Perform login using Enter key
     await loginPage.loginWithEnter('student', 'Password123');
 

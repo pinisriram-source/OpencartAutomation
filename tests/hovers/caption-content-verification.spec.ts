@@ -9,7 +9,7 @@ test.describe('Caption Content Verification', () => {
     await hoversPage.navigate();
   });
 
-  test('TC-HOVERS-021: First avatar caption displays correct user name format', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-HOVERS-021: First avatar caption displays correct user name format', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page (done in beforeEach)
     // expect: Page loads successfully
 
@@ -31,7 +31,7 @@ test.describe('Caption Content Verification', () => {
     await expect(hoversPage.getViewProfileLink(0)).toHaveText('View profile');
   });
 
-  test('TC-HOVERS-022: Second avatar caption displays correct user name format', { tag: '@functional' }, async ({ page }) => {
+  test('TC-HOVERS-022: Second avatar caption displays correct user name format', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page (done in beforeEach)
     // expect: Page loads successfully
 
@@ -53,7 +53,7 @@ test.describe('Caption Content Verification', () => {
     await expect(hoversPage.getViewProfileLink(1)).toHaveText('View profile');
   });
 
-  test('TC-HOVERS-023: Third avatar caption displays correct user name format', { tag: '@functional' }, async ({ page }) => {
+  test('TC-HOVERS-023: Third avatar caption displays correct user name format', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page (done in beforeEach)
     // expect: Page loads successfully
 
@@ -75,7 +75,7 @@ test.describe('Caption Content Verification', () => {
     await expect(hoversPage.getViewProfileLink(2)).toHaveText('View profile');
   });
 
-  test('TC-HOVERS-024: All View profile links have correct href attributes', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-HOVERS-024: All View profile links have correct href attributes', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page (done in beforeEach)
     // expect: Page loads successfully
 

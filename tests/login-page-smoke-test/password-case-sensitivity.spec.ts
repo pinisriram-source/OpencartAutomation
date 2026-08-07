@@ -9,7 +9,7 @@ test.describe('Login Page - Password Case Sensitivity', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-010: Password case-sensitive ("password123" fails)', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-010: Password case-sensitive ("password123" fails)', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // Perform login with incorrect case password
     await loginPage.login('student', 'password123');
 

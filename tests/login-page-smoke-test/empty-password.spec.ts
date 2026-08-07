@@ -9,7 +9,7 @@ test.describe('Login Page - Empty Password', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-007: Valid username, empty password shows "Your password is invalid!"', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-007: Valid username, empty password shows "Your password is invalid!"', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // Perform login with valid username and empty password
     await loginPage.login('student', '');
 

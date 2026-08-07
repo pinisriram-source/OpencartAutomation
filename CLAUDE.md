@@ -359,27 +359,28 @@ Every test case in a pipeline-generated suite (`tests/<suite>/`) is
 classified into exactly **one** of three mutually exclusive tiers, recorded
 as a `**Tier:**` line on the test case in `specs/<slug>-test-plan.md` and
 carried into the generated spec as a Playwright tag via the `test(title,
-{ tag: '@tier' }, fn)` option (not an `@tag` suffix baked into the title
-string):
+{ tag: [...] }, fn)` option (not an `@tag` suffix baked into the title
+string). Each test carries its tier tag **plus `@regression`** (see the
+"Regression tag" section below):
 
-- **Smoke** (`{ tag: '@smoke' }`) — the smallest possible set proving the
-  feature works at all: the page loads and the single primary happy-path
-  action succeeds. Usually 1-3 per suite; this is the fastest signal and
-  should run on every change.
-- **Sanity** (`{ tag: '@sanity' }`) — broader-but-still-quick checks that
-  each acceptance criterion's core documented behavior works, without deep
-  edge cases or repeated variants.
-- **Functional** (`{ tag: '@functional' }`) — everything else: repeated
-  variants (e.g. the same check against a second/third instance), negative
-  and boundary cases, validation, cross-cutting checks. This is the bulk of
-  the suite and the full regression pass.
+- **Smoke** (`{ tag: ['@smoke', '@regression'] }`) — the smallest possible
+  set proving the feature works at all: the page loads and the single
+  primary happy-path action succeeds. Usually 1-3 per suite; this is the
+  fastest signal and should run on every change.
+- **Sanity** (`{ tag: ['@sanity', '@regression'] }`) — broader-but-still-quick
+  checks that each acceptance criterion's core documented behavior works,
+  without deep edge cases or repeated variants.
+- **Functional** (`{ tag: ['@functional', '@regression'] }`) — everything
+  else: repeated variants (e.g. the same check against a second/third
+  instance), negative and boundary cases, validation, cross-cutting checks.
+  This is the bulk of the suite.
 
 Run one tier with `npx playwright test tests/<suite> --grep @smoke` (swap
 the tag), or combine tiers with `npx playwright test tests/<suite> --grep
 "@smoke|@sanity"`.
 
 Worked example: `specs/hovers-test-plan.md`'s `**Tier:**` lines and the
-matching `{ tag: '@...' }` on each `test()` in `tests/hovers/*.spec.ts`.
+matching `{ tag: [...] }` on each `test()` in `tests/hovers/*.spec.ts`.
 Apply this to every suite generated going forward, same scope-of-adoption
 caveat as the Page Object contract above (older pipeline suites have not
 been retrofitted).
@@ -388,7 +389,42 @@ This is a hard-enforced gate, not just a prompt instruction: brand-new
 suites (`pipeline-automation.yml`'s fresh-generation path only — not
 revisions of an existing suite) are checked by
 `.github/scripts/check-test-tiers.js`, which fails the stage if any `test()`
-lacks a tier tag.
+lacks a tier tag. That check accepts both the single-tag and array forms,
+so pairing the tier with `@regression` doesn't trip it.
+
+## Regression tag — "Submit New Request" pipeline suites
+
+Every test in a pipeline-generated suite also carries `@regression`
+alongside its tier tag, so the whole cross-suite regression set is
+selectable in one command:
+
+```
+npx playwright test --project=chromium --grep @regression
+```
+
+The point is **cross-suite selection**. `pipeline-execute.yml` only ever
+runs one slug (`tests/<slug>`), so before this there was no way to run
+"every pipeline suite" in a single command without listing paths by hand —
+and a bare `npx playwright test` would also pull in the OpenCart
+`tests/storefront`/`tests/admin` suites (which depend on the tutorialsninja
+demo site's state) and `tests/saucedemo-checkout`. `@regression` selects
+the pipeline suites and nothing else.
+
+It deliberately does **not** replace the tier tags: tier answers "how deep
+is this test", `@regression` answers "is this part of the cross-suite
+regression set". They compose — `--grep "@regression"` for everything,
+`--grep @smoke` for the fast signal across those same suites.
+
+Scope of adoption, as of writing: the five tier-tagged suites
+(`dynamic-loading-hidden-and-rendered-elements`, `form-authentication-login`,
+`hovers`, `login-page-smoke-test`, `single-file-upload-flow` — 131 tests),
+plus every suite generated going forward. The older untiered pipeline
+suites (`add-remove-elements`, `context-menu`, `dropdown-*`, `key-presses`,
+`practice-login-page-smoke-test`, `testing-request-dynamic-controls`) have
+**not** been retrofitted, matching how the tier convention itself was
+adopted — they have neither tier nor regression tags. `tests/storefront`,
+`tests/admin` and `tests/saucedemo-checkout` are not pipeline suites and
+are intentionally excluded.
 
 The tag on each `test()` is necessary but not sufficient for the tier to be
 *visible* anywhere: the Streamlit dashboard reads

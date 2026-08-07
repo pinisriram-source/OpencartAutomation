@@ -11,7 +11,7 @@ test.describe('Browser Navigation Behavior', () => {
     securePage = new SecurePage(page);
   });
 
-  test('TC-LOGIN-028: Browser back button after successful login returns to login page', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-028: Browser back button after successful login returns to login page', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
     await expect(page).toHaveURL(/\/secure/);
@@ -23,7 +23,7 @@ test.describe('Browser Navigation Behavior', () => {
     await expect(securePage.pageHeading).not.toBeVisible();
   });
 
-  test('TC-LOGIN-029: Browser forward button after logout navigates forward', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-029: Browser forward button after logout navigates forward', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
     await loginPage.login('tomsmith', 'SuperSecretPassword!');
     await expect(page).toHaveURL(/\/secure/);
@@ -37,7 +37,7 @@ test.describe('Browser Navigation Behavior', () => {
     await expect(loginPage.usernameField).toBeVisible();
   });
 
-  test('TC-LOGIN-030: Page refresh on login page clears form state', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-030: Page refresh on login page clears form state', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
 
     await loginPage.usernameField.fill('testuser');

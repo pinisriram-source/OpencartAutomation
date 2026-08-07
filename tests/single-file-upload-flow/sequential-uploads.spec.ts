@@ -20,7 +20,7 @@ test.describe('Sequential Uploads', () => {
     await uploadPage.navigate();
   });
 
-  test('TC-UPLOAD-017: Uploading a second file after a successful upload displays the new file name', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-UPLOAD-017: Uploading a second file after a successful upload displays the new file name', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await uploadPage.uploadFile(UPLOAD_SAMPLE);
     await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
 
@@ -35,7 +35,7 @@ test.describe('Sequential Uploads', () => {
     await expect(successPage.uploadedFileName).not.toHaveText('upload-sample.txt');
   });
 
-  test('TC-UPLOAD-018: Three sequential uploads each display the correct current file name', { tag: '@functional' }, async ({ page }) => {
+  test('TC-UPLOAD-018: Three sequential uploads each display the correct current file name', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await uploadPage.uploadFile(UPLOAD_SAMPLE);
     await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
 

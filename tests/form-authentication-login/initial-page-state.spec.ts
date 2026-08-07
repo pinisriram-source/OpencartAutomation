@@ -8,7 +8,7 @@ test.describe('Initial Page State', () => {
     loginPage = new LoginPage(page);
   });
 
-  test('TC-LOGIN-001: Verify login page loads with all required elements', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-LOGIN-001: Verify login page loads with all required elements', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await loginPage.navigate();
 
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/login');
@@ -23,7 +23,7 @@ test.describe('Initial Page State', () => {
     await expect(loginPage.flashMessage).not.toBeVisible();
   });
 
-  test('TC-LOGIN-002: Verify instruction text is displayed on page load', { tag: '@sanity' }, async () => {
+  test('TC-LOGIN-002: Verify instruction text is displayed on page load', { tag: ['@sanity', '@regression'] }, async () => {
     await loginPage.navigate();
 
     await expect(loginPage.instructionText).toBeVisible();
@@ -32,7 +32,7 @@ test.describe('Initial Page State', () => {
     await expect(loginPage.instructionText).toContainText('error messages');
   });
 
-  test('TC-LOGIN-003: Verify input fields are empty on initial page load', { tag: '@sanity' }, async () => {
+  test('TC-LOGIN-003: Verify input fields are empty on initial page load', { tag: ['@sanity', '@regression'] }, async () => {
     await loginPage.navigate();
 
     await expect(loginPage.usernameField).toHaveValue('');

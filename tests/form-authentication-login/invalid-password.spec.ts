@@ -9,7 +9,7 @@ test.describe('Invalid Password', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-009: Login with valid username but invalid password shows error', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-009: Login with valid username but invalid password shows error', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await loginPage.usernameField.fill('tomsmith');
     await expect(loginPage.usernameField).toHaveValue('tomsmith');
 
@@ -25,7 +25,7 @@ test.describe('Invalid Password', () => {
     await expect(loginPage.passwordField).toBeVisible();
   });
 
-  test('TC-LOGIN-010: Login with valid username and incorrect password case shows error', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-010: Login with valid username and incorrect password case shows error', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.usernameField.fill('tomsmith');
 
     await loginPage.passwordField.fill('supersecretpassword!');
@@ -37,7 +37,7 @@ test.describe('Invalid Password', () => {
     await expect(loginPage.flashMessage).toContainText('Your password is invalid!');
   });
 
-  test('TC-LOGIN-011: Login with valid username and whitespace-padded password shows error', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-011: Login with valid username and whitespace-padded password shows error', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.usernameField.fill('tomsmith');
 
     await loginPage.passwordField.fill(' SuperSecretPassword! ');

@@ -20,7 +20,7 @@ test.describe('Successful Upload Flow', () => {
     await uploadPage.navigate();
   });
 
-  test('TC-UPLOAD-010: Successfully uploading a .txt file navigates to success page with correct file name', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-UPLOAD-010: Successfully uploading a .txt file navigates to success page with correct file name', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await uploadPage.selectFile(UPLOAD_SAMPLE);
     await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
 
@@ -32,7 +32,7 @@ test.describe('Successful Upload Flow', () => {
     await expect(successPage.uploadedFileName).toHaveText('upload-sample.txt');
   });
 
-  test('TC-UPLOAD-011: Successfully uploading a .json file shows correct file name on success page', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-011: Successfully uploading a .json file shows correct file name on success page', { tag: ['@functional', '@regression'] }, async () => {
     await uploadPage.selectFile(PACKAGE_JSON);
     await expect(uploadPage.fileInput).toHaveValue(/package\.json$/);
 
@@ -43,7 +43,7 @@ test.describe('Successful Upload Flow', () => {
     await expect(successPage.uploadedFileName).toHaveText('package.json');
   });
 
-  test('TC-UPLOAD-012: Successfully uploading a .md file shows correct file name on success page', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-012: Successfully uploading a .md file shows correct file name on success page', { tag: ['@functional', '@regression'] }, async () => {
     await uploadPage.selectFile(CLAUDE_MD);
     await expect(uploadPage.fileInput).toHaveValue(/CLAUDE\.md$/);
 
@@ -54,7 +54,7 @@ test.describe('Successful Upload Flow', () => {
     await expect(successPage.uploadedFileName).toHaveText('CLAUDE.md');
   });
 
-  test('TC-UPLOAD-013: Upload success page displays only the file name, not the full path', { tag: '@sanity' }, async () => {
+  test('TC-UPLOAD-013: Upload success page displays only the file name, not the full path', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.selectFile(UPLOAD_SAMPLE);
     await uploadPage.clickUpload();
 

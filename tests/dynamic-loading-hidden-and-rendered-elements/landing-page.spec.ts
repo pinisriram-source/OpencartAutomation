@@ -8,7 +8,7 @@ test.describe('Landing Page', () => {
     landingPage = new DynamicLoadingLandingPage(page);
   });
 
-  test('TC-DYNLOAD-001: Landing page displays feature overview and links to both examples', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-DYNLOAD-001: Landing page displays feature overview and links to both examples', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await landingPage.navigate();
 
     await expect(page).toHaveTitle('The Internet');

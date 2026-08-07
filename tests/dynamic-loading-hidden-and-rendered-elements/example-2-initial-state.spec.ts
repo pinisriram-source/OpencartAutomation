@@ -8,7 +8,7 @@ test.describe('Example 2 - Initial State', () => {
     examplePage = new DynamicLoadingExamplePage(page, 2);
   });
 
-  test('TC-DYNLOAD-007: Example 2 initial state shows Start button with no visible message or loading indicator', { tag: '@sanity' }, async () => {
+  test('TC-DYNLOAD-007: Example 2 initial state shows Start button with no visible message or loading indicator', { tag: ['@sanity', '@regression'] }, async () => {
     await examplePage.navigate();
 
     await expect(examplePage.pageHeading).toHaveText('Example 2: Element rendered after the fact');
@@ -19,7 +19,7 @@ test.describe('Example 2 - Initial State', () => {
     await expect(examplePage.loadingSpinner).not.toBeVisible();
   });
 
-  test('TC-DYNLOAD-008: Example 2 has no Hello World element in DOM initially', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-DYNLOAD-008: Example 2 has no Hello World element in DOM initially', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
 

@@ -8,7 +8,7 @@ test.describe('Initial Page State', () => {
     hoversPage = new HoversPage(page);
   });
 
-  test('TC-HOVERS-001: Verify page load shows three avatar images with no visible captions', { tag: '@smoke' }, async ({ page }) => {
+  test('TC-HOVERS-001: Verify page load shows three avatar images with no visible captions', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page at https://the-internet.herokuapp.com/hovers
     await hoversPage.navigate();
 
@@ -37,7 +37,7 @@ test.describe('Initial Page State', () => {
     await expect(hoversPage.instructionText).toHaveText('Hover over the image for additional information');
   });
 
-  test('TC-HOVERS-002: Verify all three avatar images are rendered correctly', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-HOVERS-002: Verify all three avatar images are rendered correctly', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     await hoversPage.navigate();
 

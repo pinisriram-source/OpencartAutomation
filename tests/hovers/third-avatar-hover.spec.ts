@@ -12,7 +12,7 @@ test.describe('Single Image Hover - Third Avatar', () => {
     await hoversPage.navigate();
   });
 
-  test('TC-HOVERS-007: Hovering over third avatar reveals user3 caption and link', { tag: '@functional' }, async ({ page }) => {
+  test('TC-HOVERS-007: Hovering over third avatar reveals user3 caption and link', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page at https://the-internet.herokuapp.com/hovers
     // (Already done in beforeEach)
     await expect(hoversPage.pageHeading).toBeVisible();
@@ -40,7 +40,7 @@ test.describe('Single Image Hover - Third Avatar', () => {
     await expect(hoversPage.getCaptionOverlay(1)).toBeHidden();
   });
 
-  test('TC-HOVERS-008: Moving mouse away from third avatar hides its caption', { tag: '@functional' }, async ({ page }) => {
+  test('TC-HOVERS-008: Moving mouse away from third avatar hides its caption', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to the Hovers page
     // (Already done in beforeEach)
     await expect(hoversPage.pageHeading).toBeVisible();

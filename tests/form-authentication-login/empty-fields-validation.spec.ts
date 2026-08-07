@@ -9,7 +9,7 @@ test.describe('Empty Fields Validation', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-012: Submitting form with both fields empty shows username error', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-LOGIN-012: Submitting form with both fields empty shows username error', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await expect(loginPage.usernameField).toHaveValue('');
     await expect(loginPage.passwordField).toHaveValue('');
 
@@ -20,7 +20,7 @@ test.describe('Empty Fields Validation', () => {
     await expect(loginPage.flashMessage).toContainText('Your username is invalid!');
   });
 
-  test('TC-LOGIN-013: Submitting form with empty username and valid password shows error', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-013: Submitting form with empty username and valid password shows error', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await expect(loginPage.usernameField).toHaveValue('');
 
     await loginPage.passwordField.fill('SuperSecretPassword!');
@@ -32,7 +32,7 @@ test.describe('Empty Fields Validation', () => {
     await expect(loginPage.flashMessage).toContainText('Your username is invalid!');
   });
 
-  test('TC-LOGIN-014: Submitting form with valid username and empty password shows error', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-014: Submitting form with valid username and empty password shows error', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.usernameField.fill('tomsmith');
     await expect(loginPage.usernameField).toHaveValue('tomsmith');
     await expect(loginPage.passwordField).toHaveValue('');
@@ -44,7 +44,7 @@ test.describe('Empty Fields Validation', () => {
     await expect(loginPage.flashMessage).toContainText('Your password is invalid!');
   });
 
-  test('TC-LOGIN-015: Submitting form with whitespace-only username shows error', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-015: Submitting form with whitespace-only username shows error', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.usernameField.fill('   ');
 
     await loginPage.passwordField.fill('SuperSecretPassword!');

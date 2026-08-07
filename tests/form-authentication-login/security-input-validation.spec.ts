@@ -9,7 +9,7 @@ test.describe('Security and Input Validation', () => {
     await loginPage.navigate();
   });
 
-  test('TC-LOGIN-023: SQL injection attempt in username field is handled safely', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-023: SQL injection attempt in username field is handled safely', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.login("admin' OR '1'='1", 'anyPassword');
 
     await expect(page).toHaveURL(/\/login/);
@@ -19,7 +19,7 @@ test.describe('Security and Input Validation', () => {
     await expect(page.locator('body')).not.toContainText('syntax error');
   });
 
-  test('TC-LOGIN-024: XSS attempt in username field is sanitized', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-024: XSS attempt in username field is sanitized', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const xssPayload = "<script>alert('XSS')</script>";
 
     await loginPage.login(xssPayload, 'anyPassword');
@@ -33,7 +33,7 @@ test.describe('Security and Input Validation', () => {
     expect(dialogTriggered).toBe(false);
   });
 
-  test('TC-LOGIN-025: Special characters in username are handled correctly', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-025: Special characters in username are handled correctly', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.login('tom@smith#123!', 'SuperSecretPassword!');
 
     await expect(page).toHaveURL(/\/login/);
@@ -41,7 +41,7 @@ test.describe('Security and Input Validation', () => {
     await expect(loginPage.flashMessage).toContainText('Your username is invalid!');
   });
 
-  test('TC-LOGIN-026: Very long username input is handled correctly', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-026: Very long username input is handled correctly', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const longUsername = 'a'.repeat(500);
 
     await loginPage.login(longUsername, 'SuperSecretPassword!');
@@ -51,7 +51,7 @@ test.describe('Security and Input Validation', () => {
     await expect(loginPage.flashMessage).toContainText('Your username is invalid!');
   });
 
-  test('TC-LOGIN-027: Unicode characters in credentials are handled correctly', { tag: '@functional' }, async ({ page }) => {
+  test('TC-LOGIN-027: Unicode characters in credentials are handled correctly', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await loginPage.login('tomsmíth', 'SuperSecretPassword!');
 
     await expect(page).toHaveURL(/\/login/);

@@ -19,7 +19,7 @@ test.describe('File Name Integrity', () => {
     await uploadPage.navigate();
   });
 
-  test('TC-UPLOAD-019: File name on success page exactly matches selected file name including extension', { tag: '@sanity' }, async () => {
+  test('TC-UPLOAD-019: File name on success page exactly matches selected file name including extension', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.selectFile(UPLOAD_SAMPLE);
     await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
 
@@ -34,7 +34,7 @@ test.describe('File Name Integrity', () => {
     expect(displayedName).toContain('.txt');
   });
 
-  test('TC-UPLOAD-020: File name with uppercase letters is preserved on success page', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-020: File name with uppercase letters is preserved on success page', { tag: ['@functional', '@regression'] }, async () => {
     await uploadPage.selectFile(CLAUDE_MD);
     await expect(uploadPage.fileInput).toHaveValue(/CLAUDE\.md$/);
 
@@ -47,7 +47,7 @@ test.describe('File Name Integrity', () => {
     expect(displayedName).not.toBe('claude.md');
   });
 
-  test('TC-UPLOAD-021: File name with dots and hyphens is preserved on success page', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-021: File name with dots and hyphens is preserved on success page', { tag: ['@functional', '@regression'] }, async () => {
     await uploadPage.selectFile(UPLOAD_SAMPLE);
     await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
 

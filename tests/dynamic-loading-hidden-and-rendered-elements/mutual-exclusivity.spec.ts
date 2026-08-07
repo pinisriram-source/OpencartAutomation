@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DynamicLoadingExamplePage } from './page-objects/dynamic-loading-example.page';
 
 test.describe('Mutual Exclusivity - State Transitions', () => {
-  test('TC-DYNLOAD-012: Example 1 shows exactly one state at any moment - Start OR Loading OR Message', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-DYNLOAD-012: Example 1 shows exactly one state at any moment - Start OR Loading OR Message', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 1);
     await examplePage.navigate();
 
@@ -26,7 +26,7 @@ test.describe('Mutual Exclusivity - State Transitions', () => {
     await expect(examplePage.helloWorldHeading).toBeVisible();
   });
 
-  test('TC-DYNLOAD-013: Example 2 shows exactly one state at any moment - Start OR Loading OR Message', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-013: Example 2 shows exactly one state at any moment - Start OR Loading OR Message', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 2);
     await examplePage.navigate();
 
@@ -50,7 +50,7 @@ test.describe('Mutual Exclusivity - State Transitions', () => {
     await expect(examplePage.helloWorldHeading).toBeVisible();
   });
 
-  test('TC-DYNLOAD-014: Loading indicator and Hello World message are never visible simultaneously on Example 1', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-014: Loading indicator and Hello World message are never visible simultaneously on Example 1', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 1);
     await examplePage.navigate();
     await examplePage.clickStart();
@@ -70,7 +70,7 @@ test.describe('Mutual Exclusivity - State Transitions', () => {
     expect(bothVisible).toBe(false);
   });
 
-  test('TC-DYNLOAD-015: Loading indicator and Hello World message are never visible simultaneously on Example 2', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-015: Loading indicator and Hello World message are never visible simultaneously on Example 2', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 2);
     await examplePage.navigate();
     await examplePage.clickStart();

@@ -17,7 +17,7 @@ test.describe('File Selection Behavior', () => {
     await uploadPage.navigate();
   });
 
-  test('TC-UPLOAD-005: Selecting a valid file populates the file input', { tag: '@smoke' }, async () => {
+  test('TC-UPLOAD-005: Selecting a valid file populates the file input', { tag: ['@smoke', '@regression'] }, async () => {
     await expect(uploadPage.fileInput).toHaveValue('');
 
     await uploadPage.selectFile(UPLOAD_SAMPLE);
@@ -29,7 +29,7 @@ test.describe('File Selection Behavior', () => {
     expect(fileName).toBe('upload-sample.txt');
   });
 
-  test('TC-UPLOAD-006: Selecting a file with different extension (.json) populates the file input correctly', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-006: Selecting a file with different extension (.json) populates the file input correctly', { tag: ['@functional', '@regression'] }, async () => {
     await uploadPage.selectFile(PACKAGE_JSON);
 
     await expect(uploadPage.fileInput).toHaveValue(/package\.json$/);
@@ -39,7 +39,7 @@ test.describe('File Selection Behavior', () => {
     expect(fileName).toBe('package.json');
   });
 
-  test('TC-UPLOAD-007: Selecting a file with .md extension populates the file input correctly', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-007: Selecting a file with .md extension populates the file input correctly', { tag: ['@functional', '@regression'] }, async () => {
     await uploadPage.selectFile(CLAUDE_MD);
 
     await expect(uploadPage.fileInput).toHaveValue(/CLAUDE\.md$/);
@@ -49,7 +49,7 @@ test.describe('File Selection Behavior', () => {
     expect(fileName).toBe('CLAUDE.md');
   });
 
-  test('TC-UPLOAD-008: Canceling file chooser leaves file input empty', { tag: '@functional' }, async () => {
+  test('TC-UPLOAD-008: Canceling file chooser leaves file input empty', { tag: ['@functional', '@regression'] }, async () => {
     await expect(uploadPage.fileInput).toHaveValue('');
 
     await uploadPage.cancelFileSelection();
@@ -59,7 +59,7 @@ test.describe('File Selection Behavior', () => {
     expect(fileCount).toBe(0);
   });
 
-  test('TC-UPLOAD-009: Selecting a second file replaces the first file in the input', { tag: '@sanity' }, async () => {
+  test('TC-UPLOAD-009: Selecting a second file replaces the first file in the input', { tag: ['@sanity', '@regression'] }, async () => {
     await uploadPage.selectFile(UPLOAD_SAMPLE);
     await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
     const firstCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);

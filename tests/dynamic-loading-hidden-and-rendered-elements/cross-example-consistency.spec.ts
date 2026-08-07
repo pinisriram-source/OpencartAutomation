@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DynamicLoadingExamplePage } from './page-objects/dynamic-loading-example.page';
 
 test.describe('Cross-Example Consistency', () => {
-  test('TC-DYNLOAD-024: Both examples produce identical Hello World message text and styling', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-DYNLOAD-024: Both examples produce identical Hello World message text and styling', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     const example1 = new DynamicLoadingExamplePage(page, 1);
     await example1.navigate();
     await example1.clickStart();
@@ -37,7 +37,7 @@ test.describe('Cross-Example Consistency', () => {
     expect(styles2).toEqual(styles1);
   });
 
-  test('TC-DYNLOAD-025: Both examples show identical loading indicator during loading phase', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-025: Both examples show identical loading indicator during loading phase', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const example1 = new DynamicLoadingExamplePage(page, 1);
     await example1.navigate();
     await example1.clickStart();
@@ -61,7 +61,7 @@ test.describe('Cross-Example Consistency', () => {
     expect(loadingHtml2).toBe(loadingHtml1);
   });
 
-  test('TC-DYNLOAD-026: Both examples have approximately same loading duration', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-026: Both examples have approximately same loading duration', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const example1 = new DynamicLoadingExamplePage(page, 1);
     await example1.navigate();
     await expect(example1.startButton).toBeVisible();
@@ -88,7 +88,7 @@ test.describe('Cross-Example Consistency', () => {
     expect(Math.abs(duration1 - duration2)).toBeLessThan(1000);
   });
 
-  test('TC-DYNLOAD-027: Both examples use the same Start button text and styling', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-027: Both examples use the same Start button text and styling', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const example1 = new DynamicLoadingExamplePage(page, 1);
     await example1.navigate();
     await expect(example1.startButton).toBeVisible();

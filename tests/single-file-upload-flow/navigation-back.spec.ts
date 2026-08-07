@@ -17,7 +17,7 @@ test.describe('Navigation Back from Success Page', () => {
     await uploadPage.navigate();
   });
 
-  test('TC-UPLOAD-022: Navigating back from success page returns to upload form', { tag: '@sanity' }, async ({ page }) => {
+  test('TC-UPLOAD-022: Navigating back from success page returns to upload form', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     await uploadPage.uploadFile(UPLOAD_SAMPLE);
     await expect(successPage.pageHeading).toBeVisible();
 
@@ -29,7 +29,7 @@ test.describe('Navigation Back from Success Page', () => {
     await expect(uploadPage.uploadButton).toBeVisible();
   });
 
-  test('TC-UPLOAD-023: File input retains selected file after navigating back from success page', { tag: '@functional' }, async ({ page }) => {
+  test('TC-UPLOAD-023: File input retains selected file after navigating back from success page', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await uploadPage.selectFile(UPLOAD_SAMPLE);
     await expect(uploadPage.fileInput).toHaveValue(/upload-sample\.txt$/);
 
@@ -43,7 +43,7 @@ test.describe('Navigation Back from Success Page', () => {
     expect(fileCount).toBe(1);
   });
 
-  test('TC-UPLOAD-024: Fresh page load after navigation back clears file selection', { tag: '@functional' }, async ({ page }) => {
+  test('TC-UPLOAD-024: Fresh page load after navigation back clears file selection', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     await uploadPage.uploadFile(UPLOAD_SAMPLE);
     await expect(successPage.pageHeading).toBeVisible();
 

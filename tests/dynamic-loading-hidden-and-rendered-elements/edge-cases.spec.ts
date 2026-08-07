@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { DynamicLoadingExamplePage } from './page-objects/dynamic-loading-example.page';
 
 test.describe('Edge Cases and Error Conditions', () => {
-  test('TC-DYNLOAD-028: Example 1 can be successfully run multiple times in succession', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-028: Example 1 can be successfully run multiple times in succession', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 1);
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
@@ -19,7 +19,7 @@ test.describe('Edge Cases and Error Conditions', () => {
     await expect(examplePage.helloWorldHeading).toBeVisible();
   });
 
-  test('TC-DYNLOAD-029: Example 2 can be successfully run multiple times in succession', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-029: Example 2 can be successfully run multiple times in succession', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 2);
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
@@ -36,7 +36,7 @@ test.describe('Edge Cases and Error Conditions', () => {
     await expect(examplePage.helloWorldHeading).toBeVisible();
   });
 
-  test('TC-DYNLOAD-030: Example 1 handles browser back navigation correctly', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-030: Example 1 handles browser back navigation correctly', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 1);
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
@@ -54,7 +54,7 @@ test.describe('Edge Cases and Error Conditions', () => {
     await expect(examplePage.helloWorldHeading).not.toBeVisible();
   });
 
-  test('TC-DYNLOAD-031: Example 2 handles browser back navigation correctly', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-031: Example 2 handles browser back navigation correctly', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const examplePage = new DynamicLoadingExamplePage(page, 2);
     await examplePage.navigate();
     await expect(examplePage.startButton).toBeVisible();
@@ -72,7 +72,7 @@ test.describe('Edge Cases and Error Conditions', () => {
     await expect(examplePage.helloWorldHeading).not.toBeVisible();
   });
 
-  test('TC-DYNLOAD-032: Direct URL access to examples works correctly', { tag: '@functional' }, async ({ page }) => {
+  test('TC-DYNLOAD-032: Direct URL access to examples works correctly', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     const example1 = new DynamicLoadingExamplePage(page, 1);
     await example1.navigate();
 

@@ -8,7 +8,7 @@ test.describe('Example 1 - Initial State', () => {
     examplePage = new DynamicLoadingExamplePage(page, 1);
   });
 
-  test('TC-DYNLOAD-002: Example 1 initial state shows Start button with no visible message or loading indicator', { tag: '@smoke' }, async () => {
+  test('TC-DYNLOAD-002: Example 1 initial state shows Start button with no visible message or loading indicator', { tag: ['@smoke', '@regression'] }, async () => {
     await examplePage.navigate();
 
     await expect(examplePage.pageHeading).toHaveText('Example 1: Element on page that is hidden');
@@ -19,7 +19,7 @@ test.describe('Example 1 - Initial State', () => {
     await expect(examplePage.loadingSpinner).not.toBeVisible();
   });
 
-  test('TC-DYNLOAD-003: Example 1 has Hello World element in DOM but hidden', { tag: '@sanity' }, async () => {
+  test('TC-DYNLOAD-003: Example 1 has Hello World element in DOM but hidden', { tag: ['@sanity', '@regression'] }, async () => {
     await examplePage.navigate();
 
     await expect(examplePage.startButton).toBeVisible();
