@@ -1353,8 +1353,19 @@ with tab_details:
                 "run yet (try rebooting the app)."
             )
 
-        suite_dir = REPO_ROOT / meta["suite_path"]
-        spec_path, block = find_test_block(str(suite_dir), picked_id)
+        # An aggregator suite pools tests from many source suites, so its ids
+        # are namespaced "<source-suite>/<TC-ID>" -- a bare TC-ID isn't unique
+        # across the pool (TC-LOGIN-001 exists in two suites, as do several
+        # TC-DROPDOWN-*). Scope the lookup to that source suite and search for
+        # the bare id, since searching all of tests/ would return whichever
+        # colliding suite happened to sort first.
+        if "/" in picked_id:
+            source_suite, bare_id = picked_id.split("/", 1)
+            suite_dir = REPO_ROOT / "tests" / source_suite
+            spec_path, block = find_test_block(str(suite_dir), bare_id)
+        else:
+            suite_dir = REPO_ROOT / meta["suite_path"]
+            spec_path, block = find_test_block(str(suite_dir), picked_id)
 
         if block is None:
             st.warning(

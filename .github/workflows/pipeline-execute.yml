@@ -106,13 +106,32 @@ jobs:
           # reporters/screenshot-collector.ts), silently dropping the
           # screenshot-collector and producing zero screenshots even though
           # every test still passes/fails normally.
-          npx playwright test "tests/${SLUG}" --project=chromium 2>&1 | tee test-output.log
+          #
+          # A slug whose directory holds a suite.config.ts is an aggregator
+          # suite -- it owns no spec files and instead selects tests from
+          # across the other suites, which a `tests/<slug>` path argument
+          # can't express. Run it through that config instead.
+          if [ -f "tests/${SLUG}/suite.config.ts" ]; then
+            npx playwright test --config="tests/${SLUG}/suite.config.ts" --project=chromium 2>&1 | tee test-output.log
+          else
+            npx playwright test "tests/${SLUG}" --project=chromium 2>&1 | tee test-output.log
+          fi
           echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Claude Code -- generate dashboard data
         continue-on-error: true
         run: |
-          npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md and the raw Playwright output at test-output.log (this run used only the chromium browser project). Produce a JSON file at streamlit_app/data/${SLUG}-test-results.json that matches EXACTLY the schema of streamlit_app/data/hovers-test-results.json -- read that file first as the schema reference (keys: meta, summary, suites, use_cases, business_rules, tests, defects; each test object has id, tier, title, use_case, business_rule, chromium, note IN THAT ORDER). Populate every test's real pass/fail status from test-output.log using only a chromium key (no firefox/webkit keys). Populate each test's 'tier' field (Smoke/Sanity/Functional) by matching its Test Case ID to the '**Tier:**' line for that test case in specs/${SLUG}-test-plan.md -- do not guess or omit it. If the test plan doesn't define explicit business-rule labels, leave business_rule as an empty string on every test and business_rules as an empty object -- do not invent business rules that aren't in the source material. Only write this one file -- do not modify specs/, tests/, or any .claude/ file." \
+          # Aggregator suites pool tests from many suites, where a bare TC-ID
+          # is no longer unique (TC-LOGIN-001 exists in two suites, as do
+          # several TC-DROPDOWN-*). Namespacing the id keeps every test
+          # addressable and makes the screenshot path resolve to the nested
+          # reports/screenshots/<slug>/<source-suite>/<TC-ID>.png the
+          # collector writes for these runs.
+          AGG_NOTE=""
+          if [ -f "tests/${SLUG}/suite.config.ts" ]; then
+            AGG_NOTE=" IMPORTANT -- this is an aggregator suite that pools tests from many source suites, so a bare Test Case ID is NOT unique across it. Set each test's 'id' to '<source-suite-folder>/<TC-ID>' (e.g. 'hovers/TC-HOVERS-001'), taking the source-suite folder from the test's path under tests/ in test-output.log. Set meta.suite_path to 'tests/'. Build the 'suites' array with one entry per source suite (name = the source suite folder, file = that folder, tests = its test count), assigning use_case UC1, UC2, ... in order, and set each test's use_case to its source suite's UC. Take each test's tier from that source suite's own specs/<source-suite>-test-plan.md '**Tier:**' line; the seven suites that have no '**Tier:**' lines at all have no tier, so set tier to an empty string for those tests rather than guessing."
+          fi
+          npx claude -p "Read the test plan at specs/${SLUG}-test-plan.md and the raw Playwright output at test-output.log (this run used only the chromium browser project). Produce a JSON file at streamlit_app/data/${SLUG}-test-results.json that matches EXACTLY the schema of streamlit_app/data/hovers-test-results.json -- read that file first as the schema reference (keys: meta, summary, suites, use_cases, business_rules, tests, defects; each test object has id, tier, title, use_case, business_rule, chromium, note IN THAT ORDER). Populate every test's real pass/fail status from test-output.log using only a chromium key (no firefox/webkit keys). Populate each test's 'tier' field (Smoke/Sanity/Functional) by matching its Test Case ID to the '**Tier:**' line for that test case in specs/${SLUG}-test-plan.md -- do not guess or omit it. If the test plan doesn't define explicit business-rule labels, leave business_rule as an empty string on every test and business_rules as an empty object -- do not invent business rules that aren't in the source material. Only write this one file -- do not modify specs/, tests/, or any .claude/ file.${AGG_NOTE}" \
             --dangerously-skip-permissions
 
       - name: Stamp dashboard data with exact timestamp

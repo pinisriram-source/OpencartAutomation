@@ -103,7 +103,15 @@ jobs:
         id: generate
         run: |
           FEEDBACK=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" automation feedback)
-          if [ -n "$FEEDBACK" ]; then
+          if [ -f "tests/${SLUG}/suite.config.ts" ]; then
+            # Aggregator suite: it selects existing tests from across the other
+            # suites rather than owning spec files, so there is nothing to
+            # generate and nothing for the generator to write. Generating here
+            # would author duplicate spec files into a suite whose entire point
+            # is not to duplicate anything.
+            echo "tests/${SLUG}/ is an aggregator suite (suite.config.ts present) -- skipping generation."
+            echo "fresh_generation=false" >> "$GITHUB_OUTPUT"
+          elif [ -n "$FEEDBACK" ]; then
             echo "Revising existing automation suite per reviewer feedback."
             echo "fresh_generation=false" >> "$GITHUB_OUTPUT"
             npx claude -p "Read the existing automation suite under tests/${SLUG}/ and the test plan at specs/${SLUG}-test-plan.md for context. A stakeholder reviewed the suite and requested changes: ${FEEDBACK}. Revise the suite under tests/${SLUG}/ to address every point raised, using the playwright-test-generator subagent as needed. Keep the existing Page Object Model structure, TC-ID-named tests, and { tag: ['@smoke' | '@sanity' | '@functional', '@regression'] } tags where still applicable, adding tags to any test that's missing them per its plan Tier (always the tier tag plus '@regression'). Do not modify anything outside tests/${SLUG}/." \
@@ -119,7 +127,9 @@ jobs:
 
       - name: Verify automation suite was created
         run: |
-          if [ -z "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
+          # An aggregator suite legitimately has no spec files of its own --
+          # its suite.config.ts IS the suite.
+          if [ ! -f "tests/${SLUG}/suite.config.ts" ] && [ -z "$(find tests/${SLUG} -name '*.spec.ts' 2>/dev/null)" ]; then
             node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage automation --status failed
             node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at generation stage -- see Actions run"
             git add "$REVIEW_FILE" "$REQUEST_FILE"

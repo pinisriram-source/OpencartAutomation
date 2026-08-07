@@ -1,0 +1,21 @@
+{
+  "slug": "regression",
+  "request_file": "user-stories/request-regression-20260807-000000.md",
+  "plan": {
+    "status": "pending_review",
+    "path": "specs/regression-test-plan.md",
+    "revision": 1,
+    "feedback": ""
+  },
+  "automation": {
+    "status": "not_started",
+    "path": "",
+    "revision": 0,
+    "feedback": ""
+  },
+  "execute": {
+    "status": "not_started",
+    "workflow_run_url": ""
+  },
+  "updated_at": "2026-08-07T00:00:00.000Z"
+}
