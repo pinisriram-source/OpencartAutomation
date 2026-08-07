@@ -2106,13 +2106,48 @@ with tab_review:
         value=st.session_state.get("last_slug", ""),
         placeholder="e.g. guest-checkout-regression",
     )
-    review_auto_refresh = st.checkbox(
-        "Auto-refresh every 15s",
-        value=False,
-        key="review_auto_refresh",
-        help="Keeps re-checking this slug's review status on its own -- handy while a stage is generating.",
-    )
     review_slug = review_slug_input.strip()
+
+    # Auto-refresh only earns its place while a stage is still generating and
+    # there is nothing to look at yet. Once an artifact is on screen awaiting
+    # approval, polling would re-render the review controls underneath the
+    # reviewer mid-decision, so the option is withdrawn until they approve or
+    # request changes.
+    awaiting_approval = False
+    if review_slug:
+        status_probe = get_file(
+            owner=GITHUB_OWNER,
+            repo=GITHUB_REPO,
+            path=f"user-stories/{review_slug}-review.json",
+            ref=GITHUB_BRANCH,
+            token=get_github_token(),
+        )
+        if status_probe.success:
+            try:
+                probe_data = json.loads(status_probe.content)
+                awaiting_approval = any(
+                    (probe_data.get(stage) or {}).get("status") == "pending_review"
+                    for stage in ("plan", "automation")
+                )
+            except (json.JSONDecodeError, TypeError):
+                awaiting_approval = False
+
+    if awaiting_approval:
+        # Clearing the widget's own state, rather than merely skipping the
+        # render, is what actually unbinds the fragment's run_every below.
+        st.session_state["review_auto_refresh"] = False
+        review_auto_refresh = False
+        st.caption(
+            "⏸️ Auto-refresh is off while an artifact below waits on your review -- "
+            "it comes back once you approve or request changes."
+        )
+    else:
+        review_auto_refresh = st.checkbox(
+            "Auto-refresh every 15s",
+            value=False,
+            key="review_auto_refresh",
+            help="Keeps re-checking this slug's review status on its own -- handy while a stage is generating.",
+        )
 
     oauth_config = get_google_oauth_config()
     if oauth_config:
@@ -2170,6 +2205,16 @@ with tab_review:
         except (json.JSONDecodeError, TypeError):
             st.error("Review status file exists but isn't valid JSON yet -- try again shortly.")
             return
+
+        # The tick that lands exactly when a stage finishes generating has to
+        # promote itself to a full rerun: run_every is bound outside this
+        # fragment, so only re-running the app can unbind it and withdraw the
+        # auto-refresh control now that an artifact is waiting on review.
+        if st.session_state.get("review_auto_refresh") and any(
+            (review_data.get(stage) or {}).get("status") == "pending_review"
+            for stage in ("plan", "automation")
+        ):
+            st.rerun(scope="app")
 
         render_review_stage(
             review_data, review_path, review_slug,
