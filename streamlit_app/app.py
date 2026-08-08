@@ -2359,35 +2359,61 @@ with tab_artifacts:
                     plan_text = None
             plan_steps = parse_test_plan_steps(plan_text) if plan_text else None
 
-            if plan_approved:
-                st.markdown(f"**Test Plan & Test Cases:** `{plan_path}`")
-                if plan_text is not None:
-                    st.markdown(plan_text)
-                else:
-                    st.caption("Plan file not found in this checkout yet.")
-            else:
-                st.caption(f"Test plan: {REVIEW_STATUS_LABELS.get(plan_stage.get('status', 'not_started'), 'not started')}")
+            # Side by side rather than stacked: an approved test plan renders as
+            # a full 18-section document, which pushed the automation suite
+            # roughly fourteen screens down the expander -- far enough that it
+            # read as missing entirely. Sub-tabs keep both one click away.
+            plan_tab, suite_tab = st.tabs(
+                [
+                    f"📋 Test Plan & Test Cases{'' if plan_approved else ' (not approved)'}",
+                    f"🧪 Automation Suite{'' if automation_approved else ' (not approved)'}",
+                ]
+            )
 
-            if automation_approved:
-                suite_path = automation_stage.get("path", f"tests/{slug}/")
-                suite_dir = REPO_ROOT / suite_path
-                spec_paths = sorted(suite_dir.rglob("*.spec.ts")) if suite_dir.exists() else []
-                st.markdown(f"**Automation Suite:** `{suite_path}`")
-                if spec_paths:
-                    spec_files = []
-                    for spec_file in spec_paths:
-                        rel_path = spec_file.relative_to(REPO_ROOT).as_posix()
-                        try:
-                            spec_files.append((rel_path, spec_file.read_text(encoding="utf-8")))
-                        except OSError:
-                            st.caption(f"Could not read `{rel_path}`.")
-                    render_spec_files_inline(spec_files, plan_steps)
+            with plan_tab:
+                if plan_approved:
+                    st.markdown(f"**Test Plan & Test Cases:** `{plan_path}`")
+                    if plan_text is not None:
+                        st.markdown(plan_text)
+                    else:
+                        st.caption("Plan file not found in this checkout yet.")
                 else:
-                    st.caption("No spec files found in this checkout yet.")
-            else:
-                st.caption(
-                    f"Automation suite: {REVIEW_STATUS_LABELS.get(automation_stage.get('status', 'not_started'), 'not started')}"
-                )
+                    st.caption(
+                        "Test plan: "
+                        f"{REVIEW_STATUS_LABELS.get(plan_stage.get('status', 'not_started'), 'not started')}"
+                        " -- approve it in the Review Pipeline Artifacts tab to see it here."
+                    )
+
+            with suite_tab:
+                if automation_approved:
+                    suite_path = automation_stage.get("path") or f"tests/{slug}/"
+                    suite_dir = REPO_ROOT / suite_path
+                    spec_paths = sorted(suite_dir.rglob("*.spec.ts")) if suite_dir.exists() else []
+                    st.markdown(f"**Automation Suite:** `{suite_path}`")
+                    if spec_paths:
+                        spec_files = []
+                        for spec_file in spec_paths:
+                            rel_path = spec_file.relative_to(REPO_ROOT).as_posix()
+                            try:
+                                spec_files.append((rel_path, spec_file.read_text(encoding="utf-8")))
+                            except OSError:
+                                st.caption(f"Could not read `{rel_path}`.")
+                        render_spec_files_inline(spec_files, plan_steps)
+                    elif (REPO_ROOT / suite_path / "suite.config.ts").exists():
+                        # An aggregator suite owns no spec files of its own --
+                        # it selects tests from other suites via its config.
+                        st.caption(
+                            f"Aggregator suite -- no spec files of its own; "
+                            f"`{suite_path}suite.config.ts` selects tests from other suites."
+                        )
+                    else:
+                        st.caption("No spec files found in this checkout yet.")
+                else:
+                    st.caption(
+                        "Automation suite: "
+                        f"{REVIEW_STATUS_LABELS.get(automation_stage.get('status', 'not_started'), 'not started')}"
+                        " -- approve it in the Review Pipeline Artifacts tab to see it here."
+                    )
 
     if not shown_any:
         st.info(

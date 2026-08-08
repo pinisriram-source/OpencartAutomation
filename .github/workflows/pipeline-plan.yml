@@ -100,7 +100,19 @@ jobs:
           bash .github/scripts/git-push-retry.sh
 
       - name: Claude Code -- generate or revise test plan
+        id: plan_gen
         run: |
+          # Fingerprint the existing plan so the verify step below can tell a
+          # real regeneration from a silent no-op. "Verify plan was created"
+          # only checks the file EXISTS, which a stale plan from a previous
+          # submission satisfies -- so a generation that quietly did nothing
+          # looked like success and sent the reviewer an unchanged plan.
+          PLAN_HASH_BEFORE=""
+          if [ -f "specs/${SLUG}-test-plan.md" ]; then
+            PLAN_HASH_BEFORE=$(sha256sum "specs/${SLUG}-test-plan.md" | cut -d' ' -f1)
+          fi
+          echo "hash_before=${PLAN_HASH_BEFORE}" >> "$GITHUB_OUTPUT"
+
           FEEDBACK=$(node .github/scripts/get-review-field.js "$REVIEW_FILE" plan feedback)
           if [ -n "$FEEDBACK" ]; then
             echo "Revising existing plan per reviewer feedback."
@@ -118,8 +130,33 @@ jobs:
           fi
 
       - name: Verify plan was created
+        env:
+          PLAN_HASH_BEFORE: ${{ steps.plan_gen.outputs.hash_before }}
         run: |
-          test -f "specs/${SLUG}-test-plan.md" || (node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage plan --status failed && node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- see Actions run" && git add "$REVIEW_FILE" "$REQUEST_FILE" && git commit -m "chore(pipeline): planning failed for $SLUG" && bash .github/scripts/git-push-retry.sh && exit 1)
+          fail() {
+            node .github/scripts/set-review-status.js "$REVIEW_FILE" --stage plan --status failed
+            node .github/scripts/set-request-status.js "$REQUEST_FILE" "FAILED at planning stage -- $1"
+            git add "$REVIEW_FILE" "$REQUEST_FILE"
+            git commit -m "chore(pipeline): planning failed for $SLUG"
+            bash .github/scripts/git-push-retry.sh
+            exit 1
+          }
+
+          test -f "specs/${SLUG}-test-plan.md" || fail "no plan file produced -- see Actions run"
+
+          # A plan that came out byte-identical to the one already on disk means
+          # the generation step did nothing. Existence alone can't catch that,
+          # because the previous submission's plan is still sitting there -- and
+          # passing it off as this submission's output would put a reviewer in
+          # front of a plan that predates their requirements.
+          if [ -n "$PLAN_HASH_BEFORE" ]; then
+            PLAN_HASH_AFTER=$(sha256sum "specs/${SLUG}-test-plan.md" | cut -d' ' -f1)
+            if [ "$PLAN_HASH_AFTER" = "$PLAN_HASH_BEFORE" ]; then
+              echo "specs/${SLUG}-test-plan.md is byte-identical to the plan that was already on disk."
+              echo "The generation step produced no changes, so this run has nothing new to review."
+              fail "test plan unchanged -- generation produced no new plan, see Actions run"
+            fi
+          fi
 
       - name: Commit test plan, mark pending review
         run: |
