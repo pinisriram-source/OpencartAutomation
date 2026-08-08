@@ -227,6 +227,7 @@ def build_workbook(payload: dict):
     modeled on this project's adopted Agile Test Report template."""
     from openpyxl import Workbook
     from openpyxl.chart import BarChart, PieChart, Reference
+    from openpyxl.chart.label import DataLabelList
     from openpyxl.styles import Alignment, Font, PatternFill
     from openpyxl.utils import get_column_letter
 
@@ -328,6 +329,9 @@ def build_workbook(payload: dict):
     density_labels = Reference(ws, min_col=1, min_row=status_rows_start, max_row=status_rows_end)
     density_chart.add_data(density_data, titles_from_data=False)
     density_chart.set_categories(density_labels)
+    # Name each slice alongside its percentage, matching the dashboard's pies:
+    # a category with no defects would otherwise be an unlabelled 0%.
+    density_chart.dataLabels = DataLabelList(showCatName=True, showPercent=True)
     ws.add_chart(density_chart, f"D{defect_summary_start}")
 
     distribution_chart = PieChart()
@@ -336,6 +340,7 @@ def build_workbook(payload: dict):
     dist_labels = Reference(ws, min_col=1, min_row=severity_rows_start, max_row=severity_rows_end)
     distribution_chart.add_data(dist_data, titles_from_data=False)
     distribution_chart.set_categories(dist_labels)
+    distribution_chart.dataLabels = DataLabelList(showCatName=True, showPercent=True)
     ws.add_chart(distribution_chart, f"D{severity_rows_start}")
 
     exec_chart = BarChart()

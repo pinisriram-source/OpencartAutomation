@@ -988,6 +988,11 @@ with tab_execreport:
                         labels=list(_status_counts.keys()),
                         values=list(_status_counts.values()),
                         marker=dict(colors=CATEGORICAL),
+                        # Name every slice, not just its percentage. A category
+                        # with no defects still gets a label, and a bare "0%"
+                        # floating on a leader line reads as an error rather
+                        # than as "In Progress: none".
+                        textinfo="label+percent",
                     )]
                 )
                 fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
@@ -1003,6 +1008,7 @@ with tab_execreport:
                         labels=list(_severity_counts.keys()),
                         values=list(_severity_counts.values()),
                         marker=dict(colors=CATEGORICAL),
+                        textinfo="label+percent",
                     )]
                 )
                 fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
