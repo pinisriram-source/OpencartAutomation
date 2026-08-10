@@ -2,7 +2,7 @@
 
 **Submitted via:** Streamlit dashboard
 **Submitted date (UTC):** 2026-08-10 12:45:41
-**Status:** In progress -- generating test plan
+**Status:** FAILED at planning stage -- test plan unchanged -- generation produced no new plan, see Actions run
 
 ## Application URL
 https://the-internet.herokuapp.com/upload
