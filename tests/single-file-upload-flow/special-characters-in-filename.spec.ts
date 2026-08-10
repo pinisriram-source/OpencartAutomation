@@ -1,102 +1,155 @@
 import { test, expect } from '@playwright/test';
 import { UploadPage } from './page-objects/upload.page';
+import { stepShot } from '../_shared/step-shot';
+import path from 'path';
+import fs from 'fs';
 
 test.describe('Special Characters in Filename', () => {
   let uploadPage: UploadPage;
+  const testDataDir = path.join(__dirname, 'test-data');
+
+  test.beforeAll(async () => {
+    if (!fs.existsSync(testDataDir)) {
+      fs.mkdirSync(testDataDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(testDataDir, 'my file.txt'), 'spaces in name');
+    fs.writeFileSync(path.join(testDataDir, 'file (1).txt'), 'parentheses in name');
+    fs.writeFileSync(path.join(testDataDir, 'my file (1).txt'), 'spaces and parentheses');
+    fs.writeFileSync(path.join(testDataDir, 'test_file-name.txt'), 'underscore and hyphen');
+  });
 
   test.beforeEach(async ({ page }) => {
     uploadPage = new UploadPage(page);
   });
 
-  test('TC-UPLOAD-007: Upload file with spaces in name and verify exact filename displayed', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+  test('TC-UPLOAD-007: Upload file with spaces in name preserves exact filename', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/upload
     await uploadPage.navigate();
 
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
-    // 2. Select a test file with spaces in its name (e.g., "my test file.txt")
-    await uploadPage.selectFile('my test file.txt', Buffer.from('content'));
+    await stepShot(page, 1);
 
-    // expect: File input reflects the selected filename with spaces
-    await expect(uploadPage.fileInput).toHaveValue(/my test file\.txt/);
+    // 2. Select a file named 'my file.txt' (contains spaces)
+    await uploadPage.selectFile(path.join(testDataDir, 'my file.txt'));
 
-    // 3. Click the "Upload" button
+    // expect: File is selected in the input
+    await expect(uploadPage.fileInput).not.toHaveValue('');
+
+    await stepShot(page, 2);
+
+    // 3. Click the Upload button
     await uploadPage.clickUpload();
 
-    // expect: Page navigates to the confirmation view and shows "File Uploaded!" heading
+    // expect: Page reloads to confirmation view
+    // expect: Heading is 'File Uploaded!'
     await expect(uploadPage.uploadedHeading).toBeVisible();
 
-    // expect: Uploaded filename "my test file.txt" is displayed exactly as provided, with spaces preserved
-    await expect(uploadPage.uploadedFileName).toHaveText('my test file.txt');
+    // expect: The displayed filename is exactly 'my file.txt' with spaces preserved
+    await expect(uploadPage.uploadedFileName).toHaveText('my file.txt');
+
+    // expect: Spaces are not replaced with underscores or URL-encoded
+    await expect(uploadPage.uploadedFileName).not.toContainText('my_file');
+    await expect(uploadPage.uploadedFileName).not.toContainText('my%20file');
+
+    await stepShot(page, 3);
   });
 
-  test('TC-UPLOAD-008: Upload file with spaces and parentheses and verify exact filename displayed', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
+  test('TC-UPLOAD-008: Upload file with parentheses in name preserves exact filename', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/upload
     await uploadPage.navigate();
 
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
-    // 2. Select a test file with spaces and parentheses in its name (e.g., "my file (1).txt")
-    await uploadPage.selectFile('my file (1).txt', Buffer.from('content'));
+    await stepShot(page, 1);
 
-    // expect: File input reflects the selected filename with parentheses
-    await expect(uploadPage.fileInput).toHaveValue(/my file \(1\)\.txt/);
+    // 2. Select a file named 'file (1).txt' (contains parentheses)
+    await uploadPage.selectFile(path.join(testDataDir, 'file (1).txt'));
 
-    // 3. Click the "Upload" button
+    // expect: File is selected in the input
+    await expect(uploadPage.fileInput).not.toHaveValue('');
+
+    await stepShot(page, 2);
+
+    // 3. Click the Upload button
     await uploadPage.clickUpload();
 
-    // expect: Page navigates to the confirmation view and shows "File Uploaded!" heading
+    // expect: Page reloads to confirmation view
+    // expect: Heading is 'File Uploaded!'
     await expect(uploadPage.uploadedHeading).toBeVisible();
 
-    // expect: Uploaded filename "my file (1).txt" is displayed exactly as provided, with parentheses and spaces preserved
+    // expect: The displayed filename is exactly 'file (1).txt' with parentheses preserved
+    await expect(uploadPage.uploadedFileName).toHaveText('file (1).txt');
+
+    // expect: Parentheses are not escaped or removed
+    await expect(uploadPage.uploadedFileName).toContainText('(1)');
+
+    await stepShot(page, 3);
+  });
+
+  test('TC-UPLOAD-009: Upload file with spaces and parentheses preserves exact filename', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+    // 1. Navigate to https://the-internet.herokuapp.com/upload
+    await uploadPage.navigate();
+
+    // expect: Page loads successfully
+    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
+
+    await stepShot(page, 1);
+
+    // 2. Select a file named 'my file (1).txt' (contains both spaces and parentheses)
+    await uploadPage.selectFile(path.join(testDataDir, 'my file (1).txt'));
+
+    // expect: File is selected in the input
+    await expect(uploadPage.fileInput).not.toHaveValue('');
+
+    await stepShot(page, 2);
+
+    // 3. Click the Upload button
+    await uploadPage.clickUpload();
+
+    // expect: Page reloads to confirmation view
+    // expect: Heading is 'File Uploaded!'
+    await expect(uploadPage.uploadedHeading).toBeVisible();
+
+    // expect: The displayed filename is exactly 'my file (1).txt' completely unmodified
     await expect(uploadPage.uploadedFileName).toHaveText('my file (1).txt');
+
+    // expect: All special characters (spaces and parentheses) are preserved exactly as provided
+    await expect(uploadPage.uploadedFileName).toContainText(' ');
+    await expect(uploadPage.uploadedFileName).toContainText('(1)');
+
+    await stepShot(page, 3);
   });
 
-  test('TC-UPLOAD-009: Upload file with hyphens and underscores in name', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+  test('TC-UPLOAD-010: Upload file with hyphens and underscores in name', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/upload
     await uploadPage.navigate();
 
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
-    // 2. Select a test file with hyphens and underscores (e.g., "test-file_01.txt")
-    await uploadPage.selectFile('test-file_01.txt', Buffer.from('content'));
+    await stepShot(page, 1);
 
-    // expect: File input reflects the selected filename
-    await expect(uploadPage.fileInput).toHaveValue(/test-file_01\.txt/);
+    // 2. Select a file named 'test_file-name.txt' (contains underscore and hyphen)
+    await uploadPage.selectFile(path.join(testDataDir, 'test_file-name.txt'));
 
-    // 3. Click the "Upload" button
+    // expect: File is selected in the input
+    await expect(uploadPage.fileInput).not.toHaveValue('');
+
+    await stepShot(page, 2);
+
+    // 3. Click the Upload button
     await uploadPage.clickUpload();
 
-    // expect: Page navigates to the confirmation view and shows "File Uploaded!" heading
+    // expect: Page reloads to confirmation view
+    // expect: Heading is 'File Uploaded!'
     await expect(uploadPage.uploadedHeading).toBeVisible();
 
-    // expect: Uploaded filename "test-file_01.txt" is displayed exactly as provided
-    await expect(uploadPage.uploadedFileName).toHaveText('test-file_01.txt');
-  });
+    // expect: The displayed filename is exactly 'test_file-name.txt' with underscore and hyphen preserved
+    await expect(uploadPage.uploadedFileName).toHaveText('test_file-name.txt');
 
-  test('TC-UPLOAD-010: Upload file with mixed special characters', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    // 1. Navigate to https://the-internet.herokuapp.com/upload
-    await uploadPage.navigate();
-
-    // expect: Page loads successfully
-    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
-
-    // 2. Select a test file with multiple special characters (e.g., "test file (v2.1) [final].txt")
-    await uploadPage.selectFile('test file (v2.1) [final].txt', Buffer.from('content'));
-
-    // expect: File input reflects the selected filename
-    await expect(uploadPage.fileInput).toHaveValue(/test file \(v2\.1\) \[final\]\.txt/);
-
-    // 3. Click the "Upload" button
-    await uploadPage.clickUpload();
-
-    // expect: Page navigates to the confirmation view and shows "File Uploaded!" heading
-    await expect(uploadPage.uploadedHeading).toBeVisible();
-
-    // expect: Uploaded filename is displayed exactly as provided, with all special characters preserved
-    await expect(uploadPage.uploadedFileName).toHaveText('test file (v2.1) [final].txt');
+    await stepShot(page, 3);
   });
 });

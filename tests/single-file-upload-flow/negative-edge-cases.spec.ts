@@ -1,122 +1,118 @@
 import { test, expect } from '@playwright/test';
 import { UploadPage } from './page-objects/upload.page';
+import { stepShot } from '../_shared/step-shot';
+import path from 'path';
+import fs from 'fs';
 
 test.describe('Negative and Edge Cases', () => {
   let uploadPage: UploadPage;
+  const testDataDir = path.join(__dirname, 'test-data');
+
+  test.beforeAll(async () => {
+    if (!fs.existsSync(testDataDir)) {
+      fs.mkdirSync(testDataDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(testDataDir, 'test.txt'), 'test content');
+  });
 
   test.beforeEach(async ({ page }) => {
     uploadPage = new UploadPage(page);
   });
 
-  test('TC-UPLOAD-011: Click Upload with no file selected and verify behavior', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
+  test('TC-UPLOAD-011: Clicking Upload without selecting a file shows Internal Server Error', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/upload
     await uploadPage.navigate();
 
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
-    // expect: File input shows no file selected
+    // expect: File input is empty (no file selected)
     await expect(uploadPage.fileInput).toHaveValue('');
 
-    // 2. Click the "Upload" button without selecting a file
+    await stepShot(page, 1);
+
+    // 2. Click the Upload button without selecting any file
     await uploadPage.clickUpload();
 
-    // expect: Upload does NOT complete successfully
-    // expect: No "File Uploaded!" heading is shown on the resulting page
-    await expect(uploadPage.uploadedHeading).not.toBeVisible();
+    // expect: Page navigates/reloads
+    // expect: An 'Internal Server Error' heading (h1) is displayed
+    await expect(uploadPage.internalServerErrorHeading).toBeVisible();
 
-    // expect: Record the actual behavior (error message, "Internal Server Error", or page remains unchanged)
-    const bodyText = await page.locator('body').innerText();
-    expect(bodyText).not.toContain('File Uploaded!');
+    // expect: The upload does NOT complete successfully (no 'File Uploaded!' message)
+    await expect(uploadPage.uploadedHeading).not.toBeAttached();
+
+    // expect: URL remains https://the-internet.herokuapp.com/upload
+    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
+
+    await stepShot(page, 2);
   });
 
-  test('TC-UPLOAD-012: Select file, clear selection, then click Upload', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+  test('TC-UPLOAD-012: File input accepts file selection via browser dialog', { tag: ['@functional', '@regression'] }, async ({ page }) => {
     // 1. Navigate to https://the-internet.herokuapp.com/upload
     await uploadPage.navigate();
 
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
-    // 2. Select a test file using the file input
-    await uploadPage.selectFile('test-file.txt', Buffer.from('content'));
+    await stepShot(page, 1);
 
-    // expect: File input reflects the selected filename
-    await expect(uploadPage.fileInput).toHaveValue(/test-file\.txt/);
+    // 2. Select a file using the file input via Playwright's setInputFiles API
+    await uploadPage.selectFile(path.join(testDataDir, 'test.txt'));
 
-    // 3. Clear the file selection by setting the input to empty
+    // expect: File input element now shows the selected filename
+    await expect(uploadPage.fileInput).not.toHaveValue('');
+
+    // expect: The file is queued for upload (verifiable via input.files.length > 0)
+    const filesCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
+    expect(filesCount).toBeGreaterThan(0);
+
+    await stepShot(page, 2);
+
+    // 3. Verify the file input reflects the selection before submission
+    // expect: Upload button remains enabled and ready to submit
+    await expect(uploadPage.uploadButton).toBeEnabled();
+
+    await stepShot(page, 3);
+  });
+
+  test('TC-UPLOAD-013: Selecting then clearing a file leaves input empty and submit fails', { tag: ['@functional', '@regression'] }, async ({ page }) => {
+    // 1. Navigate to https://the-internet.herokuapp.com/upload
+    await uploadPage.navigate();
+
+    // expect: Page loads successfully
+    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
+
+    // expect: File input is empty
+    await expect(uploadPage.fileInput).toHaveValue('');
+
+    await stepShot(page, 1);
+
+    // 2. Select a file (e.g., 'test.txt')
+    await uploadPage.selectFile(path.join(testDataDir, 'test.txt'));
+
+    // expect: File input shows 'test.txt' is selected
+    await expect(uploadPage.fileInput).not.toHaveValue('');
+
+    await stepShot(page, 2);
+
+    // 3. Clear the file selection (setInputFiles with empty array)
     await uploadPage.clearFileSelection();
 
-    // expect: File input shows no file selected
+    // expect: File input is now empty
     await expect(uploadPage.fileInput).toHaveValue('');
 
-    // 4. Click the "Upload" button
+    // expect: No file is selected (input.files.length === 0)
+    const filesCount = await uploadPage.fileInput.evaluate((el: HTMLInputElement) => el.files?.length ?? 0);
+    expect(filesCount).toBe(0);
+
+    await stepShot(page, 3);
+
+    // 4. Click the Upload button
     await uploadPage.clickUpload();
 
-    // expect: Behavior matches TC-UPLOAD-011 (no successful upload occurs)
-    await expect(uploadPage.uploadedHeading).not.toBeVisible();
-  });
+    // expect: Behaves as AC6 (no file selected case): 'Internal Server Error' is displayed
+    await expect(uploadPage.internalServerErrorHeading).toBeVisible();
 
-  test('TC-UPLOAD-013: Upload file with very long filename', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    // 1. Navigate to https://the-internet.herokuapp.com/upload
-    await uploadPage.navigate();
-
-    // expect: Page loads successfully
-    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
-
-    // 2. Select a test file with a very long filename (200+ characters)
-    const longName = 'a'.repeat(200) + '.txt';
-    await uploadPage.selectFile(longName, Buffer.from('content'));
-
-    // expect: File input accepts the file
-    await expect(uploadPage.fileInput).toHaveValue(new RegExp(longName.replace(/\./g, '\\.')));
-
-    // 3. Click the "Upload" button
-    await uploadPage.clickUpload();
-
-    // expect: Upload succeeds or fails gracefully
-    // expect: If successful, the full filename is displayed on the confirmation view
-    // expect: If failed, an appropriate error or page response is shown (no unhandled crash)
-    const hasUploaded = await uploadPage.uploadedHeading.isVisible().catch(() => false);
-    if (hasUploaded) {
-      await expect(uploadPage.uploadedFileName).toHaveText(longName);
-    } else {
-      await expect(page.locator('body')).not.toHaveText('');
-    }
-  });
-
-  test('TC-UPLOAD-014: Upload same file twice in succession', { tag: ['@functional', '@regression'] }, async ({ page }) => {
-    // 1. Navigate to https://the-internet.herokuapp.com/upload
-    await uploadPage.navigate();
-
-    // expect: Page loads successfully
-    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
-
-    // 2. Select and upload a test file (e.g., "test-file.txt")
-    await uploadPage.uploadFile('test-file.txt', Buffer.from('content'));
-
-    // expect: "File Uploaded!" heading is visible
-    await expect(uploadPage.uploadedHeading).toBeVisible();
-
-    // expect: Filename "test-file.txt" is displayed
-    await expect(uploadPage.uploadedFileName).toHaveText('test-file.txt');
-
-    // 3. Navigate back to https://the-internet.herokuapp.com/upload
-    await uploadPage.navigate();
-
-    // expect: Page returns to initial empty state
-    await expect(uploadPage.fileInput).toHaveValue('');
-
-    // 4. Select and upload the same file again
-    await uploadPage.uploadFile('test-file.txt', Buffer.from('content'));
-
-    // expect: "File Uploaded!" heading is visible
-    await expect(uploadPage.uploadedHeading).toBeVisible();
-
-    // expect: Filename "test-file.txt" is displayed exactly as before
-    await expect(uploadPage.uploadedFileName).toHaveText('test-file.txt');
-
-    // expect: No error or duplicate-file warning is shown
-    const bodyText = await page.locator('body').innerText();
-    expect(bodyText).not.toMatch(/duplicate|already exists|error/i);
+    await stepShot(page, 4);
   });
 });
