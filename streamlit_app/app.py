@@ -1200,6 +1200,27 @@ def render_test_case_detail(picked_id: str, row) -> None:
                     actual_kind, actual_text = step_actual_text(step, matching_defect)
                     getattr(st, actual_kind)(actual_text)
 
+                    # Visual evidence for THIS step, captured when its
+                    # assertions ran -- the end-of-test screenshot above can't
+                    # show what the page looked like at step 2 once step 5 has
+                    # changed it. Written by tests/_shared/step-shot.ts via the
+                    # screenshot collector; absent for suites that ran before
+                    # per-step capture existed.
+                    step_shot = (
+                        REPO_ROOT
+                        / "reports"
+                        / "screenshots"
+                        / _detail_slug
+                        / picked_id
+                        / f"step-{step['number']}.jpg"
+                    )
+                    if step_shot.exists():
+                        st.image(
+                            str(step_shot),
+                            caption=f"Page state when step {step['number']} was verified",
+                            use_container_width=True,
+                        )
+
                     if step["code_lines"]:
                         st.markdown("Automation code for this step:")
                         st.code("\n".join(step["code_lines"]), language="typescript")

@@ -33,18 +33,45 @@ function destDirFor(test: TestCase): string {
   return slug === suite ? path.join(OUTPUT_ROOT, slug) : path.join(OUTPUT_ROOT, slug, suite);
 }
 
+// Per-step evidence attached by tests/_shared/step-shot.ts. The end-of-test
+// screenshot can't evidence an earlier step once a later one has changed the
+// page, so these are filed per test case in their own directory:
+// <destDir>/<TC-ID>/step-<n>.jpg, alongside the flat <TC-ID>.png.
+const STEP_ATTACHMENT_RE = /^step-(\d+)$/;
+
 export default class ScreenshotCollectorReporter implements Reporter {
   onTestEnd(test: TestCase, result: TestResult): void {
     const idMatch = test.title.match(TC_ID_RE);
     if (!idMatch) return;
 
+    const tcId = idMatch[0];
+    const destDir = destDirFor(test);
+
     const screenshot = result.attachments.find(
       (a) => a.name === 'screenshot' && a.path && fs.existsSync(a.path)
     );
-    if (!screenshot?.path) return;
+    if (screenshot?.path) {
+      fs.mkdirSync(destDir, { recursive: true });
+      fs.copyFileSync(screenshot.path, path.join(destDir, `${tcId}.png`));
+    }
 
-    const destDir = destDirFor(test);
-    fs.mkdirSync(destDir, { recursive: true });
-    fs.copyFileSync(screenshot.path, path.join(destDir, `${idMatch[0]}.png`));
+    for (const attachment of result.attachments) {
+      const stepMatch = attachment.name.match(STEP_ATTACHMENT_RE);
+      if (!stepMatch) continue;
+
+      // Attachments arrive either inline (body) or spilled to a temp file
+      // (path), depending on size -- handle both rather than assuming one.
+      let data: Buffer | undefined;
+      if (attachment.body) {
+        data = attachment.body;
+      } else if (attachment.path && fs.existsSync(attachment.path)) {
+        data = fs.readFileSync(attachment.path);
+      }
+      if (!data) continue;
+
+      const stepDir = path.join(destDir, tcId);
+      fs.mkdirSync(stepDir, { recursive: true });
+      fs.writeFileSync(path.join(stepDir, `step-${stepMatch[1]}.jpg`), data);
+    }
   }
 }
