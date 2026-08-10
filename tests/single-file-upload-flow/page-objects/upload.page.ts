@@ -8,51 +8,52 @@ export class UploadPage extends BasePage {
     return this.page.getByRole('heading', { name: 'File Uploader' });
   }
 
-  // CSS locator: file inputs have no accessible role that distinguishes them
-  // from other inputs, and this element has no label — only an id.
+  get uploadedHeading(): Locator {
+    return this.page.getByRole('heading', { name: 'File Uploaded!' });
+  }
+
   get fileInput(): Locator {
     return this.page.locator('#file-upload');
   }
 
   get uploadButton(): Locator {
-    return this.page.getByRole('button', { name: 'Upload' });
+    return this.page.locator('#file-submit');
   }
 
-  get form(): Locator {
-    return this.page.locator('#file-upload').locator('..');
-  }
-
-  get successHeading(): Locator {
-    return this.page.getByRole('heading', { name: 'File Uploaded!' });
-  }
-
-  // CSS locator: div#uploaded-files has no role/label — only an id.
-  get uploadedFiles(): Locator {
+  get uploadedFileName(): Locator {
     return this.page.locator('#uploaded-files');
+  }
+
+  get dragDropArea(): Locator {
+    return this.page.locator('#drag-drop-upload');
+  }
+
+  get instructionText(): Locator {
+    return this.page.getByText('Choose a file on your computer');
   }
 
   async navigate(): Promise<void> {
     await this.open(this.url);
   }
 
-  async selectFile(filePath: string): Promise<void> {
-    await this.fileInput.setInputFiles(filePath);
+  async selectFile(fileName: string, content: Buffer): Promise<void> {
+    await this.fileInput.setInputFiles({
+      name: fileName,
+      mimeType: 'application/octet-stream',
+      buffer: content,
+    });
   }
 
-  async selectFiles(filePaths: string[]): Promise<void> {
-    await this.fileInput.setInputFiles(filePaths);
+  async clearFileSelection(): Promise<void> {
+    await this.fileInput.setInputFiles([]);
   }
 
   async clickUpload(): Promise<void> {
     await this.uploadButton.click();
   }
 
-  async uploadFile(filePath: string): Promise<void> {
-    await this.selectFile(filePath);
+  async uploadFile(fileName: string, content: Buffer): Promise<void> {
+    await this.selectFile(fileName, content);
     await this.clickUpload();
-  }
-
-  async goBack(): Promise<void> {
-    await this.page.goBack();
   }
 }
