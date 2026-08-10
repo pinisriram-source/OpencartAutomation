@@ -2,7 +2,7 @@
 
 **Submitted via:** Streamlit dashboard
 **Submitted date (UTC):** 2026-08-10 13:24:08
-**Status:** In progress -- generating test plan
+**Status:** In progress -- test plan generated, awaiting stakeholder review
 
 ## Application URL
 https://the-internet.herokuapp.com/upload
