@@ -2,7 +2,7 @@
   "slug": "single-file-upload-flow",
   "request_file": "user-stories/request-single-file-upload-flow-20260810-151011.md",
   "plan": {
-    "status": "pending_review",
+    "status": "approved",
     "path": "specs/single-file-upload-flow-test-plan.md",
     "revision": 13,
     "feedback": ""
