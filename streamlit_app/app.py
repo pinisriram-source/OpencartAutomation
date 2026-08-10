@@ -1058,6 +1058,202 @@ def render_execution_status_header() -> None:
 )
 
 # --- Overview tab -------------------------------------------------------------
+def render_test_case_detail(picked_id: str, row) -> None:
+    """Renders one test case's outcome, screenshot, script and per-step coverage.
+
+    Extracted so the Test Execution Matrix can show the same detail inline for
+    a selected row, rather than sending the reader to the Test Case Detail tab
+    to re-find the test they just clicked. Reads the module-level suite data
+    (tests/meta/data/DATA_PATH) the same way the tab does.
+    """
+    result_col, id_col = st.columns([1, 3])
+    with id_col:
+        st.markdown(f"**{row['id']} — {row['title']}**")
+        sub_bits = [f"Use Case: `{row['use_case']}`"]
+        if row.get("business_rule"):
+            sub_bits.append(f"Business Rule: `{row['business_rule']}`")
+        st.caption(" | ".join(sub_bits))
+    with result_col:
+        outcome = str(row.get("chromium", "")).strip().lower()
+        if outcome == "pass":
+            st.success("PASS")
+        elif outcome == "fail":
+            st.error("FAIL")
+        else:
+            st.info(row.get("chromium", "n/a"))
+
+    _detail_slug = DATA_PATH.stem.removesuffix("-test-results")
+    screenshot_path = REPO_ROOT / "reports" / "screenshots" / _detail_slug / f"{picked_id}.png"
+    st.markdown("**Screenshot at test end (visual proof of the assertion outcome)**")
+    if screenshot_path.exists():
+        st.image(str(screenshot_path), use_container_width=True)
+    else:
+        st.caption(
+            "No screenshot on file for this test case -- either the suite ran before this "
+            "feature was added, or the app's checkout hasn't picked up the latest pipeline "
+            "run yet (try rebooting the app)."
+        )
+
+    # An aggregator suite pools tests from many source suites, so its ids
+    # are namespaced "<source-suite>/<TC-ID>" -- a bare TC-ID isn't unique
+    # across the pool (TC-LOGIN-001 exists in two suites, as do several
+    # TC-DROPDOWN-*). Scope the lookup to that source suite and search for
+    # the bare id, since searching all of tests/ would return whichever
+    # colliding suite happened to sort first.
+    if "/" in picked_id:
+        source_suite, bare_id = picked_id.split("/", 1)
+        suite_dir = REPO_ROOT / "tests" / source_suite
+        spec_path, block = find_test_block(str(suite_dir), bare_id)
+    else:
+        suite_dir = REPO_ROOT / meta["suite_path"]
+        spec_path, block = find_test_block(str(suite_dir), picked_id)
+
+    if block is None:
+        st.warning(
+            "Couldn't find this test's spec file. Either the automation generator didn't "
+            "actually produce it (check the note column in the Test Execution Matrix -- "
+            "e.g. a 'Skip' result with 'spec file not generated' means the test plan called "
+            "for it but the suite doesn't have it), or the app's checkout is behind a very "
+            "recent pipeline run and hasn't picked it up yet -- try rebooting the app."
+        )
+    else:
+        st.caption(f"Source: [{spec_path}]({github_url(spec_path)})")
+
+        matching_defect = next(
+            (
+                d for d in data.get("defects", [])
+                if picked_id in [r.strip() for r in str(d.get("test_ref", "")).split(",")]
+            ),
+            None,
+        )
+
+        locator_lines = [
+            line.strip() for line in block.splitlines() if LOCATOR_METHOD_RE.search(line)
+        ]
+        if locator_lines:
+            st.markdown("**Locators used**")
+            st.code("\n".join(dict.fromkeys(locator_lines)), language="typescript")
+
+        st.markdown("**Automation script (as executed)**")
+        st.code(block, language="typescript")
+
+        st.markdown("**Test case steps coverage**")
+        step_records = parse_step_markers(block)
+        steps_from_plan = False
+        if not step_records:
+            # Not every generation run emits `// N. ...` markers, so fall
+            # back to the approved test plan's own steps for this TC-ID --
+            # the same fallback the Approved Test Artifacts tab already
+            # does. Without it a suite generated without markers shows no
+            # steps at all, even though the plan defines them.
+            plan_file = REPO_ROOT / (
+                meta.get("test_plan_path") or f"specs/{_detail_slug}-test-plan.md"
+            )
+            if plan_file.exists():
+                try:
+                    plan_lookup = parse_test_plan_steps(plan_file.read_text(encoding="utf-8"))
+                except OSError:
+                    plan_lookup = {}
+                # Aggregator ids are "<source-suite>/<TC-ID>"; the plan keys
+                # are bare TC-IDs.
+                bare_id = picked_id.split("/", 1)[-1]
+                planned = plan_lookup.get(bare_id)
+                if planned:
+                    # Plan steps carry no code_lines -- supply an empty list
+                    # so the per-step renderer below can treat both sources
+                    # identically.
+                    step_records = [{**s, "code_lines": []} for s in planned]
+                    steps_from_plan = True
+
+        if not step_records:
+            st.caption(
+                "No numbered step markers (`// N. ...`) found in this script, and no steps "
+                "for this test case in the test plan -- see the full script above instead."
+            )
+        else:
+            if steps_from_plan:
+                st.caption(
+                    "This script carries no `// N. ...` step markers, so the steps below come "
+                    "from the approved test plan. Per-step automation code isn't available -- "
+                    "see the full script above."
+                )
+            annotate_step_results(step_records, outcome, matching_defect)
+            for step in step_records:
+                with st.container(border=True):
+                    st.markdown(f"**Step {step['number']}. {step['text']}**")
+
+                    st.markdown("**Expected:**")
+                    if step["expectations"]:
+                        st.markdown("\n".join(f"- {e}" for e in step["expectations"]))
+                    else:
+                        inferred = step_expected_lines(step)
+                        if inferred:
+                            st.caption(
+                                "No explicit validation comment captured -- inferred from "
+                                "this step's assertion code:"
+                            )
+                            st.code("\n".join(inferred), language="typescript")
+                        else:
+                            st.caption("No explicit validation comment captured for this step.")
+
+                    st.markdown("**Actual:**")
+                    actual_kind, actual_text = step_actual_text(step, matching_defect)
+                    getattr(st, actual_kind)(actual_text)
+
+                    if step["code_lines"]:
+                        st.markdown("Automation code for this step:")
+                        st.code("\n".join(step["code_lines"]), language="typescript")
+            if outcome == "fail" and not matching_defect:
+                st.caption(
+                    "Test failed but no matching Defects Log entry was found to attribute "
+                    "the failure to a specific step -- see the raw script above."
+                )
+            elif outcome == "fail" and all(s["result"] == "unknown" for s in step_records):
+                st.caption(
+                    "Couldn't confidently match the recorded defect to a specific step -- "
+                    "see Expected vs. Actual below for the overall failure."
+                )
+
+        assertion_lines = [
+            line.strip() for line in block.splitlines() if ASSERTION_LINE_RE.search(line)
+        ]
+        st.markdown("**Validations performed (assertions)**")
+        if assertion_lines:
+            st.code("\n".join(assertion_lines), language="typescript")
+        else:
+            st.caption("No explicit `expect(...)` assertions found in this test block.")
+
+        st.markdown("**Expected vs. Actual**")
+        if matching_defect:
+            st.error(
+                f"**Expected:** {matching_defect['expected']}\n\n"
+                f"**Actual:** {matching_defect['actual']}"
+            )
+        elif outcome == "pass":
+            st.success(
+                "Every assertion above passed -- the application's actual behavior matched "
+                "the expected value asserted at each `expect(...)` call in the script."
+            )
+        else:
+            st.caption("No further expected-vs-actual detail recorded for this result.")
+
+        if outcome == "fail":
+            run_url = meta.get("workflow_run_url")
+            if run_url:
+                st.markdown(
+                    f"[View trace & video for this run]({run_url}) "
+                    "-- in the `playwright-report` artifact at the bottom of the run page "
+                    "(the screenshot above is embedded directly; trace/video are larger "
+                    "and stay in the CI artifact)."
+                )
+            else:
+                st.caption(
+                    "No linked Actions run recorded for this suite (generated before this "
+                    "feature was added) -- trace/video unavailable."
+                )
+
+
+
 with tab_overview:
     render_execution_status_header()
 
@@ -1441,8 +1637,31 @@ with tab_matrix:
     styled = display.style.map(style_status, subset=display_browser_cols)
     if has_tier:
         styled = styled.map(style_tier, subset=["Tier"])
-    st.dataframe(styled, use_container_width=True, height=560, hide_index=True)
-    st.caption(f"Showing {len(filtered)} of {len(tests)} test cases · all shown executions passed.")
+    matrix_event = st.dataframe(
+        styled,
+        use_container_width=True,
+        height=560,
+        hide_index=True,
+        key="matrix_table",
+        on_select="rerun",
+        selection_mode="single-row",
+    )
+    st.caption(f"Showing {len(filtered)} of {len(tests)} test cases · click a row to open its detail below.")
+
+    # Selection returns positional indices into the rendered (filtered) frame,
+    # so index back through `filtered` rather than `tests` -- the two differ
+    # whenever a use-case/tier/search filter is active.
+    selected_rows = (matrix_event.selection.rows if matrix_event and matrix_event.selection else [])
+    if selected_rows:
+        picked_matrix_id = filtered.iloc[selected_rows[0]]["id"]
+        matched = tests[tests["id"] == picked_matrix_id]
+        if matched.empty:
+            st.warning(f"Couldn't find `{picked_matrix_id}` in this suite's results.")
+        else:
+            st.divider()
+            render_test_case_detail(picked_matrix_id, matched.iloc[0])
+    else:
+        st.info("Select a test case row above to see its execution steps, per-step status and screenshot here.")
 
 # --- Coverage by Use Case tab ---------------------------------------------------
 with tab_usecase:
@@ -1528,192 +1747,7 @@ with tab_details:
         picked_id = picked.split(" — ", 1)[0]
         row = tests[tests["id"] == picked_id].iloc[0]
 
-        result_col, id_col = st.columns([1, 3])
-        with id_col:
-            st.markdown(f"**{row['id']} — {row['title']}**")
-            sub_bits = [f"Use Case: `{row['use_case']}`"]
-            if row.get("business_rule"):
-                sub_bits.append(f"Business Rule: `{row['business_rule']}`")
-            st.caption(" | ".join(sub_bits))
-        with result_col:
-            outcome = str(row.get("chromium", "")).strip().lower()
-            if outcome == "pass":
-                st.success("PASS")
-            elif outcome == "fail":
-                st.error("FAIL")
-            else:
-                st.info(row.get("chromium", "n/a"))
-
-        _detail_slug = DATA_PATH.stem.removesuffix("-test-results")
-        screenshot_path = REPO_ROOT / "reports" / "screenshots" / _detail_slug / f"{picked_id}.png"
-        st.markdown("**Screenshot at test end (visual proof of the assertion outcome)**")
-        if screenshot_path.exists():
-            st.image(str(screenshot_path), use_container_width=True)
-        else:
-            st.caption(
-                "No screenshot on file for this test case -- either the suite ran before this "
-                "feature was added, or the app's checkout hasn't picked up the latest pipeline "
-                "run yet (try rebooting the app)."
-            )
-
-        # An aggregator suite pools tests from many source suites, so its ids
-        # are namespaced "<source-suite>/<TC-ID>" -- a bare TC-ID isn't unique
-        # across the pool (TC-LOGIN-001 exists in two suites, as do several
-        # TC-DROPDOWN-*). Scope the lookup to that source suite and search for
-        # the bare id, since searching all of tests/ would return whichever
-        # colliding suite happened to sort first.
-        if "/" in picked_id:
-            source_suite, bare_id = picked_id.split("/", 1)
-            suite_dir = REPO_ROOT / "tests" / source_suite
-            spec_path, block = find_test_block(str(suite_dir), bare_id)
-        else:
-            suite_dir = REPO_ROOT / meta["suite_path"]
-            spec_path, block = find_test_block(str(suite_dir), picked_id)
-
-        if block is None:
-            st.warning(
-                "Couldn't find this test's spec file. Either the automation generator didn't "
-                "actually produce it (check the note column in the Test Execution Matrix -- "
-                "e.g. a 'Skip' result with 'spec file not generated' means the test plan called "
-                "for it but the suite doesn't have it), or the app's checkout is behind a very "
-                "recent pipeline run and hasn't picked it up yet -- try rebooting the app."
-            )
-        else:
-            st.caption(f"Source: [{spec_path}]({github_url(spec_path)})")
-
-            matching_defect = next(
-                (
-                    d for d in data.get("defects", [])
-                    if picked_id in [r.strip() for r in str(d.get("test_ref", "")).split(",")]
-                ),
-                None,
-            )
-
-            locator_lines = [
-                line.strip() for line in block.splitlines() if LOCATOR_METHOD_RE.search(line)
-            ]
-            if locator_lines:
-                st.markdown("**Locators used**")
-                st.code("\n".join(dict.fromkeys(locator_lines)), language="typescript")
-
-            st.markdown("**Automation script (as executed)**")
-            st.code(block, language="typescript")
-
-            st.markdown("**Test case steps coverage**")
-            step_records = parse_step_markers(block)
-            steps_from_plan = False
-            if not step_records:
-                # Not every generation run emits `// N. ...` markers, so fall
-                # back to the approved test plan's own steps for this TC-ID --
-                # the same fallback the Approved Test Artifacts tab already
-                # does. Without it a suite generated without markers shows no
-                # steps at all, even though the plan defines them.
-                plan_file = REPO_ROOT / (
-                    meta.get("test_plan_path") or f"specs/{_detail_slug}-test-plan.md"
-                )
-                if plan_file.exists():
-                    try:
-                        plan_lookup = parse_test_plan_steps(plan_file.read_text(encoding="utf-8"))
-                    except OSError:
-                        plan_lookup = {}
-                    # Aggregator ids are "<source-suite>/<TC-ID>"; the plan keys
-                    # are bare TC-IDs.
-                    bare_id = picked_id.split("/", 1)[-1]
-                    planned = plan_lookup.get(bare_id)
-                    if planned:
-                        # Plan steps carry no code_lines -- supply an empty list
-                        # so the per-step renderer below can treat both sources
-                        # identically.
-                        step_records = [{**s, "code_lines": []} for s in planned]
-                        steps_from_plan = True
-
-            if not step_records:
-                st.caption(
-                    "No numbered step markers (`// N. ...`) found in this script, and no steps "
-                    "for this test case in the test plan -- see the full script above instead."
-                )
-            else:
-                if steps_from_plan:
-                    st.caption(
-                        "This script carries no `// N. ...` step markers, so the steps below come "
-                        "from the approved test plan. Per-step automation code isn't available -- "
-                        "see the full script above."
-                    )
-                annotate_step_results(step_records, outcome, matching_defect)
-                for step in step_records:
-                    with st.container(border=True):
-                        st.markdown(f"**Step {step['number']}. {step['text']}**")
-
-                        st.markdown("**Expected:**")
-                        if step["expectations"]:
-                            st.markdown("\n".join(f"- {e}" for e in step["expectations"]))
-                        else:
-                            inferred = step_expected_lines(step)
-                            if inferred:
-                                st.caption(
-                                    "No explicit validation comment captured -- inferred from "
-                                    "this step's assertion code:"
-                                )
-                                st.code("\n".join(inferred), language="typescript")
-                            else:
-                                st.caption("No explicit validation comment captured for this step.")
-
-                        st.markdown("**Actual:**")
-                        actual_kind, actual_text = step_actual_text(step, matching_defect)
-                        getattr(st, actual_kind)(actual_text)
-
-                        if step["code_lines"]:
-                            st.markdown("Automation code for this step:")
-                            st.code("\n".join(step["code_lines"]), language="typescript")
-                if outcome == "fail" and not matching_defect:
-                    st.caption(
-                        "Test failed but no matching Defects Log entry was found to attribute "
-                        "the failure to a specific step -- see the raw script above."
-                    )
-                elif outcome == "fail" and all(s["result"] == "unknown" for s in step_records):
-                    st.caption(
-                        "Couldn't confidently match the recorded defect to a specific step -- "
-                        "see Expected vs. Actual below for the overall failure."
-                    )
-
-            assertion_lines = [
-                line.strip() for line in block.splitlines() if ASSERTION_LINE_RE.search(line)
-            ]
-            st.markdown("**Validations performed (assertions)**")
-            if assertion_lines:
-                st.code("\n".join(assertion_lines), language="typescript")
-            else:
-                st.caption("No explicit `expect(...)` assertions found in this test block.")
-
-            st.markdown("**Expected vs. Actual**")
-            if matching_defect:
-                st.error(
-                    f"**Expected:** {matching_defect['expected']}\n\n"
-                    f"**Actual:** {matching_defect['actual']}"
-                )
-            elif outcome == "pass":
-                st.success(
-                    "Every assertion above passed -- the application's actual behavior matched "
-                    "the expected value asserted at each `expect(...)` call in the script."
-                )
-            else:
-                st.caption("No further expected-vs-actual detail recorded for this result.")
-
-            if outcome == "fail":
-                run_url = meta.get("workflow_run_url")
-                if run_url:
-                    st.markdown(
-                        f"[View trace & video for this run]({run_url}) "
-                        "-- in the `playwright-report` artifact at the bottom of the run page "
-                        "(the screenshot above is embedded directly; trace/video are larger "
-                        "and stay in the CI artifact)."
-                    )
-                else:
-                    st.caption(
-                        "No linked Actions run recorded for this suite (generated before this "
-                        "feature was added) -- trace/video unavailable."
-                    )
-
+        render_test_case_detail(picked_id, row)
 # --- Defects Log tab -------------------------------------------------------------
 with tab_defects:
     st.subheader("Defects / Behavior Findings Log")
