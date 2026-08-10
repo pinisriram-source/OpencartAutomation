@@ -41,7 +41,17 @@ LOCATOR_METHOD_RE = re.compile(
 ASSERTION_LINE_RE = re.compile(r"expect\(")
 STEP_MARKER_RE = re.compile(r"^\s*//\s*(\d+)\.\s*(.+)$")
 EXPECT_MARKER_RE = re.compile(r"^\s*//\s*(?:expect|verify)\b\s*:?\s*(.+)$", re.IGNORECASE)
-TEST_CALL_RE = re.compile(r"\btest\(\s*(['\"])(.*?)\1(?:\s*,\s*\{\s*tag:\s*(['\"])(@\w+)\3\s*\})?")
+# Group 3 is the whole tag expression, matching both the single-tag form
+# ({ tag: '@smoke' }) and the array form ({ tag: ['@smoke', '@regression'] })
+# that every pipeline test now uses -- tests carry a tier tag AND @regression,
+# so a pattern expecting a quote straight after "tag:" silently captured
+# nothing and left every test case unlabelled.
+TEST_CALL_RE = re.compile(
+    r"\btest\(\s*(['\"])(.*?)\1"
+    r"(?:\s*,\s*\{\s*tag:\s*(\[[^\]]*\]|['\"]@[\w-]+['\"])\s*\})?"
+)
+TAG_RE = re.compile(r"@[\w-]+")
+TIER_TAGS = {"@smoke": "Smoke", "@sanity": "Sanity", "@functional": "Functional"}
 TC_ID_RE = re.compile(r"TC-[A-Z0-9]+-\d+")
 PLAN_TC_HEADING_RE = re.compile(r"^####\s+.*?\b(TC-[A-Z0-9]+-\d+)\b", re.MULTILINE)
 PLAN_STEP_RE = re.compile(r"^(\d+)\.\s+(.+)$")
@@ -561,7 +571,7 @@ def extract_test_cases_from_spec(spec_text: str) -> list[dict]:
     cases: list[dict] = []
     for m in TEST_CALL_RE.finditer(spec_text):
         title = m.group(2)
-        tag = m.group(4)
+        tags = TAG_RE.findall(m.group(3) or "")
         arrow_idx = spec_text.find("=>", m.end())
         if arrow_idx == -1:
             continue
@@ -583,11 +593,17 @@ def extract_test_cases_from_spec(spec_text: str) -> list[dict]:
         block = spec_text[m.start() : end].strip()
 
         tc_id_match = TC_ID_RE.search(title)
+        # A test carries at most one tier tag, plus @regression for membership
+        # of the cross-suite regression set -- the two are independent, so keep
+        # the full tag list rather than collapsing it to a single label.
+        tier = next((TIER_TAGS[t.lower()] for t in tags if t.lower() in TIER_TAGS), None)
         cases.append(
             {
                 "tc_id": tc_id_match.group(0) if tc_id_match else None,
                 "title": title,
-                "tier": tag.lstrip("@").capitalize() if tag else None,
+                "tier": tier,
+                "tags": tags,
+                "regression": any(t.lower() == "@regression" for t in tags),
                 "block": block,
             }
         )
@@ -668,42 +684,108 @@ def render_spec_files_inline(
     is browsing-only).
     """
     feedback_fields: list[tuple[str, str]] = []
+
+    # Flatten across files so tests can be grouped by category. idx stays the
+    # test's index within its OWN file, because the feedback widget key is
+    # derived from it for tests with no TC-ID -- renumbering globally would
+    # silently orphan any feedback already typed against the old key.
+    entries: list[tuple[str, int, dict]] = []
     for rel_path, spec_text in spec_files:
-        test_cases = extract_test_cases_from_spec(spec_text)
-        plural = "s" if len(test_cases) != 1 else ""
-        st.markdown(f"**`{rel_path}`** ({len(test_cases)} test case{plural})")
-        if not test_cases:
-            st.caption("No `test()` calls found in this file.")
-            continue
-        for idx, tc in enumerate(test_cases):
-            label = tc["title"]
-            if tc["tier"]:
-                label += f"  ·  {tc['tier']}"
-            with st.expander(label):
-                steps = None
-                if plan_steps and tc["tc_id"]:
-                    steps = plan_steps.get(tc["tc_id"])
-                if not steps:
-                    steps = parse_step_markers(tc["block"])
-                if steps:
-                    st.markdown("**Test Case Steps:**")
-                    step_lines = []
-                    for step in steps:
-                        step_lines.append(f"{step['number']}. {step['text']}")
-                        step_lines.extend(f"    - expect: {e}" for e in step["expectations"])
-                    st.markdown("\n".join(step_lines))
-                else:
-                    st.caption("No test-plan steps found for this test case.")
-                st.markdown("**Automation Script:**")
-                st.code(tc["block"], language="typescript")
-                if collect_feedback:
-                    fb_key = f"{feedback_key_prefix}__{tc['tc_id'] or f'{rel_path}:{idx}'}"
-                    st.text_area(
-                        "Feedback for this test case (leave blank if no changes needed)",
-                        key=fb_key,
-                        height=80,
-                    )
-                    feedback_fields.append((tc["tc_id"] or tc["title"], fb_key))
+        for idx, tc in enumerate(extract_test_cases_from_spec(spec_text)):
+            entries.append((rel_path, idx, tc))
+
+    if not entries:
+        st.caption("No `test()` calls found in this suite.")
+        return feedback_fields
+
+    def render_entry(rel_path: str, idx: int, tc: dict) -> None:
+        label = tc["title"]
+        badges = [b for b in (tc["tier"], "Regression" if tc["regression"] else None) if b]
+        if badges:
+            label += "  ·  " + " + ".join(badges)
+        with st.expander(label):
+            st.caption(f"Source: `{rel_path}`")
+            steps = None
+            if plan_steps and tc["tc_id"]:
+                steps = plan_steps.get(tc["tc_id"])
+            if not steps:
+                steps = parse_step_markers(tc["block"])
+            if steps:
+                st.markdown("**Test Case Steps:**")
+                step_lines = []
+                for step in steps:
+                    step_lines.append(f"{step['number']}. {step['text']}")
+                    step_lines.extend(f"    - expect: {e}" for e in step["expectations"])
+                st.markdown("\n".join(step_lines))
+            else:
+                st.caption("No test-plan steps found for this test case.")
+            st.markdown("**Automation Script:**")
+            st.code(tc["block"], language="typescript")
+            if collect_feedback:
+                fb_key = f"{feedback_key_prefix}__{tc['tc_id'] or f'{rel_path}:{idx}'}"
+                st.text_area(
+                    "Feedback for this test case (leave blank if no changes needed)",
+                    key=fb_key,
+                    height=80,
+                )
+                feedback_fields.append((tc["tc_id"] or tc["title"], fb_key))
+
+    # Tier is exactly one of Smoke/Sanity/Functional (or absent on suites that
+    # predate the convention), so these groups partition the suite -- every
+    # test renders exactly once, which also keeps the feedback widget keys
+    # unique.
+    groups: dict[str, list[tuple[str, int, dict]]] = {"Smoke": [], "Sanity": [], "Functional": [], "Untagged": []}
+    for entry in entries:
+        groups[entry[2]["tier"] or "Untagged"].append(entry)
+
+    regression_entries = [e for e in entries if e[2]["regression"]]
+
+    tab_names = [f"{name} ({len(items)})" for name, items in groups.items() if items]
+    ordered = [(name, items) for name, items in groups.items() if items]
+    # Regression is NOT a tier -- it's cross-suite membership that sits
+    # alongside a tier, so these tests are the same ones already listed under
+    # the tabs above. Listed read-only (no expanders) so nothing is rendered,
+    # or keyed, twice.
+    tab_names.append(f"Regression ({len(regression_entries)})")
+
+    tabs = st.tabs(tab_names)
+    for tab, (name, items) in zip(tabs, ordered):
+        with tab:
+            by_file: dict[str, list[tuple[str, int, dict]]] = {}
+            for entry in items:
+                by_file.setdefault(entry[0], []).append(entry)
+            for rel_path, file_entries in by_file.items():
+                plural = "s" if len(file_entries) != 1 else ""
+                st.markdown(f"**`{rel_path}`** ({len(file_entries)} {name.lower()} test case{plural})")
+                for entry in file_entries:
+                    render_entry(*entry)
+
+    with tabs[-1]:
+        if not regression_entries:
+            st.caption("No tests in this suite carry the `@regression` tag.")
+        else:
+            st.caption(
+                f"{len(regression_entries)} of {len(entries)} tests are in the cross-suite regression "
+                "set (`@regression`). Regression is not a tier -- it sits alongside one, so these are "
+                "the same tests shown under the tabs above, listed here as one set. Run them all with "
+                "`npx playwright test --project=chromium --grep @regression`."
+            )
+            rows = [
+                {
+                    "Test Case": tc["tc_id"] or "--",
+                    "Tier": tc["tier"] or "--",
+                    "Title": tc["title"],
+                    "File": rel_path,
+                }
+                for rel_path, _idx, tc in regression_entries
+            ]
+            st.dataframe(
+                pd.DataFrame(rows),
+                use_container_width=True,
+                hide_index=True,
+                height=min(38 * (len(rows) + 1) + 3, 420),
+            )
+
     return feedback_fields
 
 
