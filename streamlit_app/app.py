@@ -610,6 +610,36 @@ def extract_test_cases_from_spec(spec_text: str) -> list[dict]:
     return cases
 
 
+PLAN_TIER_RE = re.compile(r"^\*\*Tier:\*\*\s*(Smoke|Sanity|Functional)\b", re.MULTILINE | re.IGNORECASE)
+
+
+def parse_test_plan_scenarios(plan_text: str) -> list[dict]:
+    """Splits Section 18 into its individual test-case scenarios.
+
+    Returns each scenario's TC-ID, its `#### ...` heading line, its
+    `**Tier:**` value, and the full markdown of that scenario -- so the Test
+    Plan view can offer a per-tier view of the same document without
+    reordering the plan itself (Section 18 stays grouped by feature area,
+    which is what the automation generator consumes).
+    """
+    headings = list(PLAN_TC_HEADING_RE.finditer(plan_text))
+    scenarios: list[dict] = []
+    for i, m in enumerate(headings):
+        start = m.start()
+        end = headings[i + 1].start() if i + 1 < len(headings) else len(plan_text)
+        block = plan_text[start:end].rstrip()
+        tier_match = PLAN_TIER_RE.search(block)
+        scenarios.append(
+            {
+                "tc_id": m.group(1),
+                "heading": plan_text[m.start() : plan_text.find("\n", m.start())].lstrip("# ").strip(),
+                "tier": tier_match.group(1).capitalize() if tier_match else None,
+                "block": block,
+            }
+        )
+    return scenarios
+
+
 def parse_test_plan_steps(plan_text: str) -> dict[str, list[dict]]:
     """Maps each TC-ID in a test plan to its parsed `**Steps:**` block.
 
@@ -787,6 +817,91 @@ def render_spec_files_inline(
             )
 
     return feedback_fields
+
+
+def regression_ids_for_suite(slug: str) -> set[str] | None:
+    """TC-IDs carrying @regression in this slug's generated suite.
+
+    The plan has no notion of regression membership -- that lives on the
+    generated test as a tag alongside its tier -- so it has to be read back
+    out of the suite. Returns None when the suite isn't available to read,
+    which the caller distinguishes from "none of them are tagged".
+    """
+    suite_dir = REPO_ROOT / "tests" / slug
+    if not suite_dir.exists():
+        return None
+    ids: set[str] = set()
+    saw_a_test = False
+    for spec in suite_dir.rglob("*.spec.ts"):
+        try:
+            text = spec.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for tc in extract_test_cases_from_spec(text):
+            saw_a_test = True
+            if tc["regression"] and tc["tc_id"]:
+                ids.add(tc["tc_id"])
+    return ids if saw_a_test else None
+
+
+def render_plan_by_tier(plan_text: str, slug: str) -> None:
+    """Renders a test plan with per-tier views alongside the full document.
+
+    The plan document is left exactly as written -- Section 18 stays grouped
+    by feature area, which is the structure the automation generator reads.
+    These tabs are a view over it, so a reviewer can look at just the smoke
+    scenarios without the plan itself having to be reordered or regenerated.
+    """
+    scenarios = parse_test_plan_scenarios(plan_text)
+    if not scenarios:
+        st.markdown(plan_text)
+        return
+
+    groups: dict[str, list[dict]] = {"Smoke": [], "Sanity": [], "Functional": [], "Untiered": []}
+    for scenario in scenarios:
+        groups[scenario["tier"] or "Untiered"].append(scenario)
+
+    reg_ids = regression_ids_for_suite(slug)
+    reg_scenarios = [s for s in scenarios if reg_ids is not None and s["tc_id"] in reg_ids]
+
+    present = [(name, items) for name, items in groups.items() if items]
+    labels = ["📄 Full plan"] + [f"{name} ({len(items)})" for name, items in present]
+    labels.append(f"Regression ({len(reg_scenarios)})" if reg_ids is not None else "Regression (n/a)")
+
+    tabs = st.tabs(labels)
+
+    with tabs[0]:
+        st.markdown(plan_text)
+
+    def render_scenarios(items: list[dict]) -> None:
+        for scenario in items:
+            st.markdown(scenario["block"])
+            st.divider()
+
+    for tab, (name, items) in zip(tabs[1:], present):
+        with tab:
+            st.caption(
+                f"{len(items)} {name.lower()} scenario(s), in plan order. Section 18 of the "
+                "document itself stays grouped by feature area -- this is a view over it."
+            )
+            render_scenarios(items)
+
+    with tabs[-1]:
+        if reg_ids is None:
+            st.caption(
+                "Regression membership is carried by the `@regression` tag on the generated "
+                f"test, not by the plan, and `tests/{slug}/` isn't in this checkout -- so it "
+                "can't be determined here."
+            )
+        elif not reg_scenarios:
+            st.caption("No test case in this plan maps to an `@regression`-tagged test.")
+        else:
+            st.caption(
+                f"{len(reg_scenarios)} of {len(scenarios)} scenarios map to an `@regression`-tagged "
+                "test. Regression isn't a tier -- it sits alongside one, so these scenarios also "
+                "appear under the tier tabs above."
+            )
+            render_scenarios(reg_scenarios)
 
 
 def _results_fingerprint() -> tuple:
@@ -2494,7 +2609,7 @@ with tab_artifacts:
                 if plan_approved:
                     st.markdown(f"**Test Plan & Test Cases:** `{plan_path}`")
                     if plan_text is not None:
-                        st.markdown(plan_text)
+                        render_plan_by_tier(plan_text, slug)
                     else:
                         st.caption("Plan file not found in this checkout yet.")
                 else:
