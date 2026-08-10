@@ -1637,31 +1637,53 @@ with tab_matrix:
     styled = display.style.map(style_status, subset=display_browser_cols)
     if has_tier:
         styled = styled.map(style_tier, subset=["Tier"])
-    matrix_event = st.dataframe(
-        styled,
-        use_container_width=True,
-        height=560,
-        hide_index=True,
-        key="matrix_table",
-        on_select="rerun",
-        selection_mode="single-row",
-    )
-    st.caption(f"Showing {len(filtered)} of {len(tests)} test cases · click a row to open its detail below.")
+    st.dataframe(styled, use_container_width=True, height=360, hide_index=True)
+    st.caption(f"Showing {len(filtered)} of {len(tests)} test cases.")
 
-    # Selection returns positional indices into the rendered (filtered) frame,
-    # so index back through `filtered` rather than `tests` -- the two differ
-    # whenever a use-case/tier/search filter is active.
-    selected_rows = (matrix_event.selection.rows if matrix_event and matrix_event.selection else [])
-    if selected_rows:
-        picked_matrix_id = filtered.iloc[selected_rows[0]]["id"]
-        matched = tests[tests["id"] == picked_matrix_id]
-        if matched.empty:
-            st.warning(f"Couldn't find `{picked_matrix_id}` in this suite's results.")
-        else:
-            st.divider()
-            render_test_case_detail(picked_matrix_id, matched.iloc[0])
+    st.divider()
+    st.markdown("#### Open a test case")
+    st.caption(
+        "Click a test case to open its execution below: the end-of-test screenshot, the "
+        "automation script, and every step with its expected result, actual result, and the "
+        "script lines that ran it."
+    )
+
+    # A clickable list rather than row-selection on the table above: Streamlit's
+    # dataframe only selects from the checkbox column, so clicking the row
+    # itself did nothing. This also renders lazily -- only the chosen test's
+    # detail is built, where an expander per row would parse every spec file on
+    # every rerun (fine for 16 tests, not for an aggregator suite's 269).
+    def _tc_label(tc_id: str) -> str:
+        trow = filtered[filtered["id"] == tc_id].iloc[0]
+        bits = [tc_id]
+        if has_tier and str(trow.get("tier", "")).strip():
+            bits.append(str(trow["tier"]))
+        result = str(trow.get("chromium", "")).strip()
+        if result:
+            bits.append(result.upper())
+        return " · ".join(bits) + f" — {trow['title']}"
+
+    if filtered.empty:
+        st.info("No test cases match the current filters.")
     else:
-        st.info("Select a test case row above to see its execution steps, per-step status and screenshot here.")
+        with st.container(height=240, border=True):
+            opened_id = st.radio(
+                "Test cases",
+                options=list(filtered["id"]),
+                format_func=_tc_label,
+                index=None,
+                label_visibility="collapsed",
+            )
+
+        if opened_id is None:
+            st.info("Pick a test case above to see its step-by-step execution here.")
+        else:
+            matched = tests[tests["id"] == opened_id]
+            if matched.empty:
+                st.warning(f"Couldn't find `{opened_id}` in this suite's results.")
+            else:
+                st.divider()
+                render_test_case_detail(opened_id, matched.iloc[0])
 
 # --- Coverage by Use Case tab ---------------------------------------------------
 with tab_usecase:
