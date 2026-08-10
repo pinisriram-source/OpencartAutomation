@@ -1486,12 +1486,44 @@ with tab_details:
 
             st.markdown("**Test case steps coverage**")
             step_records = parse_step_markers(block)
+            steps_from_plan = False
+            if not step_records:
+                # Not every generation run emits `// N. ...` markers, so fall
+                # back to the approved test plan's own steps for this TC-ID --
+                # the same fallback the Approved Test Artifacts tab already
+                # does. Without it a suite generated without markers shows no
+                # steps at all, even though the plan defines them.
+                plan_file = REPO_ROOT / (
+                    meta.get("test_plan_path") or f"specs/{_detail_slug}-test-plan.md"
+                )
+                if plan_file.exists():
+                    try:
+                        plan_lookup = parse_test_plan_steps(plan_file.read_text(encoding="utf-8"))
+                    except OSError:
+                        plan_lookup = {}
+                    # Aggregator ids are "<source-suite>/<TC-ID>"; the plan keys
+                    # are bare TC-IDs.
+                    bare_id = picked_id.split("/", 1)[-1]
+                    planned = plan_lookup.get(bare_id)
+                    if planned:
+                        # Plan steps carry no code_lines -- supply an empty list
+                        # so the per-step renderer below can treat both sources
+                        # identically.
+                        step_records = [{**s, "code_lines": []} for s in planned]
+                        steps_from_plan = True
+
             if not step_records:
                 st.caption(
-                    "No numbered step markers (`// N. ...`) found in this script -- coverage "
-                    "view unavailable for this test, see the full script above instead."
+                    "No numbered step markers (`// N. ...`) found in this script, and no steps "
+                    "for this test case in the test plan -- see the full script above instead."
                 )
             else:
+                if steps_from_plan:
+                    st.caption(
+                        "This script carries no `// N. ...` step markers, so the steps below come "
+                        "from the approved test plan. Per-step automation code isn't available -- "
+                        "see the full script above."
+                    )
                 annotate_step_results(step_records, outcome, matching_defect)
                 for step in step_records:
                     with st.container(border=True):
