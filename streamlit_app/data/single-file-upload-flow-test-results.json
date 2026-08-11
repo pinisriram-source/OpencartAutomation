@@ -1,19 +1,19 @@
 {
   "meta": {
-    "app_under_test": "The Internet - File Upload",
+    "app_under_test": "The Internet - File Uploader",
     "app_url": "https://the-internet.herokuapp.com/upload",
-    "report_date": "2026-08-10",
+    "report_date": "2026-08-11",
     "test_account": "",
     "browsers": [
       "Chromium (Desktop Chrome)"
     ],
     "run_command": "npx playwright test tests/single-file-upload-flow --project=chromium",
-    "duration_minutes": 0.4,
+    "duration_minutes": 0.2,
     "test_plan_path": "specs/single-file-upload-flow-test-plan.md",
     "suite_path": "tests/single-file-upload-flow/",
     "story": "",
-    "report_generated_at": "2026-08-10T16:59:22.451Z",
-    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/31411568219"
+    "report_generated_at": "2026-08-11T07:28:48.238Z",
+    "workflow_run_url": "https://github.com/pinisriram-source/OpencartAutomation/actions/runs/31468968280"
   },
   "summary": {
     "test_cases": 16,
@@ -31,53 +31,53 @@
       "name": "Initial Page State",
       "use_case": "UC1",
       "file": "initial-page-state.spec.ts",
-      "tests": 1
-    },
-    {
-      "name": "Happy Path Upload",
-      "use_case": "UC2",
-      "file": "happy-path-upload.spec.ts",
       "tests": 2
     },
     {
-      "name": "Multiple File Types",
-      "use_case": "UC3",
-      "file": "multiple-file-types.spec.ts",
-      "tests": 3
+      "name": "Successful Upload",
+      "use_case": "UC2",
+      "file": "successful-upload.spec.ts",
+      "tests": 2
     },
     {
-      "name": "Special Characters in Filename",
-      "use_case": "UC4",
-      "file": "special-characters-in-filename.spec.ts",
+      "name": "File Type Variants",
+      "use_case": "UC3",
+      "file": "file-type-variants.spec.ts",
       "tests": 4
     },
     {
-      "name": "Negative and Edge Cases",
-      "use_case": "UC5",
-      "file": "negative-edge-cases.spec.ts",
-      "tests": 3
+      "name": "Special Characters in Filenames",
+      "use_case": "UC4",
+      "file": "special-characters-filenames.spec.ts",
+      "tests": 4
     },
     {
-      "name": "State Reset After Upload",
+      "name": "Negative / Edge Cases",
+      "use_case": "UC5",
+      "file": "negative-cases.spec.ts",
+      "tests": 2
+    },
+    {
+      "name": "State Reset",
       "use_case": "UC6",
-      "file": "state-reset-after-upload.spec.ts",
-      "tests": 3
+      "file": "state-reset.spec.ts",
+      "tests": 2
     }
   ],
   "use_cases": {
-    "UC1": "Initial Page State — page loads with file input, upload button, and no confirmation present",
-    "UC2": "Happy Path Upload — selecting a file and clicking Upload shows File Uploaded confirmation",
-    "UC3": "Multiple File Types — PNG, JSON, and PDF files upload successfully",
-    "UC4": "Special Characters in Filename — filenames with spaces, parentheses, hyphens, and underscores are preserved",
-    "UC5": "Negative and Edge Cases — submitting without a file, verifying input state, and clearing selection",
-    "UC6": "State Reset After Upload — navigating back or refreshing resets to initial empty state"
+    "UC1": "Initial Page State — page loads with File Uploader heading, empty file input, and no confirmation",
+    "UC2": "Successful Upload — selecting a file and clicking Upload shows confirmation with exact filename",
+    "UC3": "File Type Variants — uploads of PNG, JSON, PDF, and CSV files all succeed with filename preserved",
+    "UC4": "Special Characters in Filenames — filenames with spaces, parentheses, brackets, hyphens, and underscores are preserved",
+    "UC5": "Negative / Edge Cases — submitting with no file selected results in Internal Server Error",
+    "UC6": "State Reset — navigating back to upload page after successful upload returns to initial empty state"
   },
   "business_rules": {},
   "tests": [
     {
       "id": "TC-UPLOAD-001",
       "tier": "Smoke",
-      "title": "Verify initial page load state shows file input and no confirmation",
+      "title": "Verify initial page load state shows File Uploader heading, empty file input, and no confirmation",
       "use_case": "UC1",
       "business_rule": "",
       "chromium": "Pass",
@@ -86,7 +86,7 @@
     {
       "id": "TC-UPLOAD-002",
       "tier": "Smoke",
-      "title": "Upload a text file successfully shows File Uploaded confirmation",
+      "title": "Upload a simple text file and verify confirmation with exact filename",
       "use_case": "UC2",
       "business_rule": "",
       "chromium": "Pass",
@@ -94,17 +94,17 @@
     },
     {
       "id": "TC-UPLOAD-003",
-      "tier": "Functional",
-      "title": "Upload a markdown file successfully shows File Uploaded confirmation",
-      "use_case": "UC2",
+      "tier": "Sanity",
+      "title": "Upload a PNG image file and verify confirmation with exact filename",
+      "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
     },
     {
       "id": "TC-UPLOAD-004",
-      "tier": "Sanity",
-      "title": "Upload a PNG image file successfully",
+      "tier": "Functional",
+      "title": "Upload a JSON file and verify confirmation with exact filename",
       "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
@@ -113,7 +113,7 @@
     {
       "id": "TC-UPLOAD-005",
       "tier": "Functional",
-      "title": "Upload a JSON file successfully",
+      "title": "Upload a PDF file and verify confirmation with exact filename",
       "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
@@ -121,17 +121,17 @@
     },
     {
       "id": "TC-UPLOAD-006",
-      "tier": "Functional",
-      "title": "Upload a PDF file successfully",
-      "use_case": "UC3",
+      "tier": "Sanity",
+      "title": "Upload file with spaces in filename and verify exact filename preservation",
+      "use_case": "UC4",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
     },
     {
       "id": "TC-UPLOAD-007",
-      "tier": "Sanity",
-      "title": "Upload file with spaces in name preserves exact filename",
+      "tier": "Functional",
+      "title": "Upload file with parentheses in filename and verify exact filename preservation",
       "use_case": "UC4",
       "business_rule": "",
       "chromium": "Pass",
@@ -140,7 +140,7 @@
     {
       "id": "TC-UPLOAD-008",
       "tier": "Functional",
-      "title": "Upload file with parentheses in name preserves exact filename",
+      "title": "Upload file with multiple special characters in filename and verify exact filename preservation",
       "use_case": "UC4",
       "business_rule": "",
       "chromium": "Pass",
@@ -148,9 +148,9 @@
     },
     {
       "id": "TC-UPLOAD-009",
-      "tier": "Functional",
-      "title": "Upload file with spaces and parentheses preserves exact filename",
-      "use_case": "UC4",
+      "tier": "Sanity",
+      "title": "Clicking Upload with no file selected results in Internal Server Error",
+      "use_case": "UC5",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -158,8 +158,8 @@
     {
       "id": "TC-UPLOAD-010",
       "tier": "Functional",
-      "title": "Upload file with hyphens and underscores in name",
-      "use_case": "UC4",
+      "title": "Verify upload with no file selected does not show confirmation elements",
+      "use_case": "UC5",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -167,8 +167,8 @@
     {
       "id": "TC-UPLOAD-011",
       "tier": "Sanity",
-      "title": "Clicking Upload without selecting a file shows Internal Server Error",
-      "use_case": "UC5",
+      "title": "After successful upload, navigating back to upload page resets to initial empty state",
+      "use_case": "UC6",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -176,8 +176,8 @@
     {
       "id": "TC-UPLOAD-012",
       "tier": "Functional",
-      "title": "File input accepts file selection via browser dialog",
-      "use_case": "UC5",
+      "title": "Verify confirmation view URL remains the same after successful upload",
+      "use_case": "UC2",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -185,8 +185,8 @@
     {
       "id": "TC-UPLOAD-013",
       "tier": "Functional",
-      "title": "Selecting then clearing a file leaves input empty and submit fails",
-      "use_case": "UC5",
+      "title": "Upload file with hyphen and underscore in filename",
+      "use_case": "UC4",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -194,8 +194,8 @@
     {
       "id": "TC-UPLOAD-014",
       "tier": "Sanity",
-      "title": "After successful upload, navigating back to /upload resets to initial state",
-      "use_case": "UC6",
+      "title": "Verify file input accepts any file type (no extension restriction)",
+      "use_case": "UC3",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -203,8 +203,8 @@
     {
       "id": "TC-UPLOAD-015",
       "tier": "Functional",
-      "title": "Multiple uploads in sequence each show correct filename",
-      "use_case": "UC6",
+      "title": "Verify file input is not marked as required",
+      "use_case": "UC1",
       "business_rule": "",
       "chromium": "Pass",
       "note": ""
@@ -212,7 +212,7 @@
     {
       "id": "TC-UPLOAD-016",
       "tier": "Functional",
-      "title": "Refreshing the page after upload resets state",
+      "title": "Sequential uploads — upload one file, reset, upload a different file",
       "use_case": "UC6",
       "business_rule": "",
       "chromium": "Pass",
