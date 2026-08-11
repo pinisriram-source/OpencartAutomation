@@ -1,37 +1,38 @@
 # Single File Upload Flow Test Plan
 
 **Prepared By:** playwright-test-planner subagent (Claude Code, automated)
-**Date:** 2026-08-10
+**Date:** 2026-08-11
 
 ## 1. Introduction
 
 ### 1.1 Test Plan Objectives
 
-Validate the classic HTML file-input upload flow (select file → click Upload → confirm) on the File Upload feature (the-internet.herokuapp.com/upload) end-to-end via automated regression coverage, ensuring various file types and filenames (including special characters) upload correctly, the negative case of submitting without a file is handled, and page state resets properly between uploads.
+Validate the classic file-input upload flow (select file via input, click Upload, verify confirmation) on the File Uploader page (the-internet.herokuapp.com/upload) end-to-end via automated regression coverage, ensuring all acceptance criteria — initial state, successful uploads across file types, special-character filename preservation, negative cases, and state reset — are verified so regressions are caught early without manual re-testing.
 
 ## 2. Scope
 
 ### 2.1 In Scope
-- Initial page-load state verification (heading, empty file input, no confirmation present)
-- Happy-path upload via the classic file input (id="file-upload") + submit button (id="file-submit")
-- Upload confirmation view showing "File Uploaded!" heading and the exact uploaded filename
-- Multiple file types (.txt, .png, .json, .pdf) uploading successfully
-- Filenames containing spaces, parentheses, hyphens, and underscores displaying unmodified after upload
-- Negative case: submitting the form with no file selected
-- State reset: navigating back to the upload page after a successful upload returns to initial empty state
+- Initial page-load state verification (heading, empty file input, no confirmation)
+- Successful single-file upload via the classic file input + submit button flow
+- Filename display verification for various file extensions (.txt, .png, .json, .pdf, .csv)
+- Filename preservation for names containing spaces, parentheses, brackets, hyphens, and underscores
+- Negative case: submitting with no file selected
+- State reset: navigating back to the upload page after a successful upload returns to initial state
+- Sequential uploads (upload, reset, upload a different file)
+- Confirmation view URL verification
 
 ### 2.2 Out of Scope
-- The drag-and-drop upload widget present on the same page (explicitly excluded by the acceptance criteria)
-- Visual/pixel-level styling of the upload form or confirmation view
+- The drag-and-drop upload widget present on the same page (explicitly excluded by acceptance criteria)
 - Cross-browser matrix beyond Chromium (this repo's `playwright.config.ts` runs Chromium only)
-- Performance/load testing, security penetration testing
-- Server-side validation of uploaded file content (only the UI confirmation is verified)
-- File size limits or large-file upload behavior (not specified in acceptance criteria)
+- Performance/load testing of the upload endpoint
+- Security testing (e.g., malicious file upload, path traversal)
+- File size limits or large file upload behavior (not specified in acceptance criteria)
+- Visual/pixel-level styling of the page elements
 
 ## 3. Test Strategy
 
 ### 3.1 System Test
-Functional/system-level UI testing of the File Upload feature via Playwright, covering the full upload lifecycle (initial state → file selection → submission → confirmation → state reset) end-to-end in the browser, across multiple file types and filename patterns.
+Functional/system-level UI testing of the File Uploader feature via Playwright, covering the complete upload lifecycle (page load, file selection, submission, confirmation display, state reset) end-to-end in the browser.
 
 ### 3.2 Performance Test
 Not applicable — performance/load testing is out of scope for this suite (see Section 2.2).
@@ -86,13 +87,13 @@ A reviewer requesting changes on any stage (via "Request Changes" with free-text
 Failing tests are recorded with expected/actual behavior in `streamlit_app/data/single-file-upload-flow-test-results.json`'s `defects` array and rendered in the dashboard's Defects Log tab.
 
 ## 7. Functions to be Tested
-- Initial page-load state (File Uploader heading, empty file input, Upload button, no confirmation present)
-- Classic file input selection and form submission via the Upload button
-- Upload confirmation view (File Uploaded! heading, exact filename display)
-- Multiple file type uploads (.txt, .png, .json, .pdf)
-- Filename preservation for names with spaces, parentheses, hyphens, and underscores
-- Negative case: form submission without a file selected
-- Page state reset after successful upload (fresh navigation returns to initial state)
+- Initial page-load state (heading, file input, submit button presence; absence of confirmation elements)
+- Single-file upload via classic file input + submit button (multiple file types)
+- Confirmation view display (heading, filename)
+- Filename preservation for names with spaces, special characters, hyphens, and underscores
+- Negative behavior when submitting with no file selected
+- State reset on re-navigation to the upload page after a successful upload
+- Sequential upload behavior (second upload replaces first)
 
 ## 8. Resources and Responsibilities
 
@@ -131,7 +132,7 @@ Node.js, Playwright, `@playwright/test`, the Claude Code CLI, this repo's `.gith
 None beyond the GitHub Actions `ubuntu-latest` runner — no dedicated hardware.
 
 ### 12.4 Test Data & Database
-No persistent test data or database — the-internet.herokuapp.com/upload is a stateless demo page; uploaded files do not persist across page loads. Test files (.txt, .png, .json, .pdf) are created programmatically by the test fixtures or stored as small fixtures under `tests/data/`.
+No persistent test data or database — tests create temporary files in memory (via Playwright's `setInputFiles` API with buffer payloads) for upload; no pre-existing files on disk or database state are required. The target application (the-internet.herokuapp.com/upload) does not persist uploads across page loads.
 
 ## 13. Risks
 
@@ -161,7 +162,12 @@ Recorded per-stage in `user-stories/single-file-upload-flow-review.json` (`plan.
 
 ## 17. Application Overview
 
-The Single File Upload Flow feature provides a classic HTML file input mechanism for users to select and upload a single file from their local machine. The page displays a "File Uploader" heading, a standard file input element (id="file-upload"), and an "Upload" submit button (id="file-submit"). When a user successfully selects a file and clicks Upload, the page reloads to a confirmation view at the same URL, displaying a "File Uploaded!" heading and the exact filename of the uploaded file. The page also contains a drag-and-drop upload widget, which is explicitly out of scope for this test suite — only the classic file input + submit button flow is tested here. The feature should handle various file types and filenames including those with special characters, while properly handling the edge case of submitting without a file selected (which results in an Internal Server Error page rather than a validation message).
+This feature lets a user select a single file from their local machine and upload it via a classic HTML file input and submit button. The page displays a "File Uploader" heading (h3), a file input element (id="file-upload", name="file", no `accept` attribute, not `required`), and an "Upload" submit button (id="file-submit"). On successful upload, the page reloads showing a "File Uploaded!" confirmation heading and the uploaded file's name. There is also a drag-and-drop upload widget on the page, but it is explicitly out of scope for this test plan — only the classic file input + submit button flow is tested here.
+
+Key observed behaviors:
+- Clicking Upload with no file selected results in an "Internal Server Error" response (not a friendly validation message).
+- After a successful upload, navigating back to the upload page resets to the initial empty state.
+- The confirmation view URL remains the same (`/upload`) — no redirect to a different path.
 
 ## 18. Detailed Test Scenarios
 
@@ -169,293 +175,283 @@ The Single File Upload Flow feature provides a classic HTML file input mechanism
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 1.1. TC-UPLOAD-001: Verify initial page load state shows file input and no confirmation
+#### 1.1. TC-UPLOAD-001: Verify initial page load state shows File Uploader heading, empty file input, and no confirmation
 
 **File:** `tests/single-file-upload-flow/initial-page-state.spec.ts`
 
 **Tier:** Smoke
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page (https://the-internet.herokuapp.com/upload)
     - expect: Page loads successfully
     - expect: URL is https://the-internet.herokuapp.com/upload
-    - expect: Page title is 'The Internet'
-2. Verify the initial page content
-    - expect: Heading 'File Uploader' (h3) is visible
-    - expect: File input element (id='file-upload') is present and empty
-    - expect: Upload button (id='file-submit') is visible and enabled
-    - expect: Instructional text 'Choose a file on your system and then click upload.' is present
-    - expect: No 'File Uploaded!' heading is present
+2. Inspect the page content
+    - expect: "File Uploader" heading is visible
+    - expect: File input (id="file-upload") is visible and empty (no file selected)
+    - expect: "Upload" submit button (id="file-submit") is visible
+    - expect: No "File Uploaded!" confirmation heading is present
     - expect: No uploaded filename is displayed anywhere on the page
 
-### 2. Happy Path Upload
+#### 1.2. TC-UPLOAD-015: Verify file input is not marked as required
+
+**File:** `tests/single-file-upload-flow/initial-page-state.spec.ts`
+
+**Tier:** Functional
+
+**Steps:**
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Inspect the file input element's attributes
+    - expect: File input (id="file-upload") is NOT marked with the HTML "required" attribute
+    - expect: File input does not have browser-level validation enforcing file selection
+
+### 2. Successful Upload
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 2.1. TC-UPLOAD-002: Upload a text file successfully shows File Uploaded confirmation
+#### 2.1. TC-UPLOAD-002: Upload a simple text file and verify confirmation with exact filename
 
-**File:** `tests/single-file-upload-flow/happy-path-upload.spec.ts`
+**File:** `tests/single-file-upload-flow/successful-upload.spec.ts`
 
 **Tier:** Smoke
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page
     - expect: Page loads successfully
-    - expect: Initial state is correct (File Uploader heading visible)
-2. Select a text file (e.g., 'test-file.txt') using the file input
-    - expect: File is selected in the input
-    - expect: File input shows the selected file
-3. Click the Upload button
-    - expect: Page reloads/navigates
-    - expect: URL remains https://the-internet.herokuapp.com/upload
-    - expect: Heading changes to 'File Uploaded!' (h3)
-    - expect: The exact filename 'test-file.txt' is displayed on the confirmation view
-    - expect: The original file input and instructional text are no longer present
+2. Select a simple text file (e.g., "test.txt") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view (same URL)
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "test.txt" is displayed exactly as provided
 
-#### 2.2. TC-UPLOAD-003: Upload a markdown file successfully shows File Uploaded confirmation
+#### 2.2. TC-UPLOAD-012: Verify confirmation view URL remains the same after successful upload
 
-**File:** `tests/single-file-upload-flow/happy-path-upload.spec.ts`
+**File:** `tests/single-file-upload-flow/successful-upload.spec.ts`
 
 **Tier:** Functional
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-2. Select a markdown file (e.g., 'CLAUDE.md') using the file input
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The exact filename 'CLAUDE.md' is displayed
+1. Navigate to the File Uploader page
+    - expect: URL is https://the-internet.herokuapp.com/upload
+2. Select a file (e.g., "test.txt") and click Upload
+    - expect: Page navigates to confirmation view
+    - expect: URL is still https://the-internet.herokuapp.com/upload (same URL as initial page)
+    - expect: "File Uploaded!" heading is visible
 
-### 3. Multiple File Types
+### 3. File Type Variants
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 3.1. TC-UPLOAD-004: Upload a PNG image file successfully
+#### 3.1. TC-UPLOAD-003: Upload a PNG image file and verify confirmation with exact filename
 
-**File:** `tests/single-file-upload-flow/multiple-file-types.spec.ts`
+**File:** `tests/single-file-upload-flow/file-type-variants.spec.ts`
 
 **Tier:** Sanity
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page
     - expect: Page loads successfully
-2. Select a PNG file (e.g., 'test-image.png') using the file input
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The exact filename 'test-image.png' is displayed
+2. Select a PNG image file (e.g., "image.png") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "image.png" is displayed exactly as provided
 
-#### 3.2. TC-UPLOAD-005: Upload a JSON file successfully
+#### 3.2. TC-UPLOAD-004: Upload a JSON file and verify confirmation with exact filename
 
-**File:** `tests/single-file-upload-flow/multiple-file-types.spec.ts`
+**File:** `tests/single-file-upload-flow/file-type-variants.spec.ts`
 
 **Tier:** Functional
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page
     - expect: Page loads successfully
-2. Select a JSON file (e.g., 'package.json') using the file input
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The exact filename 'package.json' is displayed
+2. Select a JSON file (e.g., "data.json") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "data.json" is displayed exactly as provided
 
-#### 3.3. TC-UPLOAD-006: Upload a PDF file successfully
+#### 3.3. TC-UPLOAD-005: Upload a PDF file and verify confirmation with exact filename
 
-**File:** `tests/single-file-upload-flow/multiple-file-types.spec.ts`
+**File:** `tests/single-file-upload-flow/file-type-variants.spec.ts`
 
 **Tier:** Functional
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page
     - expect: Page loads successfully
-2. Select a PDF file (e.g., 'document.pdf') using the file input
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The exact filename 'document.pdf' is displayed
+2. Select a PDF file (e.g., "document.pdf") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "document.pdf" is displayed exactly as provided
 
-### 4. Special Characters in Filename
+#### 3.4. TC-UPLOAD-014: Verify file input accepts any file type (no extension restriction)
 
-**Seed:** `tests/seed.spec.ts`
-
-#### 4.1. TC-UPLOAD-007: Upload file with spaces in name preserves exact filename
-
-**File:** `tests/single-file-upload-flow/special-characters-in-filename.spec.ts`
+**File:** `tests/single-file-upload-flow/file-type-variants.spec.ts`
 
 **Tier:** Sanity
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page
     - expect: Page loads successfully
-2. Select a file named 'my file.txt' (contains spaces)
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The displayed filename is exactly 'my file.txt' with spaces preserved
-    - expect: Spaces are not replaced with underscores or URL-encoded
-
-#### 4.2. TC-UPLOAD-008: Upload file with parentheses in name preserves exact filename
-
-**File:** `tests/single-file-upload-flow/special-characters-in-filename.spec.ts`
-
-**Tier:** Functional
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-2. Select a file named 'file (1).txt' (contains parentheses)
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The displayed filename is exactly 'file (1).txt' with parentheses preserved
-    - expect: Parentheses are not escaped or removed
-
-#### 4.3. TC-UPLOAD-009: Upload file with spaces and parentheses preserves exact filename
-
-**File:** `tests/single-file-upload-flow/special-characters-in-filename.spec.ts`
-
-**Tier:** Functional
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-2. Select a file named 'my file (1).txt' (contains both spaces and parentheses)
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The displayed filename is exactly 'my file (1).txt' completely unmodified
-    - expect: All special characters (spaces and parentheses) are preserved exactly as provided
-
-#### 4.4. TC-UPLOAD-010: Upload file with hyphens and underscores in name
-
-**File:** `tests/single-file-upload-flow/special-characters-in-filename.spec.ts`
-
-**Tier:** Functional
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-2. Select a file named 'test_file-name.txt' (contains underscore and hyphen)
-    - expect: File is selected in the input
-3. Click the Upload button
-    - expect: Page reloads to confirmation view
-    - expect: Heading is 'File Uploaded!'
-    - expect: The displayed filename is exactly 'test_file-name.txt' with underscore and hyphen preserved
-
-### 5. Negative and Edge Cases
-
-**Seed:** `tests/seed.spec.ts`
-
-#### 5.1. TC-UPLOAD-011: Clicking Upload without selecting a file shows Internal Server Error
-
-**File:** `tests/single-file-upload-flow/negative-edge-cases.spec.ts`
-
-**Tier:** Sanity
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-    - expect: File input is empty (no file selected)
-2. Click the Upload button without selecting any file
-    - expect: Page navigates/reloads
-    - expect: An 'Internal Server Error' heading (h1) is displayed
-    - expect: The upload does NOT complete successfully (no 'File Uploaded!' message)
-    - expect: URL remains https://the-internet.herokuapp.com/upload
-
-#### 5.2. TC-UPLOAD-012: File input accepts file selection via browser dialog
-
-**File:** `tests/single-file-upload-flow/negative-edge-cases.spec.ts`
-
-**Tier:** Functional
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-2. Select a file using the file input via Playwright's setInputFiles API
-    - expect: File input element now shows the selected filename
-    - expect: The file is queued for upload (verifiable via input.files.length > 0)
-3. Verify the file input reflects the selection before submission
-    - expect: Upload button remains enabled and ready to submit
-
-#### 5.3. TC-UPLOAD-013: Selecting then clearing a file leaves input empty and submit fails
-
-**File:** `tests/single-file-upload-flow/negative-edge-cases.spec.ts`
-
-**Tier:** Functional
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully
-    - expect: File input is empty
-2. Select a file (e.g., 'test.txt')
-    - expect: File input shows 'test.txt' is selected
-3. Clear the file selection (setInputFiles with empty array)
-    - expect: File input is now empty
-    - expect: No file is selected (input.files.length === 0)
-4. Click the Upload button
-    - expect: Behaves as AC6 (no file selected case): 'Internal Server Error' is displayed
-
-### 6. State Reset After Upload
-
-**Seed:** `tests/seed.spec.ts`
-
-#### 6.1. TC-UPLOAD-014: After successful upload, navigating back to /upload resets to initial state
-
-**File:** `tests/single-file-upload-flow/state-reset-after-upload.spec.ts`
-
-**Tier:** Sanity
-
-**Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
-    - expect: Page loads successfully in initial state
-2. Select a file (e.g., 'reset-test.txt') and click Upload
+2. Inspect the file input element
+    - expect: File input (id="file-upload") has no "accept" attribute restriction
+    - expect: File input can accept any file type
+3. Select a file with an uncommon extension (e.g., "data.csv") and click Upload
     - expect: Upload succeeds
-    - expect: Confirmation view shows 'File Uploaded!' heading and 'reset-test.txt'
-3. Navigate back to https://the-internet.herokuapp.com/upload (fresh page load)
-    - expect: Page resets to initial empty state (AC1)
-    - expect: Heading is 'File Uploader' (not 'File Uploaded!')
-    - expect: File input is empty (no file pre-selected)
-    - expect: No filename is displayed from the previous upload
-    - expect: The previous upload does not persist
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "data.csv" is displayed with the .csv extension preserved
 
-#### 6.2. TC-UPLOAD-015: Multiple uploads in sequence each show correct filename
+### 4. Special Characters in Filenames
 
-**File:** `tests/single-file-upload-flow/state-reset-after-upload.spec.ts`
+**Seed:** `tests/seed.spec.ts`
 
-**Tier:** Functional
+#### 4.1. TC-UPLOAD-006: Upload file with spaces in filename and verify exact filename preservation
+
+**File:** `tests/single-file-upload-flow/special-characters-filenames.spec.ts`
+
+**Tier:** Sanity
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload
+1. Navigate to the File Uploader page
     - expect: Page loads successfully
-2. Upload 'first-file.txt'
-    - expect: Confirmation view shows 'File Uploaded!' and 'first-file.txt'
-3. Navigate back to https://the-internet.herokuapp.com/upload
-    - expect: Page resets to initial state
-4. Upload 'second-file.json'
-    - expect: Confirmation view shows 'File Uploaded!' and 'second-file.json'
-    - expect: The displayed filename is 'second-file.json' (not 'first-file.txt')
-    - expect: Each upload is independent
+2. Select a file with spaces in the name (e.g., "my test file.txt") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "my test file.txt" is displayed exactly as provided, with spaces preserved
 
-#### 6.3. TC-UPLOAD-016: Refreshing the page after upload resets state
+#### 4.2. TC-UPLOAD-007: Upload file with parentheses in filename and verify exact filename preservation
 
-**File:** `tests/single-file-upload-flow/state-reset-after-upload.spec.ts`
+**File:** `tests/single-file-upload-flow/special-characters-filenames.spec.ts`
 
 **Tier:** Functional
 
 **Steps:**
-1. Navigate to https://the-internet.herokuapp.com/upload and upload 'refresh-test.txt'
-    - expect: Confirmation view is displayed with 'File Uploaded!' and 'refresh-test.txt'
-2. Refresh the page (page.reload())
-    - expect: Page reloads to the initial empty upload form state
-    - expect: Heading is 'File Uploader'
-    - expect: File input is empty
-    - expect: No confirmation or filename from the previous upload is shown
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Select a file with parentheses in the name (e.g., "file(1).txt") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "file(1).txt" is displayed exactly as provided, with parentheses preserved
+
+#### 4.3. TC-UPLOAD-008: Upload file with multiple special characters in filename and verify exact filename preservation
+
+**File:** `tests/single-file-upload-flow/special-characters-filenames.spec.ts`
+
+**Tier:** Functional
+
+**Steps:**
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Select a file with multiple special characters in the name (e.g., "my_file (copy) [2].txt") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "my_file (copy) [2].txt" is displayed exactly as provided, with all special characters preserved
+
+#### 4.4. TC-UPLOAD-013: Upload file with hyphen and underscore in filename
+
+**File:** `tests/single-file-upload-flow/special-characters-filenames.spec.ts`
+
+**Tier:** Functional
+
+**Steps:**
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Select a file with hyphens and underscores (e.g., "test-file_01.txt") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "test-file_01.txt" is displayed exactly as provided
+
+### 5. Negative / Edge Cases
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 5.1. TC-UPLOAD-009: Clicking Upload with no file selected results in Internal Server Error
+
+**File:** `tests/single-file-upload-flow/negative-cases.spec.ts`
+
+**Tier:** Sanity
+
+**Steps:**
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Do NOT select any file in the file input
+    - expect: File input remains empty (no file selected)
+3. Click the "Upload" submit button
+    - expect: Page navigates/responds with an error
+    - expect: "Internal Server Error" heading is visible (actual observed behavior)
+    - expect: Upload does NOT successfully complete
+
+#### 5.2. TC-UPLOAD-010: Verify upload with no file selected does not show confirmation elements
+
+**File:** `tests/single-file-upload-flow/negative-cases.spec.ts`
+
+**Tier:** Functional
+
+**Steps:**
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Do NOT select any file in the file input
+    - expect: File input remains empty
+3. Click the "Upload" submit button
+    - expect: Page responds with an error (Internal Server Error)
+    - expect: No "File Uploaded!" confirmation appears
+    - expect: No uploaded filename is displayed
+
+### 6. State Reset
+
+**Seed:** `tests/seed.spec.ts`
+
+#### 6.1. TC-UPLOAD-011: After successful upload, navigating back to upload page resets to initial empty state
+
+**File:** `tests/single-file-upload-flow/state-reset.spec.ts`
+
+**Tier:** Sanity
+
+**Steps:**
+1. Navigate to the File Uploader page
+    - expect: Page loads successfully
+2. Select a file (e.g., "test.txt") in the file input
+    - expect: File is selected successfully
+3. Click the "Upload" submit button
+    - expect: Page navigates to the confirmation view
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "test.txt" is displayed
+4. Navigate back to the File Uploader page (https://the-internet.herokuapp.com/upload)
+    - expect: Page loads successfully
+    - expect: "File Uploader" heading is visible
+    - expect: File input is empty (no file selected)
+    - expect: No "File Uploaded!" confirmation heading is present
+    - expect: No uploaded filename is displayed (state has been reset)
+    - expect: Page is in its initial empty state, identical to first load
+
+#### 6.2. TC-UPLOAD-016: Sequential uploads — upload one file, reset, upload a different file
+
+**File:** `tests/single-file-upload-flow/state-reset.spec.ts`
+
+**Tier:** Functional
+
+**Steps:**
+1. Navigate to the File Uploader page and upload "first.txt"
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "first.txt" is displayed
+2. Navigate back to the upload page
+    - expect: Page resets to initial empty state
+3. Select a different file (e.g., "second.txt") and click Upload
+    - expect: "File Uploaded!" heading is visible
+    - expect: Uploaded filename "second.txt" is displayed (not "first.txt")
+    - expect: Previous upload filename is not shown anywhere
