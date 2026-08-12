@@ -1,5 +1,5 @@
 """
-QA Test Execution Report — Streamlit dashboard.
+QA AI Automation Tool — Streamlit dashboard.
 
 Reads structured test-results data from data/*-test-results.json (one file
 per suite: the original SauceDemo suite, plus one per full-pipeline run) and
@@ -342,7 +342,7 @@ def analyze_acceptance_criteria(text: str) -> list[str]:
 
 
 st.set_page_config(
-    page_title="QA Test Execution Report",
+    page_title="QA AI Automation Tool",
     page_icon="✅",
     layout="wide",
 )
@@ -389,7 +389,7 @@ def require_authentication() -> None:
     if st.session_state.get("authenticated"):
         return
 
-    st.title("QA Test Execution Report")
+    st.title("QA AI Automation Tool")
     tab_signin, tab_signup = st.tabs(["Sign in", "Sign up"])
 
     with tab_signin:
