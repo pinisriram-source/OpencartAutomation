@@ -2,7 +2,7 @@
 
 **Submitted via:** Streamlit dashboard
 **Submitted date (UTC):** 2026-08-25 09:49:46
-**Status:** In progress -- automation generated, executing tests (Chromium)
+**Status:** Completed --   7 failed   13 passed (2.8m) . See Actions run and playwright-report artifact for details.
 
 ## Application URL
 https://the-internet.herokuapp.com/upload
