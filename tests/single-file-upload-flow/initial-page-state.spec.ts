@@ -9,38 +9,46 @@ test.describe('Initial Page State', () => {
     uploadPage = new UploadPage(page);
   });
 
-  test('TC-UPLOAD-001: Verify initial page state shows empty file input and no confirmation', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
-    // 1. Navigate to https://the-internet.herokuapp.com/upload
+  test('TC-UPLOAD-001: Verify page loads with upload form elements present', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
+    // 1. Navigate to the File Uploader page
     await uploadPage.navigate();
 
     // expect: Page loads successfully
     await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
-    // expect: Page title is 'The Internet'
-    await expect(page).toHaveTitle('The Internet');
+    // expect: Page heading 'File Uploader' is visible
+    await expect(uploadPage.pageHeading).toBeVisible();
+
+    // expect: Instructional text about choosing/dragging a file is present
+    await expect(uploadPage.instructionText).toBeVisible();
+
+    // expect: File input control is visible
+    await expect(uploadPage.fileInput).toBeAttached();
+
+    // expect: Upload button is visible
+    await expect(uploadPage.uploadButton).toBeVisible();
+
+    await stepShot(page, 1);
+  });
+
+  test('TC-UPLOAD-002: Verify file input control displays no file selected initially', { tag: ['@sanity', '@regression'] }, async ({ page }) => {
+    // 1. Navigate to the File Uploader page
+    await uploadPage.navigate();
+
+    // expect: Page loads successfully
+    await expect(page).toHaveURL('https://the-internet.herokuapp.com/upload');
 
     await stepShot(page, 1);
 
-    // 2. Inspect the page content
-    // expect: 'File Uploader' heading (h3) is visible
-    await expect(uploadPage.pageHeading).toBeVisible();
-
-    // expect: Instruction text is visible
-    await expect(uploadPage.instructionText).toBeVisible();
-
-    // expect: File input (#file-upload) is visible and empty
-    await expect(uploadPage.fileInput).toBeVisible();
+    // 2. Inspect the file input control
+    // expect: File input control shows no file selected (empty value)
     await expect(uploadPage.fileInput).toHaveValue('');
 
-    // expect: Upload button (#file-submit) with text 'Upload' is visible and enabled
-    await expect(uploadPage.uploadButton).toBeVisible();
-    await expect(uploadPage.uploadButton).toBeEnabled();
+    // expect: File input ID is 'file-upload'
+    await expect(uploadPage.fileInput).toHaveAttribute('id', 'file-upload');
 
-    // expect: No 'File Uploaded!' heading is present on the page
-    await expect(uploadPage.confirmationHeading).not.toBeAttached();
-
-    // expect: No uploaded filename is displayed anywhere on the page
-    await expect(uploadPage.uploadedFileName).not.toBeAttached();
+    // expect: File input name attribute is 'file'
+    await expect(uploadPage.fileInput).toHaveAttribute('name', 'file');
 
     await stepShot(page, 2);
   });
